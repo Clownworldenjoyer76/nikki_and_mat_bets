@@ -23,7 +23,7 @@ function fmtDate(iso){
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
-  }).replace(", ", ", ").replace(" AM", " AM").replace(" PM", " PM");
+  });
 }
 function nflWeekLabel(csvWeek){
   const base = 36; // CSV week that corresponds to NFL Week 1
@@ -56,6 +56,7 @@ function card(h, r, picks){
   const when = fmtDate(r[h.indexOf("commence_time_utc")]);
   const home = r[h.indexOf("home_team")];
   const away = r[h.indexOf("away_team")];
+
   const spreadHome  = r[h.indexOf("spread_home")] || "";
   const total       = r[h.indexOf("total")] || "";
   const spreadAway  = spreadHome === "" ? "" : fmtSigned(-Number(spreadHome));
@@ -66,28 +67,42 @@ function card(h, r, picks){
 
   const el = document.createElement("article");
   el.className = "card";
-  el.innerHTML = `
-    <div class="game-info">
-      <div>
-        <div class="match"><b>${away} @ ${home}</b></div>
-        <div class="when">${when}</div>
-        <div class="line" style="margin-top:8px;">
-          <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
-          <span class="pill">Total: <b>${totalDisp}</b></span>
-        </div>
-      </div>
+
+  // SECTION 1: Game info
+  const sec1 = document.createElement("div");
+  sec1.className = "section game-info";
+  sec1.innerHTML = `
+    <div class="match"><b>${away} @ ${home}</b></div>
+    <div class="when">${when}</div>
+    <div class="line" style="margin-top:8px;">
+      <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
+      <span class="pill">Total: <b>${totalDisp}</b></span>
     </div>
+  `;
 
-    <hr class="divider">
-
+  // SECTION 2: Mat
+  const sec2 = document.createElement("div");
+  sec2.className = "section";
+  sec2.innerHTML = `
     <div class="lane">
       <div class="name mat">Mat</div>
       <div class="btnrow" data-user="mat"></div>
+    </div>
+  `;
 
-      <div class="name nikki">Nikki</div>
+  // SECTION 3: Nikki
+  const sec3 = document.createElement("div");
+  sec3.className = "section";
+  sec3.innerHTML = `
+    <div class="lane">
+      <div class="name nikk i">Nikki</div>
       <div class="btnrow" data-user="nikki"></div>
     </div>
   `;
+
+  el.appendChild(sec1);
+  el.appendChild(sec2);
+  el.appendChild(sec3);
 
   // Options with values embedded in labels; we use data-* for logic
   const opts = [
@@ -96,11 +111,6 @@ function card(h, r, picks){
     {label:`Over ${totalDisp}`,      type:"total",  side:"over"},
     {label:`Under ${totalDisp}`,     type:"total",  side:"under"},
   ];
-
-  // Insert an extra divider between Mat and Nikki
-  const lane = el.querySelector(".lane");
-  const matRow = el.querySelector('.btnrow[data-user="mat"]');
-  const nikRow = el.querySelector('.btnrow[data-user="nikki"]');
 
   ["mat","nikki"].forEach(user=>{
     const row = el.querySelector(`.btnrow[data-user="${user}"]`);
@@ -140,11 +150,6 @@ function card(h, r, picks){
       row.appendChild(b);
     });
   });
-
-  // Add divider between Mat and Nikki sections
-  const div = document.createElement("hr");
-  div.className = "divider";
-  lane.insertBefore(div, nikRow.parentElement ? nikRow : nikRow); // safe insert before Nikki grid
 
   return el;
 }
@@ -208,7 +213,7 @@ async function load(){
   }
 }
 
-document.getElementById("openIssue").onclick = openIssue;
+document.getElementById("openIssue").onclick = openIssue; // button text now "Submit Picks" in HTML
 document.getElementById("clear").onclick = clearPicks;
 
 load();
