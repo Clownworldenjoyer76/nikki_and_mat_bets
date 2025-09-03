@@ -20,7 +20,7 @@ function key(row, h){
 function renderTable(h, rows){
   const el = document.getElementById("table"); el.innerHTML = "";
   if (!rows.length){
-    el.textContent = "No games found in latest.csv"; return;
+    el.textContent = "No consensus lines found in the CSV"; return;
   }
   const t = document.createElement("table");
   t.innerHTML = `<thead><tr><th>When (UTC)</th><th>Matchup</th><th>Home Spread</th><th>Total</th><th>Your Pick</th></tr></thead>`;
@@ -47,9 +47,10 @@ function renderTable(h, rows){
   t.appendChild(b); el.appendChild(t);
 }
 
-async function loadLatest(){
+async function loadFixed(){
   try{
-    const raw = "data/weekly/latest.csv"; // served from /docs
+    // hard-point directly to your existing file
+    const raw = "../data/weekly/2025_wk36_odds.csv";
     const { hdr, rows } = parseCSV(await fetchCSV(raw));
     const cons = consensusOnly(rows, hdr);
     renderTable(hdr, cons);
@@ -61,10 +62,10 @@ async function loadLatest(){
       window._week = String(week).padStart(2,"0");
     }
   }catch(e){
-    document.getElementById("table").textContent = "No latest.csv yet. Run the odds workflow once.";
+    document.getElementById("table").textContent = "CSV not found at ../data/weekly/2025_wk36_odds.csv";
   }
 }
-loadLatest();
+loadFixed();
 
 document.getElementById("openIssue").onclick = ()=>{
   const season = window._season || new Date().getFullYear();
