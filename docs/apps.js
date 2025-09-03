@@ -30,18 +30,25 @@ function renderTable(h,rows){
   t.appendChild(b); el.appendChild(t);
 }
 
-async function loadWeek(){
-  const season=document.getElementById("season").value;
-  const week=String(document.getElementById("week").value).padStart(2,"0");
-  const path=`../data/weekly/${season}_wk${week}_odds.csv`;
-  const {hdr,rows}=parseCSV(await fetchCSV(path));
+async function loadLatest(){
+  // Fetch directory listing from GitHub raw content
+  const api=`https://api.github.com/repos/YOUR_USER/YOUR_REPO/contents/data/weekly`;
+  const res=await fetch(api,{cache:"no-store"}); const files=await res.json();
+  const csvs=files.filter(f=>f.name.endsWith(".csv")).map(f=>f.name).sort();
+  if(!csvs.length){ document.getElementById("table").textContent="No odds CSVs found"; return; }
+  const latest=csvs[csvs.length-1];
+  const raw=`https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/main/data/weekly/${latest}`;
+  const {hdr,rows}=parseCSV(await fetchCSV(raw));
   renderTable(hdr, consensusOnly(rows,hdr));
+
+  // Patch Open Issue button with season/week
+  const [season, wk] = latest.split("_wk");
+  window._season=season; window._week=wk.slice(0,2);
 }
-document.getElementById("load").onclick=loadWeek;
+loadLatest();
 
 document.getElementById("openIssue").onclick=()=>{
-  const season=document.getElementById("season").value;
-  const week=String(document.getElementById("week").value).padStart(2,"0");
+  const season=window._season, week=window._week;
   const picks=localStorage.getItem("picks")||"{}";
   const title=encodeURIComponent(`PICKS ${season} WK${week} (Mathew vs Wife)`);
   const body=encodeURIComponent(`Paste (do not edit) between the fences:\n\n\`\`\`json\n${picks}\n\`\`\`\n`);
