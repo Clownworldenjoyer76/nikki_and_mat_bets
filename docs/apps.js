@@ -2,6 +2,11 @@
 const CSV_URL = "data/weekly/latest.csv"; // served from /docs
 
 // ---------- UTILS ----------
+function normalizeTeamName(name){
+  if(name === "Washington Commanders") return "Washington Redskins";
+  return name;
+}
+
 async function fetchCSV(url){
   const r = await fetch(url, { cache: "no-store" });
   if(!r.ok) throw new Error("CSV not found: " + url);
@@ -26,8 +31,8 @@ function fmtDate(iso){
   });
 }
 function nflWeekLabel(csvWeek){
-  const base = 36; // CSV week that corresponds to NFL Week 1
-  const w = ((parseInt(csvWeek,10) - base) % 18 + 18) % 18 + 1; // 1..18
+  const base = 36;
+  const w = ((parseInt(csvWeek,10) - base) % 18 + 18) % 18 + 1;
   return w;
 }
 function fmtSigned(n){
@@ -37,7 +42,7 @@ function fmtSigned(n){
   return (v>0?`+${v}`:`${v}`);
 }
 
-// Nickname-only PNG logos in docs/assets/logos/ (e.g., eagles.png, cowboys.png)
+// Nickname-only PNG logos in docs/assets/logos/
 function logoPath(team){
   const cleaned = team.replace(/[^A-Za-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
   const parts = cleaned.split(" ");
@@ -62,8 +67,8 @@ function savePicks(all){
 // ---------- RENDER ----------
 function card(h, r, picks){
   const when = fmtDate(r[h.indexOf("commence_time_utc")]);
-  const home = r[h.indexOf("home_team")];
-  const away = r[h.indexOf("away_team")];
+  const home = normalizeTeamName(r[h.indexOf("home_team")]);
+  const away = normalizeTeamName(r[h.indexOf("away_team")]);
 
   const spreadHome  = r[h.indexOf("spread_home")] || "";
   const total       = r[h.indexOf("total")] || "";
@@ -76,7 +81,7 @@ function card(h, r, picks){
   const el = document.createElement("article");
   el.className = "card";
 
-  // SECTION 1: logos left/right, centered text block in the middle
+  // SECTION 1
   const sec1 = document.createElement("div");
   sec1.className = "section game-info";
   sec1.innerHTML = `
