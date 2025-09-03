@@ -49,7 +49,8 @@ function renderTable(h, rows){
 
 async function loadLatest(){
   try{
-    const raw = "data/weekly/latest.csv"; // file inside /docs
+    // Absolute path for a GitHub Pages project site: /<repo>/...
+    const raw = "/bet-duel/data/weekly/latest.csv";
     const { hdr, rows } = parseCSV(await fetchCSV(raw));
     const cons = consensusOnly(rows, hdr);
     renderTable(hdr, cons);
