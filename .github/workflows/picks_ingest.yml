@@ -13,7 +13,7 @@ jobs:
     if: ${{ github.event_name == 'issues' && startsWith(github.event.issue.title, 'PICKS ') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4   # REQUIRED
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
@@ -23,8 +23,7 @@ jobs:
         env:
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY:  ${{ github.event.issue.body }}
-        run: |
-          python scripts/ingest_issue.py
+        run: python scripts/ingest_issue.py
 
       - name: Commit picks file
         run: |
