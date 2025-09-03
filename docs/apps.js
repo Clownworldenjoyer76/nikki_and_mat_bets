@@ -49,8 +49,8 @@ function renderTable(h, rows){
 
 async function loadFixed(){
   try{
-    // point directly to your actual CSV file
-    const raw = "../data/weekly/2025_wk36_odds.csv";
+    // correct path inside /docs
+    const raw = "data/weekly/2025_wk36_odds.csv";
     const { hdr, rows } = parseCSV(await fetchCSV(raw));
     const cons = consensusOnly(rows, hdr);
     renderTable(hdr, cons);
@@ -62,7 +62,7 @@ async function loadFixed(){
       window._week = String(week).padStart(2,"0");
     }
   }catch(e){
-    document.getElementById("table").textContent = "CSV not found at ../data/weekly/2025_wk36_odds.csv";
+    document.getElementById("table").textContent = "CSV not found at data/weekly/2025_wk36_odds.csv";
   }
 }
 loadFixed();
