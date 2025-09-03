@@ -1,4 +1,4 @@
-import os, csv, math, time, json
+import os, csv
 from datetime import datetime, timedelta, timezone
 from dateutil import tz
 import requests
@@ -9,43 +9,35 @@ BASE = "https://api.the-odds-api.com/v4"
 REGION = "us"
 MARKETS = "spreads,totals"
 ODDS_FMT = "american"
-DATE_FMT = "iso"
 
 NY = tz.gettz("America/New_York")
 
-def current_season(dt):
-    # NFL season labeled by the year the regular season starts
-    return dt.astimezone(NY).year
+def median(vals):
+    x = sorted([v for v in vals if v is not None])
+    if not x: return None
+    n = len(x)
+    return x[n//2] if n % 2 else (x[n//2-1] + x[n//2]) / 2
 
-def nfl_week_start_end(now_ny):
-    # Run Tuesdays 06:00 NY; capture games Tue 00:00 through next Mon 23:59 NY
+def week_window_ny(now_ny):
     start = now_ny.replace(hour=0, minute=0, second=0, microsecond=0)
-    end = (start + timedelta(days=6, hours=23, minutes=59))
-    return start, end
-
-def median(nums):
-    a = sorted([n for n in nums if n is not None])
-    if not a: return None
-    n = len(a)
-    mid = n//2
-    return (a[mid] if n%2==1 else (a[mid-1]+a[mid])/2)
+    end = start + timedelta(days=6, hours=23, minutes=59)
+    return start.astimezone(timezone.utc), end.astimezone(timezone.utc)
 
 def main():
-    now = datetime.now(tz=NY)
-    season = current_season(now)
-    start_ny, end_ny = nfl_week_start_end(now)
-    start_utc = start_ny.astimezone(timezone.utc)
-    end_utc   = end_ny.astimezone(timezone.utc)
+    now_ny = datetime.now(tz=NY)
+    season = now_ny.year
+    week = now_ny.isocalendar().week
+
+    start_utc, end_utc = week_window_ny(now_ny)
 
     params = {
         "apiKey": API_KEY,
         "regions": REGION,
         "markets": MARKETS,
         "oddsFormat": ODDS_FMT,
-        "dateFormat": DATE_FMT
+        "dateFormat": "iso",
     }
-    url = f"{BASE}/sports/{SPORT}/odds"
-    resp = requests.get(url, params=params, timeout=30)
+    resp = requests.get(f"{BASE}/sports/{SPORT}/odds", params=params, timeout=30)
     resp.raise_for_status()
     events = resp.json()
 
@@ -55,48 +47,37 @@ def main():
         if not (start_utc <= ct <= end_utc):
             continue
 
-        home = ev.get("home_team")
-        away = ev.get("away_team")
-        gid  = ev.get("id")
+        home, away = ev.get("home_team"), ev.get("away_team")
+        gid = ev.get("id")
         updated = ev.get("last_update", datetime.now(timezone.utc).isoformat())
 
-        # collect book-level lines
-        spread_home_vals, spread_away_vals, total_vals = [], [], []
+        sh_vals, sa_vals, tot_vals = [], [], []
         for bk in ev.get("bookmakers", []):
             book = bk["title"]
-            # find latest market values
-            spread_home, spread_away, total = None, None, None
+            sh = sa = tot = None
             for m in bk.get("markets", []):
-                if m["key"] == "spreads" and m.get("outcomes"):
-                    for o in m["outcomes"]:
-                        if o["name"] == home and "point" in o: spread_home = float(o["point"])
-                        if o["name"] == away and "point" in o: spread_away = float(o["point"])
-                if m["key"] == "totals" and m.get("outcomes"):
-                    # outcomes: Over/Under, each with "point"
-                    if "point" in m["outcomes"][0]:
-                        total = float(m["outcomes"][0]["point"])
-            # record book row if we have something
-            if spread_home is not None or total is not None:
-                rows.append([season, "", gid, ct.isoformat(), home, away, book,
-                             spread_home, spread_away, total, updated, 0])
-                if spread_home is not None: spread_home_vals.append(spread_home)
-                if spread_away is not None: spread_away_vals.append(spread_away)
-                if total is not None: total_vals.append(total)
+                if m["key"] == "spreads":
+                    for o in m.get("outcomes", []):
+                        if o["name"] == home and "point" in o: sh = float(o["point"])
+                        if o["name"] == away and "point" in o: sa = float(o["point"])
+                elif m["key"] == "totals":
+                    for o in m.get("outcomes", []):
+                        if "point" in o: tot = float(o["point"]); break
+            if sh is not None or tot is not None:
+                rows.append([season, week, gid, ct.isoformat(), home, away, book,
+                             sh, sa, tot, updated, 0])
+                if sh is not None: sh_vals.append(sh)
+                if sa is not None: sa_vals.append(sa)
+                if tot is not None: tot_vals.append(tot)
 
-        # consensus row
-        if spread_home_vals or total_vals:
-            rows.append([season, "", gid, ct.isoformat(), home, away, "CONSENSUS",
-                         median(spread_home_vals), median(spread_away_vals), median(total_vals),
+        if sh_vals or tot_vals:
+            rows.append([season, week, gid, ct.isoformat(), home, away, "CONSENSUS",
+                         median(sh_vals), median(sa_vals), median(tot_vals),
                          datetime.now(timezone.utc).isoformat(), 1])
-
-    # infer week sequentially by Tuesday count in season (simple; tweak if you want exact NFL wk)
-    # store as current NY week-of-year anchor
-    for r in rows:
-        r[1] = datetime.now(NY).isocalendar().week
 
     outdir = "data/weekly"
     os.makedirs(outdir, exist_ok=True)
-    out = f"{outdir}/{season}_wk{int(rows[0][1]):02d}_odds.csv" if rows else f"{outdir}/{season}_wk_unknown_odds.csv"
+    out = f"{outdir}/{season}_wk{int(week):02d}_odds.csv" if rows else f"{outdir}/{season}_wk{int(week):02d}_odds_empty.csv"
 
     with open(out, "w", newline="") as f:
         w = csv.writer(f)
