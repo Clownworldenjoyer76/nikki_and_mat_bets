@@ -25,11 +25,16 @@ function fmtDate(iso){
     hour12: true,
   });
 }
-// Map CSV calendar week to NFL regular-season week label (36->1, 37->2, ... wrap 1..18)
 function nflWeekLabel(csvWeek){
   const base = 36; // CSV week that corresponds to NFL Week 1
   const w = ((parseInt(csvWeek,10) - base) % 18 + 18) % 18 + 1; // 1..18
   return w;
+}
+function fmtSigned(n){
+  if(n === "" || n === null || n === undefined) return "";
+  const v = Number(n);
+  if(Number.isNaN(v)) return String(n);
+  return (v>0?`+${v}`:`${v}`);
 }
 
 // ---------- STORAGE (two users) ----------
@@ -51,8 +56,12 @@ function card(h, r, picks){
   const when = fmtDate(r[h.indexOf("commence_time_utc")]);
   const home = r[h.indexOf("home_team")];
   const away = r[h.indexOf("away_team")];
-  const spr  = r[h.indexOf("spread_home")] || "";
-  const tot  = r[h.indexOf("total")] || "";
+  const spreadHome  = r[h.indexOf("spread_home")] || "";
+  const total       = r[h.indexOf("total")] || "";
+  const spreadAway  = spreadHome === "" ? "" : fmtSigned(-Number(spreadHome));
+  const spreadHomeDisp = fmtSigned(spreadHome);
+  const totalDisp   = total;
+
   const key  = keyOf(r,h);
 
   const el = document.createElement("article");
@@ -60,27 +69,29 @@ function card(h, r, picks){
   el.innerHTML = `
     <div class="top">
       <div>
-        <div class="match">${away} @ ${home}</div>
+        <div class="match"><b>${away} @ ${home}</b></div>
         <div class="when">${when}</div>
       </div>
     </div>
     <div class="line">
-      <span class="pill">Home spread: <b>${spr}</b></span>
-      <span class="pill">Total: <b>${tot}</b></span>
+      <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
+      <span class="pill">Total: <b>${totalDisp}</b></span>
     </div>
     <div class="lane">
       <div class="name mat">Mat</div>
       <div class="btnrow" data-user="mat"></div>
+
       <div class="name nikki">Nikki</div>
       <div class="btnrow" data-user="nikki"></div>
     </div>
   `;
 
+  // Options with values embedded in labels; we use data-* for logic
   const opts = [
-    {label:"Home", type:"spread", side:"home"},
-    {label:"Away", type:"spread", side:"away"},
-    {label:"Over", type:"total",  side:"over"},
-    {label:"Under",type:"total",  side:"under"},
+    {label:`Home ${spreadHomeDisp}`, type:"spread", side:"home"},
+    {label:`Away ${spreadAway}`,     type:"spread", side:"away"},
+    {label:`Over ${totalDisp}`,      type:"total",  side:"over"},
+    {label:`Under ${totalDisp}`,     type:"total",  side:"under"},
   ];
 
   ["mat","nikki"].forEach(user=>{
@@ -90,6 +101,8 @@ function card(h, r, picks){
       const b = document.createElement("button");
       b.className = "pickbtn";
       b.textContent = o.label;
+      b.dataset.type = o.type;
+      b.dataset.side = o.side;
 
       const cur = (picks[user]||{})[key];
       if(cur && cur.type===o.type && cur.side===o.side){
@@ -100,21 +113,18 @@ function card(h, r, picks){
         const all = loadPicks();
         const existing = (all[user]||{})[key];
         if(existing && existing.type===o.type && existing.side===o.side){
-          delete all[user][key];
+          delete all[user][key]; // toggle off
         }else{
           all[user] = all[user] || {};
           all[user][key] = { type:o.type, side:o.side };
         }
         savePicks(all);
 
+        // refresh lane highlights
         row.querySelectorAll(".pickbtn").forEach(x=>x.classList.remove("active","mat","nikki"));
         const now = (all[user]||{})[key];
         if(now){
-          const btn = Array.from(row.children).find(btn=>{
-            const lbl = btn.textContent.toLowerCase();
-            return (now.type==="spread" && lbl===now.side) ||
-                   (now.type==="total"  && lbl===now.side);
-          });
+          const btn = Array.from(row.children).find(btn => btn.dataset.type===now.type && btn.dataset.side===now.side);
           if(btn) btn.classList.add("active", color);
         }
       };
