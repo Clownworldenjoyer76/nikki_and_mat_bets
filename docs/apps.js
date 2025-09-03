@@ -25,6 +25,12 @@ function fmtDate(iso){
     hour12: true,
   });
 }
+// Map CSV calendar week to NFL regular-season week label (36->1, 37->2, ... wrap 1..18)
+function nflWeekLabel(csvWeek){
+  const base = 36; // CSV week that corresponds to NFL Week 1
+  const w = ((parseInt(csvWeek,10) - base) % 18 + 18) % 18 + 1; // 1..18
+  return w;
+}
 
 // ---------- STORAGE (two users) ----------
 const LS_MAT = "picks_mat";
@@ -141,8 +147,8 @@ function openIssue(){
     }
   }
   const season = window._season || new Date().getFullYear();
-  const week   = window._week   || "01";
-  const title  = encodeURIComponent(`Nikki and Mat’s NFL Picks — ${season} WK${String(week).padStart(2,"0")}`);
+  const weekLabel = window._week_label || "1";
+  const title  = encodeURIComponent(`Nikki and Mat’s NFL Picks — ${season} Week ${weekLabel}`);
   const body   = encodeURIComponent(`Paste (do not edit):\n\n\`\`\`json\n${JSON.stringify(combined, null, 2)}\n\`\`\`\n`);
   window.open(`https://github.com/Clownworldenjoyer76/bet-duel/issues/new?title=${title}&body=${body}`, "_blank");
 }
@@ -150,7 +156,7 @@ function openIssue(){
 function clearPicks(){
   localStorage.removeItem(LS_MAT);
   localStorage.removeItem(LS_NIK);
-  load();
+  load(); // re-render to clear highlights
 }
 
 // ---------- LOAD ----------
@@ -162,10 +168,15 @@ async function load(){
     render(hdr, cons);
 
     if(rows.length){
-      window._season = rows[0][hdr.indexOf("season")];
-      window._week   = rows[0][hdr.indexOf("week")];
+      const season = rows[0][hdr.indexOf("season")];
+      const csvWeek = rows[0][hdr.indexOf("week")];
+      const labelWeek = nflWeekLabel(csvWeek);
+      window._season = season;
+      window._week = csvWeek;
+      window._week_label = labelWeek;
+
       const label = document.getElementById("weeklabel");
-      if(label) label.textContent = `Season ${window._season} • Week ${window._week}`;
+      if(label) label.textContent = `${season} • Week ${labelWeek}`;
     }
   }catch(e){
     const empty = document.getElementById("empty");
