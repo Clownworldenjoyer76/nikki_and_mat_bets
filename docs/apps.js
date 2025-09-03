@@ -74,7 +74,7 @@ function card(h, r, picks){
   sec1.innerHTML = `
     <div class="match"><b>${away} @ ${home}</b></div>
     <div class="when">${when}</div>
-    <div class="line" style="margin-top:8px;">
+    <div class="line">
       <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
       <span class="pill">Total: <b>${totalDisp}</b></span>
     </div>
@@ -95,7 +95,7 @@ function card(h, r, picks){
   sec3.className = "section";
   sec3.innerHTML = `
     <div class="lane">
-      <div class="name nikk i">Nikki</div>
+      <div class="name nikki">Nikki</div>
       <div class="btnrow" data-user="nikki"></div>
     </div>
   `;
@@ -104,7 +104,7 @@ function card(h, r, picks){
   el.appendChild(sec2);
   el.appendChild(sec3);
 
-  // Options with values embedded in labels; we use data-* for logic
+  // Options with values in labels; data-* for logic
   const opts = [
     {label:`Home ${spreadHomeDisp}`, type:"spread", side:"home"},
     {label:`Away ${spreadAway}`,     type:"spread", side:"away"},
@@ -138,7 +138,6 @@ function card(h, r, picks){
         }
         savePicks(all);
 
-        // refresh lane highlights
         row.querySelectorAll(".pickbtn").forEach(x=>x.classList.remove("active","mat","nikki"));
         const now = (all[user]||{})[key];
         if(now){
@@ -184,7 +183,7 @@ function openIssue(){
 function clearPicks(){
   localStorage.removeItem(LS_MAT);
   localStorage.removeItem(LS_NIK);
-  load(); // re-render to clear highlights
+  load();
 }
 
 // ---------- LOAD ----------
@@ -213,7 +212,7 @@ async function load(){
   }
 }
 
-document.getElementById("openIssue").onclick = openIssue; // button text now "Submit Picks" in HTML
+document.getElementById("openIssue").onclick = openIssue;
 document.getElementById("clear").onclick = clearPicks;
 
 load();
