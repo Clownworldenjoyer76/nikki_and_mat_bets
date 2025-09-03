@@ -68,11 +68,15 @@ function card(h, r, picks){
   const el = document.createElement("article");
   el.className = "card";
 
-  // SECTION 1: Game info
+  // SECTION 1: Game info (match split over 3 lines, centered)
   const sec1 = document.createElement("div");
   sec1.className = "section game-info";
   sec1.innerHTML = `
-    <div class="match"><b>${away} @ ${home}</b></div>
+    <div class="match">
+      <div>${away}</div>
+      <div>@</div>
+      <div>${home}</div>
+    </div>
     <div class="when">${when}</div>
     <div class="line">
       <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
@@ -104,7 +108,7 @@ function card(h, r, picks){
   el.appendChild(sec2);
   el.appendChild(sec3);
 
-  // Options with values in labels; data-* for logic
+  // Button options with values
   const opts = [
     {label:`Home ${spreadHomeDisp}`, type:"spread", side:"home"},
     {label:`Away ${spreadAway}`,     type:"spread", side:"away"},
