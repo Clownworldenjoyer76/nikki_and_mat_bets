@@ -31,8 +31,8 @@ function fmtDate(iso){
   });
 }
 function nflWeekLabel(csvWeek){
-  const base = 36;
-  const w = ((parseInt(csvWeek,10) - base) % 18 + 18) % 18 + 1;
+  const base = 36; // CSV "week" that corresponds to NFL Week 1
+  const w = ((parseInt(csvWeek,10) - base) % 18 + 18) % 18 + 1; // 1..18
   return w;
 }
 function fmtSigned(n){
@@ -42,7 +42,7 @@ function fmtSigned(n){
   return (v>0?`+${v}`:`${v}`);
 }
 
-// Nickname-only PNG logos in docs/assets/logos/
+// Nickname-only PNG logos in docs/assets/logos/ (e.g., eagles.png, cowboys.png)
 function logoPath(team){
   const cleaned = team.replace(/[^A-Za-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
   const parts = cleaned.split(" ");
@@ -50,7 +50,7 @@ function logoPath(team){
   return `assets/logos/${nickname}.png`;
 }
 
-// ---------- STORAGE ----------
+// ---------- STORAGE (two users; per-game picks have two fields) ----------
 const LS_MAT = "picks_mat";
 const LS_NIK = "picks_nikki";
 function loadPicks(){
@@ -64,8 +64,14 @@ function savePicks(all){
   localStorage.setItem(LS_NIK, JSON.stringify(all.nikki || {}));
 }
 
+// Ensure structure { spread: 'home'|'away', total: 'over'|'under' }
+function ensurePickShape(obj){
+  if(!obj || typeof obj !== "object") return { spread: null, total: null };
+  return { spread: obj.spread ?? null, total: obj.total ?? null };
+}
+
 // ---------- RENDER ----------
-function card(h, r, picks){
+function card(h, r, picksAll){
   const when = fmtDate(r[h.indexOf("commence_time_utc")]);
   const home = normalizeTeamName(r[h.indexOf("home_team")]);
   const away = normalizeTeamName(r[h.indexOf("away_team")]);
@@ -81,7 +87,7 @@ function card(h, r, picks){
   const el = document.createElement("article");
   el.className = "card";
 
-  // SECTION 1
+  // SECTION 1: logos left/right, centered text block in the middle
   const sec1 = document.createElement("div");
   sec1.className = "section game-info";
   sec1.innerHTML = `
@@ -125,7 +131,7 @@ function card(h, r, picks){
   el.appendChild(sec2);
   el.appendChild(sec3);
 
-  // Buttons
+  // Options (labels) with category in data-type
   const opts = [
     {label:`Home ${spreadHomeDisp}`, type:"spread", side:"home"},
     {label:`Away ${spreadAway}`,     type:"spread", side:"away"},
@@ -136,35 +142,54 @@ function card(h, r, picks){
   ["mat","nikki"].forEach(user=>{
     const row = el.querySelector(`.btnrow[data-user="${user}"]`);
     const color = user==="mat" ? "mat" : "nikki";
+
+    // current picks for this game/user
+    const picksUser = picksAll[user] || {};
+    const curPick = ensurePickShape(picksUser[key]);
+
+    // make buttons
     opts.forEach(o=>{
       const b = document.createElement("button");
       b.className = "pickbtn";
       b.textContent = o.label;
-      b.dataset.type = o.type;
-      b.dataset.side = o.side;
+      b.dataset.type = o.type; // "spread" | "total"
+      b.dataset.side = o.side; // "home"/"away" or "over"/"under"
 
-      const cur = (picks[user]||{})[key];
-      if(cur && cur.type===o.type && cur.side===o.side){
+      // highlight independently by category
+      if( (o.type === "spread" && curPick.spread === o.side) ||
+          (o.type === "total"  && curPick.total  === o.side) ){
         b.classList.add("active", color);
       }
 
       b.onclick = ()=>{
         const all = loadPicks();
-        const existing = (all[user]||{})[key];
-        if(existing && existing.type===o.type && existing.side===o.side){
-          delete all[user][key];
-        }else{
-          all[user] = all[user] || {};
-          all[user][key] = { type:o.type, side:o.side };
+        const mine = all[user] || {};
+        const current = ensurePickShape(mine[key]);
+
+        // toggle within the clicked category only
+        if(o.type === "spread"){
+          current.spread = (current.spread === o.side) ? null : o.side;
+        }else if(o.type === "total"){
+          current.total  = (current.total  === o.side) ? null : o.side;
         }
+
+        // if both null, remove; else save object
+        if(current.spread === null && current.total === null){
+          delete mine[key];
+        }else{
+          mine[key] = current;
+        }
+        all[user] = mine;
         savePicks(all);
 
-        row.querySelectorAll(".pickbtn").forEach(x=>x.classList.remove("active","mat","nikki"));
-        const now = (all[user]||{})[key];
-        if(now){
-          const btn = Array.from(row.children).find(btn => btn.dataset.type===now.type && btn.dataset.side===now.side);
-          if(btn) btn.classList.add("active", color);
-        }
+        // refresh highlights for this row, per category
+        row.querySelectorAll(".pickbtn").forEach(x=>{
+          x.classList.remove("active","mat","nikki");
+          const t = x.dataset.type, s = x.dataset.side;
+          if( (t==="spread" && current.spread===s) || (t==="total" && current.total===s) ){
+            x.classList.add("active", color);
+          }
+        });
       };
 
       row.appendChild(b);
@@ -188,12 +213,17 @@ function render(h, rows){
 // ---------- ISSUE ----------
 function openIssue(){
   const all = loadPicks();
+
+  // Combine by game key with both users' category picks preserved
   const combined = {};
   for(const [user, bag] of Object.entries(all)){
     for(const [k,v] of Object.entries(bag)){
-      (combined[k] ||= {})[user] = v;
+      const shaped = ensurePickShape(v);
+      (combined[k] ||= {});
+      combined[k][user] = { spread: shaped.spread, total: shaped.total };
     }
   }
+
   const season = window._season || new Date().getFullYear();
   const weekLabel = window._week_label || "1";
   const title  = encodeURIComponent(`Nikki and Mat’s NFL Picks — ${season} Week ${weekLabel}`);
