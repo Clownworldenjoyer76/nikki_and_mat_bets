@@ -37,6 +37,15 @@ function fmtSigned(n){
   return (v>0?`+${v}`:`${v}`);
 }
 
+// Build logo path using NICKNAME ONLY (last word of team name), PNG files.
+// Examples: "Chicago Bears" -> bears.png, "San Francisco 49ers" -> 49ers.png
+function logoPath(team){
+  const cleaned = team.replace(/[^A-Za-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  const parts = cleaned.split(" ");
+  const nickname = parts[parts.length - 1].toLowerCase();
+  return `assets/logos/${nickname}.png`;
+}
+
 // ---------- STORAGE (two users) ----------
 const LS_MAT = "picks_mat";
 const LS_NIK = "picks_nikki";
@@ -68,14 +77,20 @@ function card(h, r, picks){
   const el = document.createElement("article");
   el.className = "card";
 
-  // SECTION 1: Game info (match split over 3 lines, centered)
+  // SECTION 1: Game info with logos (3 lines, centered)
   const sec1 = document.createElement("div");
   sec1.className = "section game-info";
   sec1.innerHTML = `
     <div class="match">
-      <div>${away}</div>
-      <div>@</div>
-      <div>${home}</div>
+      <div class="teamblock">
+        <img class="team-logo" src="${logoPath(away)}" alt="${away} logo">
+        <div class="team-name">${away}</div>
+      </div>
+      <div class="at">@</div>
+      <div class="teamblock">
+        <img class="team-logo" src="${logoPath(home)}" alt="${home} logo">
+        <div class="team-name">${home}</div>
+      </div>
     </div>
     <div class="when">${when}</div>
     <div class="line">
