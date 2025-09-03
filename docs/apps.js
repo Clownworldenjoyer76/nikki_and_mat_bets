@@ -23,7 +23,7 @@ function fmtDate(iso){
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
-  });
+  }).replace(", ", ", ").replace(" AM", " AM").replace(" PM", " PM");
 }
 function nflWeekLabel(csvWeek){
   const base = 36; // CSV week that corresponds to NFL Week 1
@@ -67,16 +67,19 @@ function card(h, r, picks){
   const el = document.createElement("article");
   el.className = "card";
   el.innerHTML = `
-    <div class="top">
+    <div class="game-info">
       <div>
         <div class="match"><b>${away} @ ${home}</b></div>
         <div class="when">${when}</div>
+        <div class="line" style="margin-top:8px;">
+          <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
+          <span class="pill">Total: <b>${totalDisp}</b></span>
+        </div>
       </div>
     </div>
-    <div class="line">
-      <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
-      <span class="pill">Total: <b>${totalDisp}</b></span>
-    </div>
+
+    <hr class="divider">
+
     <div class="lane">
       <div class="name mat">Mat</div>
       <div class="btnrow" data-user="mat"></div>
@@ -93,6 +96,11 @@ function card(h, r, picks){
     {label:`Over ${totalDisp}`,      type:"total",  side:"over"},
     {label:`Under ${totalDisp}`,     type:"total",  side:"under"},
   ];
+
+  // Insert an extra divider between Mat and Nikki
+  const lane = el.querySelector(".lane");
+  const matRow = el.querySelector('.btnrow[data-user="mat"]');
+  const nikRow = el.querySelector('.btnrow[data-user="nikki"]');
 
   ["mat","nikki"].forEach(user=>{
     const row = el.querySelector(`.btnrow[data-user="${user}"]`);
@@ -132,6 +140,11 @@ function card(h, r, picks){
       row.appendChild(b);
     });
   });
+
+  // Add divider between Mat and Nikki sections
+  const div = document.createElement("hr");
+  div.className = "divider";
+  lane.insertBefore(div, nikRow.parentElement ? nikRow : nikRow); // safe insert before Nikki grid
 
   return el;
 }
