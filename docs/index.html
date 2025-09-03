@@ -27,7 +27,7 @@
       .game-info { text-align:center; }
       .matchgrid {
         display:grid;
-        grid-template-columns:48px 1fr 48px;   /* left logo | text | right logo */
+        grid-template-columns:48px 1fr 48px;
         align-items:center;
         gap:8px;
       }
@@ -38,9 +38,9 @@
       .team-logo {
         max-width:48px; max-height:48px;
         width:auto; height:auto; object-fit:contain; display:block;
-        justify-self:start;   /* left cell default */
+        justify-self:start;
       }
-      .team-logo.right { justify-self:end; } /* home logo aligns right */
+      .team-logo.right { justify-self:end; }
 
       @media (min-width:700px){
         .matchgrid { grid-template-columns:56px 1fr 56px; }
@@ -66,19 +66,17 @@
       .pickbtn.active.mat   { background:var(--mat);   color:#fff; border-color:var(--mat); }
       .pickbtn.active.nikki { background:var(--nikki); color:#fff; border-color:var(--nikki); }
 
-      .small { font-size:.70rem; color:#aaa; }
-
-      /* compact sticky footer (half-height) */
+      /* --- Compact sticky footer (one line) --- */
       .stickybar {
         position:sticky; bottom:0; background:#1a1a1a;
         border-top:1px solid #222;
-        padding:3px 6px;
-        display:flex; gap:6px; justify-content:space-between; align-items:center;
+        padding:4px 8px;
+        display:flex; gap:8px; justify-content:center; align-items:center;
       }
       .cta {
-        padding:4px 8px; border-radius:6px;
+        padding:4px 10px; border-radius:6px;
         border:1px solid #333; background:#111; color:#fff;
-        font-size:.70rem; cursor:pointer;
+        font-size:.75rem; cursor:pointer;
       }
       .ghost { background:#1a1a1a; }
       .empty { padding:16px; text-align:center; color:#aaa; }
@@ -96,11 +94,8 @@
     </main>
 
     <div class="stickybar">
-      <span class="small">Picks save locally on this device.</span>
-      <div>
-        <button id="clear" class="cta ghost">Clear Picks</button>
-        <button id="openIssue" class="cta">Submit Picks</button>
-      </div>
+      <button id="clear" class="cta ghost">Clear Picks</button>
+      <button id="openIssue" class="cta">Submit Picks</button>
     </div>
 
     <script src="apps.js"></script>
