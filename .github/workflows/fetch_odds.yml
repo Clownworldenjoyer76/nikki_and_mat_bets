@@ -1,6 +1,9 @@
-name: Fetch NFL odds TEST (no time guard)
+name: Fetch NFL odds weekly
 
 on:
+  schedule:
+    - cron: "0 10 * * 2"   # Tue 10:00 UTC
+    - cron: "0 11 * * 2"   # Tue 11:00 UTC (DST buffer)
   workflow_dispatch:
 
 permissions:
@@ -9,8 +12,15 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
+    env:
+      TZ: America/New_York
     steps:
       - uses: actions/checkout@v4
+
+      - name: Run only at 06:00 New York
+        run: |
+          HOUR=$(TZ=America/New_York date +%H)
+          [ "$HOUR" = "06" ] || { echo "Not 06:00 NY; exiting."; exit 78; }
 
       - uses: actions/setup-python@v5
         with:
@@ -24,10 +34,19 @@ jobs:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/pull_nfl_odds.py
 
-      - name: Commit data
+      - name: Publish CSVs to /docs for Pages
+        run: |
+          mkdir -p docs/data/weekly
+          cp -f data/weekly/*.csv docs/data/weekly/ || true
+          latest=$(ls -t data/weekly/*.csv | head -n1 || true)
+          if [ -n "$latest" ]; then
+            cp -f "$latest" docs/data/weekly/latest.csv
+          fi
+
+      - name: Commit data (site + raw)
         run: |
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
-          git add data/weekly/*.csv
-          git commit -m "TEST odds update [skip ci]" || echo "No changes"
+          git add data/weekly/*.csv docs/data/weekly/*.csv
+          git commit -m "Publish odds to Pages" || echo "No changes"
           git push
