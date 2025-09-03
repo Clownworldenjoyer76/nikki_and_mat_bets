@@ -1,6 +1,6 @@
 async function fetchCSV(url){
   const r = await fetch(url, { cache: "no-store" });
-  if (!r.ok) throw new Error(`CSV not found: ${url}`);
+  if (!r.ok) throw new Error("CSV not found: " + url);
   return r.text();
 }
 
@@ -47,10 +47,15 @@ function renderTable(h, rows){
   t.appendChild(b); el.appendChild(t);
 }
 
+function siteBase(){
+  // Works for both user sites (/) and project sites (/repo/)
+  const p = window.location.pathname;
+  return p.endsWith("/") ? p : p.replace(/\/[^/]*$/, "/");
+}
+
 async function loadLatest(){
   try{
-    // Absolute path for your project site:
-    const raw = "/nikki_and_mat_bets/data/weekly/latest.csv";
+    const raw = siteBase() + "data/weekly/latest.csv";
     const { hdr, rows } = parseCSV(await fetchCSV(raw));
     const cons = consensusOnly(rows, hdr);
     renderTable(hdr, cons);
@@ -62,7 +67,7 @@ async function loadLatest(){
       window._week = String(week).padStart(2,"0");
     }
   }catch(e){
-    document.getElementById("table").textContent = "No latest.csv available.";
+    document.getElementById("table").textContent = "No latest.csv available at " + (siteBase() + "data/weekly/latest.csv");
   }
 }
 loadLatest();
