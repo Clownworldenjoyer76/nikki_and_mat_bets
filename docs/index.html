@@ -6,20 +6,47 @@
     <title>Nikki and Mat’s NFL Picks</title>
     <link rel="stylesheet" href="https://unpkg.com/mvp.css" />
     <style>
-      :root { --mat:#1f6feb; --nikki:#e11d48; --muted:#666; }
+      :root {
+        --mat:#1f6feb;
+        --nikki:#e11d48;
+        --muted:#666;
+        /* Controls header text size & image cap height (3 lines) */
+        --mast-size: 1.55rem;      /* base font for header lines */
+        --mast-lines: 3;           /* “3 lines” block */
+        --mast-cap: calc(var(--mast-size) * var(--mast-lines) * 1.05);
+      }
 
       body { background:#000; color:#fff; max-width:900px; margin:0 auto; padding:10px; }
-      header { text-align:center; }
-      header h1 { margin:10px 0 4px; font-size:1.8rem; }
-      #weeklabel {
-        font-size:1.8rem; font-weight:700;
-        margin:0 0 8px;
+
+      /* ===== Masthead with side images ===== */
+      .mast {
+        display:grid;
+        grid-template-columns: minmax(36px,64px) 1fr minmax(36px,64px);
+        align-items:center;
+        gap:10px;
+        margin:6px 0 6px;
       }
-      #nfl-logo {
-        max-width:48px; max-height:48px;
-        display:block; margin:0 auto 12px;
+      .mast-img {
+        max-height: var(--mast-cap);
+        width:auto; height:auto; object-fit:contain; display:block;
+        justify-self:center;
+      }
+      .mast-center { text-align:center; }
+      .mast-center h1 {
+        margin:0; line-height:1.1; font-size:var(--mast-size);
+      }
+      .mast-center h1 .break { display:block; }
+      #weeklabel {
+        margin:6px 0 0; font-weight:700; line-height:1.1;
+        font-size:var(--mast-size);
       }
 
+      /* tighten on wider screens */
+      @media (min-width:700px){
+        :root { --mast-size: 1.7rem; }
+      }
+
+      /* ===== Cards grid ===== */
       #games { display:grid; grid-template-columns:1fr; gap:10px; }
       @media (min-width:700px){ #games { grid-template-columns:1fr 1fr; } }
 
@@ -31,6 +58,7 @@
       .section { padding:10px 12px; }
       .section + .section { border-top:1px solid #e3e3e3; }
 
+      /* --------- Game header with team logos left/right --------- */
       .game-info { text-align:center; }
       .matchgrid {
         display:grid;
@@ -52,13 +80,13 @@
       @media (min-width:700px){
         .matchgrid { grid-template-columns:56px 1fr 56px; }
         .team-logo { max-width:56px; max-height:56px; }
-        #nfl-logo { max-width:56px; max-height:56px; }
       }
 
       .when  { color:var(--muted); margin:6px 0; font-size:.95rem; }
       .line  { display:flex; justify-content:center; gap:8px; margin:0; flex-wrap:wrap; }
       .pill  { background:#f7f7f7; border:1px solid #e2e2e2; border-radius:999px; padding:4px 10px; }
 
+      /* Picks lanes */
       .lane { display:grid; grid-template-columns:66px 1fr; gap:6px 10px; align-items:start; }
       .name { font-size:.85rem; font-weight:700; line-height:1.2; padding-top:2px; }
       .name.mat { color:var(--mat); }
@@ -73,6 +101,7 @@
       .pickbtn.active.mat   { background:var(--mat);   color:#fff; border-color:var(--mat); }
       .pickbtn.active.nikki { background:var(--nikki); color:#fff; border-color:var(--nikki); }
 
+      /* --- Compact sticky footer (one line) --- */
       .stickybar {
         position:sticky; bottom:0; background:#1a1a1a;
         border-top:1px solid #222;
@@ -90,9 +119,18 @@
   </head>
   <body>
     <header>
-      <h1>Nikki and Mat’s<br>NFL Picks</h1>
-      <p id="weeklabel"></p>
-      <img id="nfl-logo" src="assets/logos/_NFL_logo.png" alt="NFL Logo">
+      <!-- Masthead with left/right photos and centered 3-line title -->
+      <div class="mast">
+        <img class="mast-img" src="assets/logos/IMG_0931.jpeg" alt="Left header image">
+        <div class="mast-center">
+          <h1>
+            Nikki and Mat’s <span class="break"></span>
+            NFL Picks
+          </h1>
+          <p id="weeklabel"></p>
+        </div>
+        <img class="mast-img" src="assets/logos/IMG_0930.jpeg" alt="Right header image">
+      </div>
     </header>
 
     <main>
