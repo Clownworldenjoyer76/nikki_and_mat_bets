@@ -49,7 +49,7 @@ function renderTable(h, rows){
 
 async function loadLatest(){
   try{
-    const raw = "data/weekly/latest.csv"; // served from /docs
+    const raw = "data/weekly/latest.csv"; // file inside /docs
     const { hdr, rows } = parseCSV(await fetchCSV(raw));
     const cons = consensusOnly(rows, hdr);
     renderTable(hdr, cons);
