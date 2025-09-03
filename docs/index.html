@@ -18,28 +18,25 @@
 
       /* Cards */
       .card {
-        background:#fff; color:#000; border-radius:12px; padding:14px;
+        background:#fff; color:#000; border-radius:12px; padding:0;
         box-shadow:0 2px 10px rgba(0,0,0,.4); border:1px solid #e6e6e6;
+        overflow:hidden;
       }
 
+      /* 3 distinct sections inside each card */
+      .section { padding:14px; }
+      .section + .section { border-top:1px solid #ccc; } /* grey line between sections */
+
       /* Centered game info */
-      .top, .game-info { display:flex; justify-content:center; }
-      .top > div, .game-info > div { text-align:center; width:100%; }
+      .game-info { text-align:center; }
       .match { font-weight:800; font-size:1.05rem; }
       .when { color:var(--muted); margin-top:2px; }
 
-      .line { display:flex; justify-content:center; gap:10px; margin:8px 0 12px; }
+      .line { display:flex; justify-content:center; gap:10px; margin:8px 0 0; }
       .pill { background:#f7f7f7; border:1px solid #e2e2e2; border-radius:999px; padding:4px 10px; }
 
-      /* Dividers */
-      .divider {
-        border: none;
-        border-top: 1px solid #ccc;
-        margin: 12px 0;
-      }
-
       /* Picks lanes */
-      .lane { display:grid; grid-template-columns:auto 1fr; gap:8px 10px; align-items:start; margin-top:6px; }
+      .lane { display:grid; grid-template-columns:auto 1fr; gap:8px 10px; align-items:start; }
       .name { font-size:.9rem; font-weight:700; align-self:center; }
       .name.mat { color:var(--mat); }
       .name.nikki { color:var(--nikki); }
@@ -56,11 +53,12 @@
 
       .small { font-size:.85rem; color:#aaa; }
       .stickybar {
-        position:sticky; bottom:0; background:#000; border-top:1px solid #222;
+        position:sticky; bottom:0; background:#1a1a1a; /* dark gray */
+        border-top:1px solid #222;
         padding:10px; display:flex; gap:10px; justify-content:space-between; align-items:center;
       }
       .cta { padding:10px 14px; border-radius:8px; border:1px solid #333; background:#111; color:#fff; cursor:pointer; }
-      .ghost { background:#000; }
+      .ghost { background:#1a1a1a; }
       .empty { padding:20px; text-align:center; color:#aaa; }
     </style>
   </head>
@@ -79,7 +77,7 @@
       <span class="small">Picks save locally on this device.</span>
       <div>
         <button id="clear" class="cta ghost">Clear Picks</button>
-        <button id="openIssue" class="cta">Open GitHub Issue</button>
+        <button id="openIssue" class="cta">Submit Picks</button>
       </div>
     </div>
 
