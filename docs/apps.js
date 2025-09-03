@@ -49,8 +49,8 @@ function renderTable(h, rows){
 
 async function loadLatest(){
   try{
-    // Absolute path for a GitHub Pages project site: /<repo>/...
-    const raw = "/bet-duel/data/weekly/latest.csv";
+    // Absolute path for your project site:
+    const raw = "/nikki_and_mat_bets/data/weekly/latest.csv";
     const { hdr, rows } = parseCSV(await fetchCSV(raw));
     const cons = consensusOnly(rows, hdr);
     renderTable(hdr, cons);
