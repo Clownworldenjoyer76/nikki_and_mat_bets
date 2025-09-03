@@ -37,8 +37,7 @@ function fmtSigned(n){
   return (v>0?`+${v}`:`${v}`);
 }
 
-// Build logo path using NICKNAME ONLY (last word of team name), PNG files.
-// Examples: "Chicago Bears" -> bears.png, "San Francisco 49ers" -> 49ers.png
+// Nickname-only PNG logos in docs/assets/logos/ (e.g., eagles.png, cowboys.png)
 function logoPath(team){
   const cleaned = team.replace(/[^A-Za-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
   const parts = cleaned.split(" ");
@@ -46,7 +45,7 @@ function logoPath(team){
   return `assets/logos/${nickname}.png`;
 }
 
-// ---------- STORAGE (two users) ----------
+// ---------- STORAGE ----------
 const LS_MAT = "picks_mat";
 const LS_NIK = "picks_nikki";
 function loadPicks(){
@@ -77,20 +76,18 @@ function card(h, r, picks){
   const el = document.createElement("article");
   el.className = "card";
 
-  // SECTION 1: Game info with logos (3 lines, centered)
+  // SECTION 1: logos left/right, centered text block in the middle
   const sec1 = document.createElement("div");
   sec1.className = "section game-info";
   sec1.innerHTML = `
-    <div class="match">
-      <div class="teamblock">
-        <img class="team-logo" src="${logoPath(away)}" alt="${away} logo">
-        <div class="team-name">${away}</div>
+    <div class="matchgrid">
+      <img class="team-logo" src="${logoPath(away)}" alt="${away} logo">
+      <div class="matchtext">
+        <div class="team">${away}</div>
+        <div class="at">@</div>
+        <div class="team">${home}</div>
       </div>
-      <div class="at">@</div>
-      <div class="teamblock">
-        <img class="team-logo" src="${logoPath(home)}" alt="${home} logo">
-        <div class="team-name">${home}</div>
-      </div>
+      <img class="team-logo right" src="${logoPath(home)}" alt="${home} logo">
     </div>
     <div class="when">${when}</div>
     <div class="line">
@@ -123,7 +120,7 @@ function card(h, r, picks){
   el.appendChild(sec2);
   el.appendChild(sec3);
 
-  // Button options with values
+  // Buttons
   const opts = [
     {label:`Home ${spreadHomeDisp}`, type:"spread", side:"home"},
     {label:`Away ${spreadAway}`,     type:"spread", side:"away"},
@@ -150,7 +147,7 @@ function card(h, r, picks){
         const all = loadPicks();
         const existing = (all[user]||{})[key];
         if(existing && existing.type===o.type && existing.side===o.side){
-          delete all[user][key]; // toggle off
+          delete all[user][key];
         }else{
           all[user] = all[user] || {};
           all[user][key] = { type:o.type, side:o.side };
