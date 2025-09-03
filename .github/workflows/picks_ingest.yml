@@ -10,10 +10,12 @@ permissions:
 
 jobs:
   ingest:
-    if: startsWith(github.event.issue.title, 'PICKS ')
+    # Guard: only run when the event is "issues" AND title starts with "PICKS "
+    if: ${{ github.event_name == 'issues' && startsWith(github.event.issue.title, 'PICKS ') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Extract JSON from issue body
         id: parse
         run: |
@@ -21,10 +23,8 @@ jobs:
 ${{ github.event.issue.body }}
 EOF
 )
-          # JSON must appear between ```json and ```
           json=$(printf "%s" "$body" | awk '/```json/{flag=1;next}/```/{flag=0}flag')
           echo "$json" > picks_tmp.json
-          # Pull season/week from title: "PICKS 2025 WK01 (Mathew vs Wife)"
           title="${{ github.event.issue.title }}"
           season=$(echo "$title" | sed -n 's/.*PICKS \([0-9]\{4\}\).*/\1/p')
           week=$(echo "$title" | sed -n 's/.*WK\([0-9]\{2\}\).*/\1/p')
@@ -33,15 +33,15 @@ EOF
           mv picks_tmp.json "$out"
           echo "out=$out" >> $GITHUB_OUTPUT
 
-      - name: Commit picks
+      - name: Commit picks file
         run: |
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
-          git add ${{ steps.parse.outputs.out }}
+          git add "${{ steps.parse.outputs.out }}"
           git commit -m "Add picks ${{ steps.parse.outputs.out }}" || echo "No changes"
           git push
 
-      - name: Close issue
+      - name: Close issue with note
         uses: actions-ecosystem/action-add-comment@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
