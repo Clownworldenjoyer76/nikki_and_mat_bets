@@ -6,64 +6,42 @@
     <title>Nikki and Mat’s NFL Picks</title>
     <link rel="stylesheet" href="https://unpkg.com/mvp.css" />
     <style>
-      :root { --mat:#1f6feb; --nikki:#e11d48; --card:#ffffff; --muted:#666; }
-      body { max-width: 900px; margin: 0 auto; padding: 12px; }
-      header h1 { margin: 12px 0 8px; }
-      #games { display: grid; grid-template-columns: 1fr; gap: 12px; }
-      @media (min-width:700px){ #games { grid-template-columns: 1fr 1fr; } }
+      body { background: #000; color: #fff; }
       .card {
-        background: var(--card); border: 1px solid #ddd; border-radius: 10px;
-        padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.05);
+        background: #fff;
+        color: #000;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 6px rgba(255,255,255,0.2);
       }
-      .top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
-      .when { font-size:.9rem; color:var(--muted); }
-      .match { font-weight:700; }
-      .line { display:flex; gap:10px; margin:6px 0 10px; font-size:.95rem; }
-      .pill { background:#f2f6ff; padding:4px 8px; border-radius: 999px; border:1px solid #e5e8f0; }
-      .lane { display:grid; grid-template-columns: auto 1fr; gap:6px 8px; align-items:center; margin-top:6px; }
-      .name { font-size:.9rem; font-weight:700; }
-      .name.mat { color: var(--mat); }
-      .name.nikki { color: var(--nikki); }
-      .btnrow { display:flex; flex-wrap:wrap; gap:6px; }
       .pickbtn {
-        border:1px solid #ddd; background:#fafafa; padding:6px 10px; border-radius:8px;
-        font-size:.9rem; cursor:pointer;
+        background: #fff;
+        color: #000;
+        border: 2px solid #000;
+        margin: 0.2rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        cursor: pointer;
       }
-      .pickbtn.active.mat { border-color: var(--mat); background: #eef4ff; }
-      .pickbtn.active.nikki { border-color: var(--nikki); background: #ffe7ee; }
-      .footer {
-        display:flex; gap:10px; margin: 16px 0 8px; justify-content:flex-end; flex-wrap:wrap;
-      }
-      .small { font-size:.85rem; color:var(--muted); }
-      .stickybar {
-        position: sticky; bottom: 0; background: #fff; border-top:1px solid #eee;
-        padding:10px; display:flex; gap:10px; justify-content:space-between; align-items:center;
-      }
-      .cta { padding:10px 14px; border-radius:8px; border:1px solid #ddd; background:#111; color:#fff; cursor:pointer; }
-      .ghost { background:#fff; color:#111; }
-      .empty { padding:20px; text-align:center; color:var(--muted); }
+      .pickbtn.active.mat { background: #007bff; color: #fff; border-color: #007bff; }
+      .pickbtn.active.nikki { background: #dc3545; color: #fff; border-color: #dc3545; }
+      .top .when { font-size: 0.9rem; color: #444; }
     </style>
   </head>
   <body>
     <header>
       <h1>Nikki and Mat’s NFL Picks</h1>
-      <p class="small" id="weeklabel"></p>
+      <div id="weeklabel"></div>
     </header>
 
     <main>
-      <section id="games" aria-live="polite"></section>
-      <div id="empty" class="empty" hidden>No games yet.</div>
+      <section id="games"></section>
+      <p id="empty" hidden>No games found.</p>
+      <button id="clear">Clear Picks</button>
+      <button id="openIssue">Open GitHub Issue</button>
     </main>
 
-    <div class="stickybar">
-      <span class="small">Picks save locally on this device.</span>
-      <div>
-        <button id="clear" class="cta ghost">Clear Picks</button>
-        <button id="openIssue" class="cta">Open GitHub Issue</button>
-      </div>
-    </div>
-
-    <!-- NOTE: your site is at /nikki_and_mat_bets/ -->
     <script src="apps.js"></script>
   </body>
 </html>
