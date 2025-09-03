@@ -1,0 +1,23 @@
+<!doctype html>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bet Duel — NFL</title>
+<link rel="stylesheet" href="https://unpkg.com/mvp.css">
+<body>
+  <header><h1>Bet Duel — NFL (Weekly Lines & Picks)</h1></header>
+
+  <section>
+    <label>Season <input id="season" type="number" min="2024"></label>
+    <label>Week <input id="week" type="number" min="1" max="22"></label>
+    <button id="load">Load</button>
+  </section>
+
+  <section id="table"></section>
+
+  <section>
+    <h2>Your Picks</h2>
+    <p>Tap a game row: choose <b>Home</b>, <b>Away</b>, or <b>Over</b>/<b>Under</b>. When done, click “Open GitHub Issue” to save.</p>
+    <button id="openIssue">Open GitHub Issue</button>
+  </section>
+
+  <script src="app.js"></script>
+</body>
