@@ -14,6 +14,17 @@ function parseCSV(txt){
 }
 function onlyConsensus(rows, hdr){ return rows.filter(r => r[hdr.indexOf("book")] === "CONSENSUS"); }
 function keyOf(r,h){ return `${r[h.indexOf("away_team")]}@${r[h.indexOf("home_team")]}_${r[h.indexOf("commence_time_utc")]}`; }
+function fmtDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
 
 // ---------- STORAGE (two users) ----------
 const LS_MAT = "picks_mat";
@@ -31,7 +42,7 @@ function savePicks(all){
 
 // ---------- RENDER ----------
 function card(h, r, picks){
-  const when = r[h.indexOf("commence_time_utc")];
+  const when = fmtDate(r[h.indexOf("commence_time_utc")]);
   const home = r[h.indexOf("home_team")];
   const away = r[h.indexOf("away_team")];
   const spr  = r[h.indexOf("spread_home")] || "";
@@ -57,7 +68,6 @@ function card(h, r, picks){
       <div class="name nikki">Nikki</div>
       <div class="btnrow" data-user="nikki"></div>
     </div>
-    <div class="footer small"><span>${key}</span></div>
   `;
 
   const opts = [
@@ -84,21 +94,20 @@ function card(h, r, picks){
         const all = loadPicks();
         const existing = (all[user]||{})[key];
         if(existing && existing.type===o.type && existing.side===o.side){
-          delete all[user][key];               // toggle off
+          delete all[user][key];
         }else{
           all[user] = all[user] || {};
           all[user][key] = { type:o.type, side:o.side };
         }
         savePicks(all);
 
-        // refresh highlight for this lane
         row.querySelectorAll(".pickbtn").forEach(x=>x.classList.remove("active","mat","nikki"));
         const now = (all[user]||{})[key];
         if(now){
           const btn = Array.from(row.children).find(btn=>{
             const lbl = btn.textContent.toLowerCase();
-            return (now.type==="spread" && (lbl==="home"||lbl==="away") && lbl===now.side) ||
-                   (now.type==="total"  && (lbl==="over"||lbl==="under") && lbl===now.side);
+            return (now.type==="spread" && lbl===now.side) ||
+                   (now.type==="total"  && lbl===now.side);
           });
           if(btn) btn.classList.add("active", color);
         }
@@ -141,7 +150,7 @@ function openIssue(){
 function clearPicks(){
   localStorage.removeItem(LS_MAT);
   localStorage.removeItem(LS_NIK);
-  load(); // re-render to clear highlights
+  load();
 }
 
 // ---------- LOAD ----------
