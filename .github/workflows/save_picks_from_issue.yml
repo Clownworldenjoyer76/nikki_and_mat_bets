@@ -1,0 +1,45 @@
+name: Save Picks From Issue
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+
+jobs:
+  save:
+    if: contains(github.event.issue.title, "NFL Picks")
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Write issue body to file
+        run: |
+          echo "${{ github.event.issue.body }}" > issue_body.txt
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run parser
+        env:
+          BODY_FILE: issue_body.txt
+        run: |
+          python -m pip install --upgrade pip
+          python scripts/parse_and_save_picks.py
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/data/picks/*
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            MSG="Save picks from Issue #${{ github.event.issue.number }} - ${{ github.event.issue.title }}"
+            git commit -m "$MSG"
+            git push
+          fi
