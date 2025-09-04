@@ -1,6 +1,10 @@
 // ---------- CONFIG ----------
 const CSV_URL = "data/weekly/latest.csv"; // served from /docs
 
+// Where "Submit Picks" opens the issue:
+const GH_OWNER = "clownworldenjoyer76";
+const GH_REPO  = "nikki_and_mat_bets";
+
 // ---------- UTILS ----------
 function normalizeTeamName(name){
   if(name === "Washington Commanders") return "Washington Redskins";
@@ -50,7 +54,7 @@ function logoPath(team){
   return `assets/logos/${nickname}.png`;
 }
 
-// ---------- STORAGE (two users; per-game picks have two fields) ----------
+// ---------- STORAGE ----------
 const LS_MAT = "picks_mat";
 const LS_NIK = "picks_nikki";
 function loadPicks(){
@@ -87,7 +91,7 @@ function card(h, r, picksAll){
   const el = document.createElement("article");
   el.className = "card";
 
-  // SECTION 1: logos left/right, centered text block in the middle
+  // SECTION 1: logos + game info
   const sec1 = document.createElement("div");
   sec1.className = "section game-info";
   sec1.innerHTML = `
@@ -131,7 +135,7 @@ function card(h, r, picksAll){
   el.appendChild(sec2);
   el.appendChild(sec3);
 
-  // Options (labels) with category in data-type
+  // Options
   const opts = [
     {label:`Home ${spreadHomeDisp}`, type:"spread", side:"home"},
     {label:`Away ${spreadAway}`,     type:"spread", side:"away"},
@@ -143,19 +147,16 @@ function card(h, r, picksAll){
     const row = el.querySelector(`.btnrow[data-user="${user}"]`);
     const color = user==="mat" ? "mat" : "nikki";
 
-    // current picks for this game/user
     const picksUser = picksAll[user] || {};
     const curPick = ensurePickShape(picksUser[key]);
 
-    // make buttons
     opts.forEach(o=>{
       const b = document.createElement("button");
       b.className = "pickbtn";
       b.textContent = o.label;
-      b.dataset.type = o.type; // "spread" | "total"
-      b.dataset.side = o.side; // "home"/"away" or "over"/"under"
+      b.dataset.type = o.type;
+      b.dataset.side = o.side;
 
-      // highlight independently by category
       if( (o.type === "spread" && curPick.spread === o.side) ||
           (o.type === "total"  && curPick.total  === o.side) ){
         b.classList.add("active", color);
@@ -166,14 +167,12 @@ function card(h, r, picksAll){
         const mine = all[user] || {};
         const current = ensurePickShape(mine[key]);
 
-        // toggle within the clicked category only
         if(o.type === "spread"){
           current.spread = (current.spread === o.side) ? null : o.side;
         }else if(o.type === "total"){
           current.total  = (current.total  === o.side) ? null : o.side;
         }
 
-        // if both null, remove; else save object
         if(current.spread === null && current.total === null){
           delete mine[key];
         }else{
@@ -182,7 +181,6 @@ function card(h, r, picksAll){
         all[user] = mine;
         savePicks(all);
 
-        // refresh highlights for this row, per category
         row.querySelectorAll(".pickbtn").forEach(x=>{
           x.classList.remove("active","mat","nikki");
           const t = x.dataset.type, s = x.dataset.side;
@@ -213,8 +211,6 @@ function render(h, rows){
 // ---------- ISSUE ----------
 function openIssue(){
   const all = loadPicks();
-
-  // Combine by game key with both users' category picks preserved
   const combined = {};
   for(const [user, bag] of Object.entries(all)){
     for(const [k,v] of Object.entries(bag)){
@@ -228,7 +224,9 @@ function openIssue(){
   const weekLabel = window._week_label || "1";
   const title  = encodeURIComponent(`Nikki and Mat’s NFL Picks — ${season} Week ${weekLabel}`);
   const body   = encodeURIComponent(`Paste (do not edit):\n\n\`\`\`json\n${JSON.stringify(combined, null, 2)}\n\`\`\`\n`);
-  window.open(`https://github.com/Clownworldenjoyer76/bet-duel/issues/new?title=${title}&body=${body}`, "_blank");
+
+  const url = `https://github.com/${GH_OWNER}/${GH_REPO}/issues/new?title=${title}&body=${body}`;
+  window.open(url, "_blank");
 }
 
 function clearPicks(){
