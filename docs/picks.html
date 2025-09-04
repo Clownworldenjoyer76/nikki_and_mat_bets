@@ -3,15 +3,30 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nikki & Mat — Weekly Records</title>
+  <title>2025 Records</title>
   <link rel="stylesheet" href="https://unpkg.com/mvp.css" />
   <style>
     :root { --mat:#1f6feb; --nikki:#e11d48; --muted:#9aa; }
     html,body { background:#000; color:#fff; }
     body { max-width:1000px; margin:0 auto; padding:12px; }
-    header { text-align:center; margin-bottom:10px; }
-    header h1 { margin:10px 0 6px; }
-    #seasonLabel { margin:0; opacity:.9; }
+
+    header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:14px;
+    }
+    header h1 {
+      margin:0;
+      font-size:1.5rem;
+      font-weight:bold;
+      text-align:center;
+      flex:1;
+    }
+    header img {
+      max-height:60px;
+      width:auto;
+    }
 
     .grid {
       display:grid; gap:12px;
@@ -42,8 +57,9 @@
 </head>
 <body>
   <header>
-    <h1>Nikki & Mat — Weekly Records</h1>
-    <p id="seasonLabel" class="muted"></p>
+    <img src="assets/logos/IMG_0931.jpeg" alt="Left Logo" />
+    <h1>2025 Records</h1>
+    <img src="assets/logos/IMG_0930.jpeg" alt="Right Logo" />
   </header>
 
   <main class="grid">
