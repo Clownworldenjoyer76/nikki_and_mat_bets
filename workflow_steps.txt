@@ -1,0 +1,56 @@
+🔗 Pipeline in order of use:
+	1.	Weekly Fetcher → gets odds (latest.csv).
+	2.	Save Picks From Issue → records everyone’s picks.
+	3.	Init Scores CSV → creates a blank scorecard for that week.
+	4.	You fill in the scores manually.
+	5.	Combine Picks & Scores → merges picks + results → final.csv.
+
+
+1. Odds / Weekly Data Fetcher
+
+(from earlier setup)
+	•	When it runs: Automatically on Tuesday at 6 AM EST, or manually.
+	•	What it does: Pulls the NFL games for the upcoming week (spreads + totals) from the API and saves them into:
+docs/data/weekly/<season>_wkNN_odds.csv
+docs/data/weekly/latest.csv
+	•	Why: Provides the “official” line set for that week. This is the base file used for both picks and scores.
+
+2. Save Picks From Issue (Manual)
+
+File: .github/workflows/save_picks_manual.yml
+	•	When it runs: Manually triggered. You enter an issue number.
+	•	What it does:
+	1.	Fetches the body of that GitHub Issue.
+	2.	Parses the JSON (the picks you or Nikki submitted).
+	3.	Joins those picks with the week’s odds (docs/data/weekly/latest.csv).
+	4.	Writes results to:
+docs/data/picks/<season>_wkNN_picks.csv
+docs/data/picks/latest.csv
+docs/data/picks/history.csv
+•	Why: Captures and stores both players’ picks in structured CSV form. history.csv accumulates season-long picks.
+
+3. Init Scores CSV (Manual)
+
+File: .github/workflows/init_scores_manual.yml
+	•	When it runs: Manually triggered (no inputs needed).
+	•	What it does:
+	1.	Reads docs/data/weekly/latest.csv (CONSENSUS rows).
+	2.	Extracts game_id, home_team, and away_team.
+	3.	Creates an empty scores sheet for that week with blank columns for home_score and away_score:
+docs/data/scores/<season>_wkNN_scores.csv
+•	Why: Gives you a ready-to-fill template for recording final scores after games are played.
+
+4. Combine Picks & Scores (Manual)
+
+File: .github/workflows/combine_manual.yml
+	•	When it runs: Manually triggered. You enter the week number (1–18).
+	•	What it does:
+	1.	Finds the week’s picks file (docs/data/picks/<season>_wkNN_picks.csv).
+	2.	Finds the week’s scores file (docs/data/scores/<season>_wkNN_scores.csv).
+	3.	Joins them on game_id.
+	4.	Outputs the merged file to:
+docs/data/final/<season>_wkNN_final.csv
+including all picks, spreads, totals, and now the final scores.
+
+	•	Why: Produces the “final” authoritative record for the week — who picked what, the lines, the results.
+
