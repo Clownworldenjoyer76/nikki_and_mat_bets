@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import csv, json, os, re, sys
 from pathlib import Path
-from datetime import datetime
 
 ROOT = Path(__file__).resolve().parents[1]  # repo root
 LATEST_CSV = ROOT / "docs" / "data" / "weekly" / "latest.csv"
@@ -24,12 +23,12 @@ def parse_issue_body(path: Path) -> dict:
         sys.exit(78)
     return json.loads(m.group(1))
 
-def load_latest_rows(latest_csv: Path):
+def load_consensus_latest(latest_csv: Path):
     with latest_csv.open(newline="", encoding="utf-8") as f:
         rdr = csv.DictReader(f)
-        rows = list(rdr)
+        rows = [r for r in rdr if (r.get("book") == "CONSENSUS" or r.get("is_consensus") in ("1","true","True"))]
     if not rows:
-        print("ERROR: latest.csv is empty.", file=sys.stderr); sys.exit(78)
+        print("ERROR: no CONSENSUS rows found in latest.csv.", file=sys.stderr); sys.exit(78)
     return rows
 
 def main():
@@ -39,9 +38,9 @@ def main():
         print(f"ERROR: {BODY_FILE} not found.", file=sys.stderr); sys.exit(78)
 
     picks_by_game = parse_issue_body(BODY_FILE)  # { key: { mat:{spread,total}, nikki:{spread,total} } }
-    weekly_rows = load_latest_rows(LATEST_CSV)
+    weekly_rows = load_consensus_latest(LATEST_CSV)
 
-    # Build map game key -> weekly info (CONSENSUS rows are fine; dedupe by game_id+time)
+    # Build unique games from CONSENSUS only
     seen_keys = set()
     games = []
     for r in weekly_rows:
@@ -61,6 +60,9 @@ def main():
             "commence_time_utc": when_iso,
             "home_team": home,
             "away_team": away,
+            # inject consensus lines
+            "spread_home": r.get("spread_home",""),
+            "total": r.get("total",""),
         })
 
     # Determine labels
@@ -71,9 +73,10 @@ def main():
     OUT_FILE = PICKS_DIR / out_name
     OUT_LATEST = PICKS_DIR / "latest.csv"
 
-    # Compose output rows
+    # Compose output rows (now includes spread_home and total)
     fieldnames = [
         "season","week","game_id","commence_time_utc","home_team","away_team",
+        "spread_home","total",
         "mat_spread","mat_total","nikki_spread","nikki_total"
     ]
     out_rows = []
@@ -89,6 +92,8 @@ def main():
             "commence_time_utc": g["commence_time_utc"],
             "home_team": g["home_team"],
             "away_team": g["away_team"],
+            "spread_home": g["spread_home"],
+            "total": g["total"],
             "mat_spread": mat.get("spread") or "",
             "mat_total":  mat.get("total")  or "",
             "nikki_spread": nik.get("spread") or "",
@@ -100,14 +105,13 @@ def main():
         w = csv.DictWriter(f, fieldnames=fieldnames)
         w.writeheader(); w.writerows(out_rows)
 
-    # Update "latest.csv"
+    # Update "latest.csv" (tracking latest picks snapshot)
     with OUT_LATEST.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=fieldnames)
         w.writeheader(); w.writerows(out_rows)
 
-    # Update history.csv (append non-duplicates)
+    # Upsert history.csv (append non-duplicates)
     if HISTORY.exists():
-        # load existing rows into a set of keys (season, week, game_id)
         with HISTORY.open(newline="", encoding="utf-8") as f:
             rdr = csv.DictReader(f)
             hist = list(rdr)
