@@ -29,11 +29,9 @@
     }
 
     .grid {
-      display:grid; gap:12px;
-      grid-template-columns: 1fr; 
-    }
-    @media (min-width:800px){
-      .grid { grid-template-columns: 1fr 1fr; }
+      display:grid;
+      gap:12px;
+      grid-template-columns: 1fr 1fr; /* always two columns */
     }
 
     .panel {
