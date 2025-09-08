@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nikki & Mat — Team Metrics</title>
+  <link rel="stylesheet" href="https://unpkg.com/mvp.css" />
+  <style>
+    :root { --mat:#1f6feb; --nikki:#e11d48; }
+    html,body{ background:#000; color:#fff; }
+    body{ max-width:1100px; margin:0 auto; padding:10px 8px; }
+
+    /* Header */
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      margin:6px 0 14px;
+    }
+    header h1{ margin:0; font-size:1.35rem; font-weight:800; text-align:center; flex:1; }
+    header img{ max-height:52px; width:auto; }
+
+    /* Controls */
+    .controls{
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;
+      margin:6px 0 14px;
+    }
+    .controls label{ font-size:.9rem; color:#ccc; }
+    .controls select, .controls input[type="search"]{
+      background:#111; color:#fff; border:1px solid #333; border-radius:8px; padding:6px 10px;
+    }
+    .pillbar{
+      display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:10px;
+    }
+    .pill{
+      background:#111; color:#fff; border:1px solid #333; border-radius:999px; padding:6px 10px; cursor:pointer; font-size:.85rem;
+    }
+    .pill.active{ background:#1f2937; }
+
+    /* Tables */
+    section.panel{ display:none; }
+    section.panel.active{ display:block; }
+    table{ width:100%; border-collapse:collapse; table-layout:fixed; font-size:0.82rem; }
+    th,td{ border-bottom:1px solid #222; padding:6px 6px; text-align:center; }
+    th:first-child, td:first-child{ text-align:left; }
+    tr:last-child td{ border-bottom:none; }
+    thead th button{
+      background:transparent; color:#fff; border:none; cursor:pointer; font-weight:700;
+    }
+    .muted{ color:#9aa; font-size:.85rem; }
+
+    @media (max-width:600px){
+      header h1{ font-size:1.2rem; }
+      table{ font-size:0.74rem; }
+      th,td{ padding:4px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="assets/logos/IMG_0931.jpeg" alt="Left Logo" />
+    <h1>Team Metrics</h1>
+    <img src="assets/logos/IMG_0930.jpeg" alt="Right Logo" />
+  </header>
+
+  <div class="controls">
+    <label for="pickerSel">Picker</label>
+    <select id="pickerSel">
+      <option value="Nikki">Nikki</option>
+      <option value="Mat">Mat</option>
+    </select>
+
+    <label for="seasonSel">Season</label>
+    <select id="seasonSel"></select>
+
+    <label for="teamSearch">Filter Team</label>
+    <input id="teamSearch" type="search" placeholder="Type team name…" />
+  </div>
+
+  <div class="pillbar">
+    <button class="pill active" data-tab="pick-team">ATS — Picked Team</button>
+    <button class="pill" data-tab="fade-team">ATS — Faded Team</button>
+    <button class="pill" data-tab="totals-team">Totals — Over/Under</button>
+  </div>
+
+  <!-- Picked team ATS -->
+  <section id="pick-team" class="panel active">
+    <h2>Against the Spread — When Picking That Team <span class="muted" id="countPick"></span></h2>
+    <table>
+      <thead>
+        <tr>
+          <th><button data-sort="team">Team</button></th>
+          <th><button data-sort="wins">W</button></th>
+          <th><button data-sort="losses">L</button></th>
+          <th><button data-sort="pushes">P</button></th>
+          <th><button data-sort="games">Games</button></th>
+          <th><button data-sort="win_pct">Win %</button></th>
+        </tr>
+      </thead>
+      <tbody id="bodyPick"></tbody>
+    </table>
+  </section>
+
+  <!-- Faded team ATS -->
+  <section id="fade-team" class="panel">
+    <h2>Against the Spread — When Fading That Team <span class="muted" id="countFade"></span></h2>
+    <table>
+      <thead>
+        <tr>
+          <th><button data-sort="team">Opponent</button></th>
+          <th><button data-sort="wins">W</button></th>
+          <th><button data-sort="losses">L</button></th>
+          <th><button data-sort="pushes">P</button></th>
+          <th><button data-sort="games">Games</button></th>
+          <th><button data-sort="win_pct">Win %</button></th>
+        </tr>
+      </thead>
+      <tbody id="bodyFade"></tbody>
+    </table>
+  </section>
+
+  <!-- Totals by team -->
+  <section id="totals-team" class="panel">
+    <h2>Totals — Over / Under by Team <span class="muted" id="countTot"></span></h2>
+    <table>
+      <thead>
+        <tr>
+          <th><button data-sort="team">Team</button></th>
+          <th><button data-sort="side">Side</button></th>
+          <th><button data-sort="wins">W</button></th>
+          <th><button data-sort="losses">L</button></th>
+          <th><button data-sort="pushes">P</button></th>
+          <th><button data-sort="games">Games</button></th>
+          <th><button data-sort="win_pct">Win %</button></th>
+        </tr>
+      </thead>
+      <tbody id="bodyTot"></tbody>
+    </table>
+  </section>
+
+  <script src="metrics.js"></script>
+</body>
+</html>
