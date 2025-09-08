@@ -33,13 +33,12 @@ jobs:
           ls -la docs/data/metrics || true
           echo "== Preview =="
           for f in docs/data/metrics/*.csv; do
-            echo "--- $f"; head -n 5 "$f"; done
+            echo "--- $f"; head -n 10 "$f"; done
 
       - name: Commit metrics
         run: |
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
-          # Stage folder (works even if files are new)
           git add -A docs/data/metrics
           if git diff --cached --quiet; then
             echo "No metrics changes to commit."
