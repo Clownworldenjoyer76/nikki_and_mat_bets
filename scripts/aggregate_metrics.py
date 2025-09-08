@@ -1,19 +1,5 @@
 #!/usr/bin/env python3
-"""
-Reads docs/data/final/<season>_wkNN_final.csv files,
-derives per-pick results for Mat & Nikki, and writes rollups to:
-
-docs/data/metrics/
-  - team_ats_by_picker.csv
-  - team_fade_ats_by_picker.csv
-  - home_away_ats_by_picker.csv
-  - totals_by_picker.csv
-  - team_totals_by_picker.csv
-"""
-
-import csv
-import os
-import re
+import csv, os, re
 from pathlib import Path
 from collections import defaultdict
 
@@ -27,129 +13,60 @@ def die(msg, code=78):
     print(f"ERROR: {msg}")
     raise SystemExit(code)
 
-def norm(s):
-    return (s or "").strip()
-
-def lowerkeys(d):
-    return {k.lower(): v for k, v in d.items()}
+def norm(s): return (s or "").strip()
 
 def find_col(headers, *alts):
-    """Find the first header name that matches any lowercased alternative."""
     hset = {h.lower(): h for h in headers}
+    # exact
     for a in alts:
         a = a.lower()
-        if a in hset:
-            return hset[a]
-    # fuzzy find if "pick" wording varies
+        if a in hset: return hset[a]
+    # fuzzy contains
     for a in alts:
         a = a.lower()
         for h in headers:
-            if a in h.lower():
-                return h
+            if a in h.lower(): return h
     return None
 
-def get_latest_season(files):
-    """Pick latest season by lexicographic prefix (e.g., 2025_...)."""
+def latest_season(files):
     seasons = []
     for f in files:
         m = re.match(r"^(\d{4})_wk\d{2}_final\.csv$", f.name)
-        if m:
-            seasons.append(m.group(1))
+        if m: seasons.append(m.group(1))
     return max(seasons) if seasons else None
 
-def parse_final_row(row, header_map):
-    """Extract typed values from a final.csv row using header_map."""
-    val = lambda key, default="": norm(row.get(header_map.get(key, ""), default))
+def to_float(v):
+    try: return float(v)
+    except: return None
 
-    # Required
-    home_team = val("home_team")
-    away_team = val("away_team")
+def to_int_pair(hs, as_):
     try:
-        spread_home = float(val("spread_home", ""))
+        return int(hs), int(as_)
     except:
-        spread_home = None
-    try:
-        total_line = float(val("total", ""))
-    except:
-        total_line = None
+        return None, None
 
-    # Scores (may be blank)
-    try:
-        home_score = int(val("home_score", ""))
-        away_score = int(val("away_score", ""))
-        have_scores = True
-    except:
-        home_score = away_score = 0
-        have_scores = False
-
-    # normalized picks: dict like {"Mat": {"spread": "Home"/"Away"/"", "total": "Over"/"Under"/""}, ...}
-    picks = {p: {"spread": "", "total": ""} for p in PICKERS}
-    for p in PICKERS:
-        spread_key = header_map.get(f"{p.lower()}_spread") or header_map.get(f"{p.lower()}_spread_pick")
-        total_key  = header_map.get(f"{p.lower()}_total")  or header_map.get(f"{p.lower()}_total_pick")
-        if spread_key:
-            picks[p]["spread"] = norm(row.get(spread_key, ""))
-        if total_key:
-            picks[p]["total"]  = norm(row.get(total_key, ""))
-
-    return {
-        "home_team": home_team,
-        "away_team": away_team,
-        "spread_home": spread_home,
-        "total_line": total_line,
-        "home_score": home_score,
-        "away_score": away_score,
-        "have_scores": have_scores,
-        "picks": picks,
-    }
-
-def result_spread(pick_side, spread_home, home_score, away_score):
-    """
-    Return W/L/P for a spread pick:
-    - pick_side: "Home" or "Away"
-    - spread_home: spread for the HOME team (e.g., -3.5 if favorite)
-    """
-    if pick_side not in ("Home", "Away"):
+def result_spread(pick_side, spread_home, hs, as_):
+    if pick_side not in ("Home", "Away") or spread_home is None or hs is None or as_ is None:
         return None
-    # margin > 0 means HOME covers; ==0 push; <0 home doesn't cover
-    margin = (home_score + (spread_home or 0.0)) - away_score
-    if margin == 0:
-        covered_home = None  # push
-    else:
-        covered_home = margin > 0
-
-    if covered_home is None:
-        return "P"
-    if (covered_home and pick_side == "Home") or ((not covered_home) and pick_side == "Away"):
+    margin = (hs + spread_home) - as_
+    if margin == 0: return "P"
+    covered_home = margin > 0
+    if (covered_home and pick_side=="Home") or ((not covered_home) and pick_side=="Away"):
         return "W"
     return "L"
 
-def result_total(pick_side, total_line, home_score, away_score):
-    if pick_side not in ("Over", "Under"):
+def result_total(pick_side, total_line, hs, as_):
+    if pick_side not in ("Over", "Under") or total_line is None or hs is None or as_ is None:
         return None
-    total_points = home_score + away_score
-    if total_points == (total_line or 0.0):
-        return "P"
-    if (pick_side == "Over" and total_points > (total_line or 0.0)) or (pick_side == "Under" and total_points < (total_line or 0.0)):
+    total_pts = hs + as_
+    if total_pts == total_line: return "P"
+    if (pick_side=="Over" and total_pts>total_line) or (pick_side=="Under" and total_pts<total_line):
         return "W"
     return "L"
 
-def safe_inc(bucket, key_tuple, res):
-    """Increment W/L/P counters in bucket[key_tuple]."""
-    if res is None:
-        return
-    wins, losses, pushes = bucket[key_tuple]
-    if res == "W":
-        wins += 1
-    elif res == "L":
-        losses += 1
-    elif res == "P":
-        pushes += 1
-    bucket[key_tuple] = (wins, losses, pushes)
-
-def percent(w, l, p):
-    games = w + l + p
-    return (games and round(100.0 * w / games, 1)) or 0.0, games
+def pct(w,l,p):
+    g = w+l+p
+    return (round(100.0*w/g,1) if g else 0.0), g
 
 def write_rows(path, headers, rows):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -160,130 +77,169 @@ def write_rows(path, headers, rows):
             w.writerow(r)
 
 def main():
-    season = os.environ.get("SEASON", "").strip()
+    season = os.environ.get("SEASON","").strip()
     files = sorted(FINAL_DIR.glob("*_wk??_final.csv"))
-    if not files:
-        die(f"No final CSV files found in {FINAL_DIR}")
-
+    if not files: die(f"No final CSV files found in {FINAL_DIR}")
     if not season:
-        season = get_latest_season(files) or ""
-    if not season:
-        die("Could not determine season. Provide SEASON env or ensure filenames like 2025_wk01_final.csv")
+        season = latest_season(files) or ""
+    if not season: die("Could not determine season; set SEASON env or ensure filenames like 2025_wk01_final.csv")
 
     season_files = [f for f in files if f.name.startswith(season + "_")]
-    if not season_files:
-        die(f"No final CSVs for season {season} in {FINAL_DIR}")
+    if not season_files: die(f"No final CSVs for season {season}")
 
     # Buckets
-    team_ats_by_picker = defaultdict(lambda: (0, 0, 0))   # (team, picker) -> (W,L,P)
-    team_fade_by_picker = defaultdict(lambda: (0, 0, 0))  # (opponent, picker) -> (W,L,P)
-    home_away_by_picker = defaultdict(lambda: (0, 0, 0))  # (picker, side) -> (W,L,P)
-    totals_by_picker = defaultdict(lambda: (0, 0, 0))     # (picker, side) -> (W,L,P)
-    team_totals_by_picker = defaultdict(lambda: (0, 0, 0))# (team, picker, side) -> (W,L,P)
+    team_ats = defaultdict(lambda:(0,0,0))         # (team, picker)
+    team_fade = defaultdict(lambda:(0,0,0))        # (opponent, picker)
+    home_away = defaultdict(lambda:(0,0,0))        # (picker, side)
+    totals = defaultdict(lambda:(0,0,0))           # (picker, side)
+    team_totals = defaultdict(lambda:(0,0,0))      # (team, picker, side)
 
-    # process files
+    total_rows=0; graded_rows=0
+    skipped_no_scores=0; skipped_no_picks=0
+    debug_samples=[]
+
     for f in season_files:
         with f.open("r", encoding="utf-8", newline="") as fh:
             reader = csv.DictReader(fh)
             headers = reader.fieldnames or []
-            hlow = [h.lower() for h in headers]
 
-            # build header map
-            hm = {}
-            hm["home_team"] = find_col(headers, "home_team")
-            hm["away_team"] = find_col(headers, "away_team")
-            hm["spread_home"] = find_col(headers, "spread_home", "home_spread", "spread")
-            hm["total"] = find_col(headers, "total", "over_under", "ou", "total_points")
-            hm["home_score"] = find_col(headers, "home_score", "score_home")
-            hm["away_score"] = find_col(headers, "away_score", "score_away")
+            # map columns
+            col_home_team = find_col(headers, "home_team")
+            col_away_team = find_col(headers, "away_team")
+            col_spread_home = find_col(headers, "spread_home","home_spread","spread")
+            col_total = find_col(headers, "total","over_under","ou","total_points")
+            col_home_score = find_col(headers, "home_score","score_home")
+            col_away_score = find_col(headers, "away_score","score_away")
 
-            # pick columns per person
+            # picks (support many variants)
+            pick_cols = {}
             for p in PICKERS:
                 pl = p.lower()
-                hm[f"{pl}_spread"] = find_col(headers, f"{pl}_spread_pick", f"{pl}_spread", f"{p} Spread", f"{p}_spread")
-                hm[f"{pl}_total"]  = find_col(headers, f"{pl}_total_pick",  f"{pl}_total",  f"{p} Total",  f"{p}_total")
+                pick_cols[f"{p}_spread"] = find_col(headers,
+                    f"{pl}_spread", f"{pl}_spread_pick", f"{p} Spread", f"{p}_Spread")
+                pick_cols[f"{p}_total"] = find_col(headers,
+                    f"{pl}_total", f"{pl}_total_pick", f"{p} Total", f"{p}_Total")
 
-            # iterate rows
             for row in reader:
-                data = parse_final_row(row, hm)
-                if not data["have_scores"]:
-                    # can't grade without scores
+                total_rows += 1
+
+                ht = norm(row.get(col_home_team,""))
+                at = norm(row.get(col_away_team,""))
+                sh = to_float(row.get(col_spread_home,""))
+                tot = to_float(row.get(col_total,""))
+                hs, as_ = to_int_pair(row.get(col_home_score,""), row.get(col_away_score,""))
+
+                has_any_pick=False
+                for p in PICKERS:
+                    ps = norm(row.get(pick_cols.get(f"{p}_spread","") or "", "")).capitalize()
+                    pt = norm(row.get(pick_cols.get(f"{p}_total","") or "", "")).capitalize()
+                    if ps in ("Home","Away") or pt in ("Over","Under"):
+                        has_any_pick=True
+
+                if hs is None or as_ is None:
+                    skipped_no_scores += 1
+                    if len(debug_samples)<5:
+                        debug_samples.append(f"{f.name}: skipped(no scores) {ht} vs {at} | hs='{row.get(col_home_score)}' as='{row.get(col_away_score)}'")
                     continue
 
-                # Spread results
+                if not has_any_pick:
+                    skipped_no_picks += 1
+                    if len(debug_samples)<5:
+                        debug_samples.append(f"{f.name}: skipped(no picks) {ht} vs {at}")
+                    continue
+
+                graded_rows += 1
+
+                # grade each picker
                 for p in PICKERS:
-                    side = data["picks"][p]["spread"]  # "Home"/"Away"/""
-                    if side:
-                        res = result_spread(side, data["spread_home"], data["home_score"], data["away_score"])
-                        # chosen/faded teams
-                        if side == "Home":
-                            chosen = data["home_team"]; faded = data["away_team"]; side_flag = "home"
+                    ps = norm(row.get(pick_cols.get(f"{p}_spread","") or "", "")).capitalize()
+                    if ps in ("Home","Away"):
+                        res = result_spread(ps, sh, hs, as_)
+                        if ps=="Home":
+                            chosen, faded, side = ht, at, "home"
                         else:
-                            chosen = data["away_team"]; faded = data["home_team"]; side_flag = "away"
+                            chosen, faded, side = at, ht, "away"
+                        w,l,push = team_ats[(chosen,p)]
+                        if   res=="W": w+=1
+                        elif res=="L": l+=1
+                        elif res=="P": push+=1
+                        team_ats[(chosen,p)]=(w,l,push)
 
-                        safe_inc(team_ats_by_picker, (chosen, p), res)
-                        safe_inc(team_fade_by_picker, (faded, p), res)
-                        safe_inc(home_away_by_picker, (p, side_flag), res)
+                        w,l,push = team_fade[(faded,p)]
+                        if   res=="W": w+=1
+                        elif res=="L": l+=1
+                        elif res=="P": push+=1
+                        team_fade[(faded,p)]=(w,l,push)
 
-                # Totals results
-                for p in PICKERS:
-                    side = data["picks"][p]["total"]  # "Over"/"Under"/""
-                    if side:
-                        res = result_total(side, data["total_line"], data["home_score"], data["away_score"])
-                        safe_inc(totals_by_picker, (p, side.lower()), res)
+                        w,l,push = home_away[(p,side)]
+                        if   res=="W": w+=1
+                        elif res=="L": l+=1
+                        elif res=="P": push+=1
+                        home_away[(p,side)]=(w,l,push)
 
-                        # attribute totals to BOTH teams (game involves both)
-                        for team in (data["home_team"], data["away_team"]):
-                            safe_inc(team_totals_by_picker, (team, p, side.lower()), res)
+                    pt = norm(row.get(pick_cols.get(f"{p}_total","") or "", "")).capitalize()
+                    if pt in ("Over","Under"):
+                        res = result_total(pt, tot, hs, as_)
+                        w,l,push = totals[(p,pt.lower())]
+                        if   res=="W": w+=1
+                        elif res=="L": l+=1
+                        elif res=="P": push+=1
+                        totals[(p,pt.lower())]=(w,l,push)
 
+                        for team in (ht, at):
+                            w,l,push = team_totals[(team,p,pt.lower())]
+                            if   res=="W": w+=1
+                            elif res=="L": l+=1
+                            elif res=="P": push+=1
+                            team_totals[(team,p,pt.lower())]=(w,l,push)
+
+    # Write outputs
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Write: team_ats_by_picker.csv
-    rows = []
-    for (team, picker), (w,l,p) in sorted(team_ats_by_picker.items()):
-        pct, games = percent(w,l,p)
-        rows.append([season, team, picker, w, l, p, games, pct])
-    write_rows(OUT_DIR / "team_ats_by_picker.csv",
-               ["season","team","picker","wins","losses","pushes","games","win_pct"],
-               rows)
+    def pct_and_games(w,l,p):
+        g = w+l+p
+        return g, (round(100.0*w/g,1) if g else 0.0)
 
-    # Write: team_fade_ats_by_picker.csv
-    rows = []
-    for (opponent, picker), (w,l,p) in sorted(team_fade_by_picker.items()):
-        pct, games = percent(w,l,p)
-        rows.append([season, opponent, picker, w, l, p, games, pct])
-    write_rows(OUT_DIR / "team_fade_ats_by_picker.csv",
-               ["season","opponent","picker","wins","losses","pushes","games","win_pct"],
-               rows)
+    rows=[]
+    for (team,picker),(w,l,p) in sorted(team_ats.items()):
+        g,wp = pct_and_games(w,l,p)
+        rows.append([season,team,picker,w,l,p,g,wp])
+    write_rows(OUT_DIR/"team_ats_by_picker.csv",
+               ["season","team","picker","wins","losses","pushes","games","win_pct"], rows)
 
-    # Write: home_away_ats_by_picker.csv
-    rows = []
-    for (picker, side), (w,l,p) in sorted(home_away_by_picker.items()):
-        pct, games = percent(w,l,p)
-        rows.append([season, picker, side, w, l, p, games, pct])
-    write_rows(OUT_DIR / "home_away_ats_by_picker.csv",
-               ["season","picker","side","wins","losses","pushes","games","win_pct"],
-               rows)
+    rows=[]
+    for (opp,picker),(w,l,p) in sorted(team_fade.items()):
+        g,wp = pct_and_games(w,l,p)
+        rows.append([season,opp,picker,w,l,p,g,wp])
+    write_rows(OUT_DIR/"team_fade_ats_by_picker.csv",
+               ["season","opponent","picker","wins","losses","pushes","games","win_pct"], rows)
 
-    # Write: totals_by_picker.csv
-    rows = []
-    for (picker, side), (w,l,p) in sorted(totals_by_picker.items()):
-        pct, games = percent(w,l,p)
-        rows.append([season, picker, side, w, l, p, games, pct])
-    write_rows(OUT_DIR / "totals_by_picker.csv",
-               ["season","picker","side","wins","losses","pushes","games","win_pct"],
-               rows)
+    rows=[]
+    for (picker,side),(w,l,p) in sorted(home_away.items()):
+        g,wp = pct_and_games(w,l,p)
+        rows.append([season,picker,side,w,l,p,g,wp])
+    write_rows(OUT_DIR/"home_away_ats_by_picker.csv",
+               ["season","picker","side","wins","losses","pushes","games","win_pct"], rows)
 
-    # Write: team_totals_by_picker.csv
-    rows = []
-    for (team, picker, side), (w,l,p) in sorted(team_totals_by_picker.items()):
-        pct, games = percent(w,l,p)
-        rows.append([season, team, picker, side, w, l, p, games, pct])
-    write_rows(OUT_DIR / "team_totals_by_picker.csv",
-               ["season","team","picker","side","wins","losses","pushes","games","win_pct"],
-               rows)
+    rows=[]
+    for (picker,side),(w,l,p) in sorted(totals.items()):
+        g,wp = pct_and_games(w,l,p)
+        rows.append([season,picker,side,w,l,p,g,wp])
+    write_rows(OUT_DIR/"totals_by_picker.csv",
+               ["season","picker","side","wins","losses","pushes","games","win_pct"], rows)
 
-    print(f"Wrote metrics to {OUT_DIR.relative_to(ROOT)} for season {season}")
+    rows=[]
+    for (team,picker,side),(w,l,p) in sorted(team_totals.items()):
+        g,wp = pct_and_games(w,l,p)
+        rows.append([season,team,picker,side,w,l,p,g,wp])
+    write_rows(OUT_DIR/"team_totals_by_picker.csv",
+               ["season","team","picker","side","wins","losses","pushes","games","win_pct"], rows)
+
+    print(f"Season {season}: processed files={len(season_files)} rows_total={total_rows} graded_rows={graded_rows} skipped_no_scores={skipped_no_scores} skipped_no_picks={skipped_no_picks}")
+    if debug_samples:
+        print("Examples of skipped rows:")
+        for s in debug_samples:
+            print("  - " + s)
 
 if __name__ == "__main__":
     main()
