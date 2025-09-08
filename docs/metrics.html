@@ -9,44 +9,23 @@
     :root { --mat:#1f6feb; --nikki:#e11d48; }
     html,body{ background:#000; color:#fff; }
     body{ max-width:1100px; margin:0 auto; padding:10px 8px; }
-
-    /* Header */
-    header{
-      display:flex; align-items:center; justify-content:space-between;
-      margin:6px 0 14px;
-    }
+    header{ display:flex; align-items:center; justify-content:space-between; margin:6px 0 14px; }
     header h1{ margin:0; font-size:1.35rem; font-weight:800; text-align:center; flex:1; }
     header img{ max-height:52px; width:auto; }
-
-    /* Controls */
-    .controls{
-      display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;
-      margin:6px 0 14px;
-    }
+    .controls{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center; margin:6px 0 14px; }
     .controls label{ font-size:.9rem; color:#ccc; }
-    .controls select, .controls input[type="search"]{
-      background:#111; color:#fff; border:1px solid #333; border-radius:8px; padding:6px 10px;
-    }
-    .pillbar{
-      display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:10px;
-    }
-    .pill{
-      background:#111; color:#fff; border:1px solid #333; border-radius:999px; padding:6px 10px; cursor:pointer; font-size:.85rem;
-    }
+    .controls select{ background:#111; color:#fff; border:1px solid #333; border-radius:8px; padding:6px 10px; }
+    .pillbar{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:10px; }
+    .pill{ background:#111; color:#fff; border:1px solid #333; border-radius:999px; padding:6px 10px; cursor:pointer; font-size:.85rem; }
     .pill.active{ background:#1f2937; }
-
-    /* Tables */
     section.panel{ display:none; }
     section.panel.active{ display:block; }
     table{ width:100%; border-collapse:collapse; table-layout:fixed; font-size:0.82rem; }
     th,td{ border-bottom:1px solid #222; padding:6px 6px; text-align:center; }
-    th:first-child, td:first-child{ text-align:left; }
+    th:first-child,td:first-child{ text-align:left; }
     tr:last-child td{ border-bottom:none; }
-    thead th button{
-      background:transparent; color:#fff; border:none; cursor:pointer; font-weight:700;
-    }
+    thead th button{ background:transparent; color:#fff; border:none; cursor:pointer; font-weight:700; }
     .muted{ color:#9aa; font-size:.85rem; }
-
     @media (max-width:600px){
       header h1{ font-size:1.2rem; }
       table{ font-size:0.74rem; }
@@ -71,8 +50,8 @@
     <label for="seasonSel">Season</label>
     <select id="seasonSel"></select>
 
-    <label for="teamSearch">Filter Team</label>
-    <input id="teamSearch" type="search" placeholder="Type team name…" />
+    <label for="teamSel">Team</label>
+    <select id="teamSel"></select>
   </div>
 
   <div class="pillbar">
@@ -81,7 +60,6 @@
     <button class="pill" data-tab="totals-team">Totals — Over/Under</button>
   </div>
 
-  <!-- Picked team ATS -->
   <section id="pick-team" class="panel active">
     <h2>Against the Spread — When Picking That Team <span class="muted" id="countPick"></span></h2>
     <table>
@@ -99,7 +77,6 @@
     </table>
   </section>
 
-  <!-- Faded team ATS -->
   <section id="fade-team" class="panel">
     <h2>Against the Spread — When Fading That Team <span class="muted" id="countFade"></span></h2>
     <table>
@@ -117,7 +94,6 @@
     </table>
   </section>
 
-  <!-- Totals by team -->
   <section id="totals-team" class="panel">
     <h2>Totals — Over / Under by Team <span class="muted" id="countTot"></span></h2>
     <table>
