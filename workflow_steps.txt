@@ -4,7 +4,7 @@
 	3.	Init Scores CSV → creates a blank scorecard for that week.
 	4.	You fill in the scores manually.
 	5.	Combine Picks & Scores → merges picks + results → final.csv.
-
+	6.	Build Insights Metrics → aggregates season splits for Insights page.
 
 1. Odds / Weekly Data Fetcher
 
@@ -51,6 +51,18 @@ File: .github/workflows/combine_manual.yml
 	4.	Outputs the merged file to:
 docs/data/final/<season>_wkNN_final.csv
 including all picks, spreads, totals, and now the final scores.
-
 	•	Why: Produces the “final” authoritative record for the week — who picked what, the lines, the results.
 
+5. Build Insights Metrics (Manual)
+
+File: .github/workflows/build_metrics_manual.yml
+	•	When it runs: Manually triggered (optional “season” input; if blank, auto-detect latest season from filenames).
+	•	What it does:
+	1.	Scans all docs/data/final/<season>_wkNN_final.csv files.
+	2.	Computes season-to-date splits (per-team ATS when picked, per-team ATS when faded, home/away ATS, totals over/under, etc.).
+	3.	Writes aggregated CSVs to:
+docs/data/metrics/team_ats_by_picker.csv
+docs/data/metrics/team_fade_ats_by_picker.csv
+docs/data/metrics/home_away_ats_by_picker.csv
+docs/data/metrics/totals_by_picker.csv
+	•	Why: Powers the Insights page (insights.html) with granular records without reprocessing in the browser.
