@@ -36,14 +36,10 @@ def latest_season(files):
     return max(seasons) if seasons else None
 
 def to_float(v):
-    try: return float(v)
-    except: return None
-
-def to_int_pair(hs, as_):
     try:
-        return int(hs), int(as_)
+        return float(str(v).strip())
     except:
-        return None, None
+        return None
 
 def result_spread(pick_side, spread_home, hs, as_):
     if pick_side not in ("Home", "Away") or spread_home is None or hs is None or as_ is None:
@@ -111,7 +107,7 @@ def main():
             col_home_score = find_col(headers, "home_score","score_home")
             col_away_score = find_col(headers, "away_score","score_away")
 
-            # picks (support many variants)
+            # picks (support common variants)
             pick_cols = {}
             for p in PICKERS:
                 pl = p.lower()
@@ -127,12 +123,16 @@ def main():
                 at = norm(row.get(col_away_team,""))
                 sh = to_float(row.get(col_spread_home,""))
                 tot = to_float(row.get(col_total,""))
-                hs, as_ = to_int_pair(row.get(col_home_score,""), row.get(col_away_score,""))
+                hs = to_float(row.get(col_home_score,""))
+                as_ = to_float(row.get(col_away_score,""))
 
+                # detect any picks on this row
                 has_any_pick=False
                 for p in PICKERS:
-                    ps = norm(row.get(pick_cols.get(f"{p}_spread","") or "", "")).capitalize()
-                    pt = norm(row.get(pick_cols.get(f"{p}_total","") or "", "")).capitalize()
+                    ps_raw = norm(row.get(pick_cols.get(f"{p}_spread","") or "", ""))
+                    pt_raw = norm(row.get(pick_cols.get(f"{p}_total","") or "", ""))
+                    ps = ps_raw.capitalize()
+                    pt = pt_raw.capitalize()
                     if ps in ("Home","Away") or pt in ("Over","Under"):
                         has_any_pick=True
 
@@ -152,7 +152,12 @@ def main():
 
                 # grade each picker
                 for p in PICKERS:
-                    ps = norm(row.get(pick_cols.get(f"{p}_spread","") or "", "")).capitalize()
+                    ps_raw = norm(row.get(pick_cols.get(f"{p}_spread","") or "", ""))
+                    pt_raw = norm(row.get(pick_cols.get(f"{p}_total","") or "", ""))
+
+                    ps = ps_raw.capitalize()   # home/away
+                    pt = pt_raw.capitalize()   # over/under
+
                     if ps in ("Home","Away"):
                         res = result_spread(ps, sh, hs, as_)
                         if ps=="Home":
@@ -177,7 +182,6 @@ def main():
                         elif res=="P": push+=1
                         home_away[(p,side)]=(w,l,push)
 
-                    pt = norm(row.get(pick_cols.get(f"{p}_total","") or "", "")).capitalize()
                     if pt in ("Over","Under"):
                         res = result_total(pt, tot, hs, as_)
                         w,l,push = totals[(p,pt.lower())]
@@ -235,7 +239,7 @@ def main():
     write_rows(OUT_DIR/"team_totals_by_picker.csv",
                ["season","team","picker","side","wins","losses","pushes","games","win_pct"], rows)
 
-    print(f"Season {season}: processed files={len(season_files)} rows_total={total_rows} graded_rows={graded_rows} skipped_no_scores={skipped_no_scores} skipped_no_picks={skipped_no_picks}")
+    print(f"Season {season}: files={len(season_files)} rows_total={total_rows} graded_rows={graded_rows} skipped_no_scores={skipped_no_scores} skipped_no_picks={skipped_no_picks}")
     if debug_samples:
         print("Examples of skipped rows:")
         for s in debug_samples:
