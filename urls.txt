@@ -5,3 +5,7 @@ https://clownworldenjoyer76.github.io/nikki_and_mat_bets/
 📊 Weekly Records Page (Nikki vs Mat results)
 
 https://clownworldenjoyer76.github.io/nikki_and_mat_bets/picks.html
+
+📐 Granular Metrics
+
+https://clownworldenjoyer76.github.io/nikki_and_mat_bets/insights.html
