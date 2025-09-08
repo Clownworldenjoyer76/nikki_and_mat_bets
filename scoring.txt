@@ -1,9 +1,4 @@
-docs/data/scores/<season>_wkNN_scores.csv needs these columns:
-
-game_id,home_team,away_team,home_score,away_score
-
-• game_id → must match the IDs in odds/picks files  
-• home_team → for readability  
-• away_team → for readability  
-• home_score → left blank at first, fill in after game  
-• away_score → left blank at first, fill in after game
+* Run Action  Export CSV to XLSX (Manual)
+* Enter Week Number
+* Download data/scores/2025_wk??_scores.xlsx
+*Open and Update CSV in Google Sheets
