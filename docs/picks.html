@@ -8,54 +8,54 @@
   <style>
     :root { --mat:#1f6feb; --nikki:#e11d48; }
     html,body { background:#000; color:#fff; }
-    body { max-width:1000px; margin:0 auto; padding:12px; }
+    body { max-width:1000px; margin:0 auto; padding:10px 8px; }
 
     /* Header */
     header{
       display:flex; align-items:center; justify-content:space-between;
-      margin:6px 0 14px;
+      margin:4px 0 10px;
     }
-    header h1{ margin:0; font-size:1.4rem; font-weight:bold; text-align:center; flex:1; }
-    header img{ max-height:60px; width:auto; }
+    header h1{ margin:0; font-size:1.25rem; font-weight:800; text-align:center; flex:1; }
+    header img{ max-height:52px; width:auto; }
 
-    /* Side-by-side record cards */
+    /* Two fixed columns, always same row */
     .records-container{
-      display:flex;
-      justify-content:center;
-      align-items:stretch;   /* force equal height */
-      gap:12px;
+      display:flex; justify-content:center; align-items:stretch; gap:10px;
     }
     .record-card{
-      flex:1 1 0;            /* equal width columns */
-      max-width:48%;         /* each ~half screen */
-      background:#111;
-      border:1px solid #222;
-      border-radius:10px;
-      padding:10px;
+      flex:0 0 50%;
+      max-width:50%;
+      background:#101010; border:1px solid #202020; border-radius:10px;
+      padding:8px 8px 10px;
       box-shadow:0 2px 10px rgba(0,0,0,.35);
-      text-align:center;
-      display:flex;
-      flex-direction:column;
+      text-align:center; display:flex; flex-direction:column;
     }
-    .record-card h2{
-      margin:0 0 8px;
-      font-size:0.9rem;      /* smaller names */
-      font-weight:700;
-    }
+    .record-card h2{ margin:0 0 6px; font-size:0.85rem; font-weight:800; letter-spacing:.2px; }
     .record-card.nikki h2{ color:var(--nikki); }
     .record-card.mat   h2{ color:var(--mat); }
 
-    table{ width:100%; border-collapse:collapse; font-size:0.75rem; }
-    thead th{ background:#111; }
-    th,td{ border-bottom:1px solid #222; padding:4px; text-align:center; }
+    /* Tight table */
+    table{
+      width:100%; border-collapse:collapse; table-layout:fixed;
+      font-size:0.68rem; line-height:1.1;
+    }
+    thead th{ background:#101010; }
+    th,td{ border-bottom:1px solid #222; padding:3px 2px; text-align:center; }
     th:first-child, td:first-child{ text-align:left; }
     tr:last-child td{ border-bottom:none; }
-    .empty{ text-align:center; color:#aaa; padding:6px; border:1px dashed #333; border-radius:8px; margin-top:8px; font-size:0.7rem; }
 
+    /* Fixed column widths so nothing wraps off-screen */
+    colgroup col.col-week  { width:34%; }
+    colgroup col.col-spread{ width:33%; }
+    colgroup col.col-ou    { width:33%; }
+
+    /* Extra-tight on small phones */
     @media (max-width:600px){
-      header h1{ font-size:1.2rem; }
-      .record-card{ max-width:48%; padding:8px; }
-      table, th, td{ font-size:0.7rem; padding:3px; }
+      header h1{ font-size:1.1rem; }
+      header img{ max-height:46px; }
+      .record-card{ padding:6px; }
+      table{ font-size:0.62rem; }
+      th,td{ padding:2px; }
     }
   </style>
 </head>
@@ -70,23 +70,29 @@
     <section class="record-card nikki">
       <h2>Nikki</h2>
       <table>
+        <colgroup>
+          <col class="col-week"><col class="col-spread"><col class="col-ou">
+        </colgroup>
         <thead>
           <tr><th>Week</th><th>Spread</th><th>O/U</th></tr>
         </thead>
         <tbody id="nikkiBody"></tbody>
       </table>
-      <div id="nikkiEmpty" class="empty" hidden>No final files found.</div>
+      <div id="nikkiEmpty" hidden></div>
     </section>
 
     <section class="record-card mat">
       <h2>Mat</h2>
       <table>
+        <colgroup>
+          <col class="col-week"><col class="col-spread"><col class="col-ou">
+        </colgroup>
         <thead>
           <tr><th>Week</th><th>Spread</th><th>O/U</th></tr>
         </thead>
         <tbody id="matBody"></tbody>
       </table>
-      <div id="matEmpty" class="empty" hidden>No final files found.</div>
+      <div id="matEmpty" hidden></div>
     </section>
   </main>
 
