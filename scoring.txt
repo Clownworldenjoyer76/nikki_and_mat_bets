@@ -2,3 +2,6 @@
 * Enter Week Number
 * Download data/scores/2025_wk??_scores.xlsx
 *Open and Update CSV in Google Sheets
+*
+* Upload Updated xlsx file
+XLSX input: docs/data/final/<season>_wkNN_<suffix>.xlsx
