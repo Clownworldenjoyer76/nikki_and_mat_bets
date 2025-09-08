@@ -4,4 +4,13 @@
 *Open and Update CSV in Google Sheets
 *
 * Upload Updated xlsx file
-XLSX input: docs/data/final/<season>_wkNN_<suffix>.xlsx
+Move the file to docs/data/scores/2025_wk01_scores.xlsx.
+	2.	Re-run Import XLSX back to CSV (Manual) with:
+	•	folder = scores
+	•	week = 1
+
+B) Final flow
+	1.	Rename the file to docs/data/final/2025_wk01_final.xlsx.
+	2.	Re-run the workflow with:
+	•	folder = final
+	•	week = 1
