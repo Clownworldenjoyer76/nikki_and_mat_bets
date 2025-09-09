@@ -87,26 +87,30 @@ function makePickButton(label, type, side, curPick, color, key, user){
       (type === "total"  && curPick.total  === side) ){
     b.classList.add("active", color);
   }
-  b.onclick = ()=>{
-    const all = loadPicks();
-    const mine = all[user] || {};
-    const current = ensurePickShape(mine[key]);
+  b.onclick = async ()=>{
+    try {
+      const all = loadPicks();
+      const mine = all[user] || {};
+      const current = ensurePickShape(mine[key]);
 
-    if(type === "spread"){
-      current.spread = (current.spread === side) ? null : side;
-    }else if(type === "total"){
-      current.total  = (current.total  === side) ? null : side;
+      if(type === "spread"){
+        current.spread = (current.spread === side) ? null : side;
+      }else if(type === "total"){
+        current.total  = (current.total  === side) ? null : side;
+      }
+
+      if(current.spread === null && current.total === null){
+        delete mine[key];
+      }else{
+        mine[key] = current;
+      }
+
+      all[user] = mine;
+      savePicks(all);
+      await render();
+    } catch (e) {
+      alert("Error: " + e.message);
     }
-
-    if(current.spread === null && current.total === null){
-      delete mine[key];
-    }else{
-      mine[key] = current;
-    }
-
-    all[user] = mine;
-    savePicks(all);
-    render();
   };
   return b;
 }
