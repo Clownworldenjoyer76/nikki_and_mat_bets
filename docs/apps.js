@@ -114,20 +114,21 @@ function card(h, r, picksAll){
       </div>
       <img class="team-logo right" src="${logoPath(home)}" alt="${home} logo">
     </div>
-    <div class="when">${when}</div>
-    <div class="line">
+    <div class="when" style="text-align:center; margin-top:6px;">${when}</div>
+    <div class="line" style="text-align:center; margin-top:6px;">
       <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
-      <span class="pill">Total: <b>${totalDisp}</b></span>
+      <span class="pill" style="margin-left:8px;">Total: <b>${totalDisp}</b></span>
     </div>
     <div class="lane"><div class="name mat">Mat</div><div class="btnrow" data-user="mat"></div></div>
     <div class="lane"><div class="name nikki">Nikki</div><div class="btnrow" data-user="nikki"></div></div>
   `;
 
+  // Button labels now show TEAM NAMES instead of Home/Away
   const opts = [
-    {label:`Home ${spreadHomeDisp}`, type:"spread", side:"home"},
-    {label:`Away ${spreadAway}`,     type:"spread", side:"away"},
-    {label:`Over ${totalDisp}`,      type:"total",  side:"over"},
-    {label:`Under ${totalDisp}`,     type:"total",  side:"under"},
+    {label:`${home} ${spreadHomeDisp}`, type:"spread", side:"home"},
+    {label:`${away} ${spreadAway}`,     type:"spread", side:"away"},
+    {label:`Over ${totalDisp}`,         type:"total",  side:"over"},
+    {label:`Under ${totalDisp}`,        type:"total",  side:"under"},
   ];
 
   ["mat","nikki"].forEach(user=>{
@@ -178,12 +179,19 @@ function card(h, r, picksAll){
   return el;
 }
 
-async function render(){
-  // 1) Fetch schedule CSV from your requested path; if that fails,
-  //    try two equivalent site paths so the page still works.
-  const { txt, used } = await fetchFirstAvailable(CSV_CANDIDATES);
+function neonDivider(){
+  const div = document.createElement("div");
+  // Inline style so you don't need to edit CSS/HTML:
+  div.setAttribute("style",
+    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;");
+  return div;
+}
 
-  // 2) Parse and pick a source set (CONSENSUS preferred, else all rows)
+async function render(){
+  // 1) Fetch schedule CSV (your path + safe fallbacks)
+  const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
+
+  // 2) Parse and pick source (CONSENSUS preferred, else all rows)
   const { hdr, rows } = parseCSV(txt);
   const consensus = onlyConsensus(rows, hdr);
   const source = consensus.length ? consensus : rows;
@@ -195,11 +203,17 @@ async function render(){
   const week = wkVal ? nflWeekLabel(wkVal) : "";
   document.getElementById("seasonWeek").textContent = week ? `NFL Week ${week}` : "NFL Schedule";
 
-  // 4) Render cards
+  // 4) Render cards + neon divider between each game
   const picksAll = loadPicks();
   const gamesDiv = document.getElementById("games");
   gamesDiv.innerHTML = "";
-  source.forEach(r=> gamesDiv.appendChild(card(hdr,r,picksAll)));
+  source.forEach((r, i)=>{
+    const c = card(hdr,r,picksAll);
+    gamesDiv.appendChild(c);
+    if(i < source.length - 1){
+      gamesDiv.appendChild(neonDivider());
+    }
+  });
 }
 
 document.getElementById("clearBtn").onclick = ()=>{
