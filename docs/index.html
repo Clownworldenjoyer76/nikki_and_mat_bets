@@ -8,11 +8,6 @@
     :root { --bg:#000; --fg:#fff; --muted:#bbb; --accent:#1f6feb; --neon:#39ff14; }
     html,body{background:#000;color:#fff;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 
-    .topbar{background:#111;border-bottom:1px solid #333;padding:6px 10px;position:sticky;top:0;z-index:1000}
-    .topbar nav{display:flex;gap:14px;justify-content:center}
-    .topbar a{color:#fff;text-decoration:none;font-size:.9rem}
-    .topbar a:hover{color:var(--accent)}
-
     .wrap{max-width:1000px;margin:0 auto;padding:50px 10px 10px 10px}
     header.main-header {
       display:flex;
@@ -40,8 +35,36 @@
       z-index:0;
     }
 
-    .bar{position:sticky;bottom:0;background:#1a1a1a;border-top:1px solid #333;padding:8px}
-    .bar .row{display:flex;gap:10px;justify-content:center;align-items:center}
+    .bar{
+      position:sticky;
+      bottom:0;
+      background:#1a1a1a;
+      border-top:1px solid #333;
+      padding:8px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .bar nav{
+      display:flex;
+      gap:14px;
+      justify-content:center;
+      margin:0 auto;
+    }
+    .bar a{
+      color:#fff;
+      text-decoration:none;
+      font-size:.9rem;
+    }
+    .bar a:hover{
+      color:var(--accent);
+    }
+    .bar .row{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      align-items:center;
+    }
     .btn{background:#111;color:#fff;border:1px solid #444;border-radius:10px;padding:8px 14px;font-weight:600}
     .btn.primary{background:#0b5cff;border-color:#0b5cff}
     #games{display:flex;flex-direction:column;gap:14px;margin:12px 0 100px}
@@ -72,15 +95,6 @@
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <nav>
-      <a href="./index.html">🏈 Picks</a>
-      <a href="./picks.html">📊 Weekly</a>
-      <a href="./insights.html">📐 Insights</a>
-      <a href="./metrics.html">📏 By Team</a>
-    </nav>
-  </header>
-
   <div class="wrap">
     <header class="main-header">
       <img src="assets/logos/IMG_0931.jpeg" alt="Left logo">
@@ -96,6 +110,12 @@
   </div>
 
   <div class="bar">
+    <nav>
+      <a href="./index.html">🏈 Picks</a>
+      <a href="./picks.html">📊 Weekly</a>
+      <a href="./insights.html">📐 Insights</a>
+      <a href="./metrics.html">📏 By Team</a>
+    </nav>
     <div class="row">
       <button class="btn" id="clearBtn">Clear Picks</button>
       <button class="btn primary" id="issueBtn">Submit Picks</button>
