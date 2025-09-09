@@ -37,6 +37,7 @@
       border-radius:2px;
       box-shadow:0 0 8px var(--neon);
       pointer-events:none;
+      z-index:0;
     }
 
     .bar{position:sticky;bottom:0;background:#1a1a1a;border-top:1px solid #333;padding:8px}
@@ -58,6 +59,21 @@
       line-height:1.2;
     }
     .team-logo { width:50px; height:auto; }
+
+    /* --- TAP FIX --- */
+    .pickbtn {
+      pointer-events:auto !important;
+      position:relative;
+      z-index:9999;
+      cursor:pointer;
+      touch-action:manipulation;
+      width:100%;
+      min-height:44px;
+    }
+    .pink-divider, .neon-divider, .neon-separator {
+      pointer-events:none !important;
+      z-index:0 !important;
+    }
   </style>
 </head>
 <body>
