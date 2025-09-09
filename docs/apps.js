@@ -82,14 +82,19 @@ function makePickButton(label, type, side, curPick, color){
   b.textContent = label;
   b.dataset.type = type;
   b.dataset.side = side;
-  // make sure grid cells line up nicely
   b.style.width = "100%";
-  b.style.justifySelf = "stretch";
   if( (type === "spread" && curPick.spread === side) ||
       (type === "total"  && curPick.total  === side) ){
     b.classList.add("active", color);
   }
   return b;
+}
+
+function pinkDivider(){
+  const div = document.createElement("div");
+  div.setAttribute("style",
+    "height:2px;background:#ff00ff;margin:10px 0;border-radius:2px;box-shadow:0 0 6px #ff00ff;");
+  return div;
 }
 
 function card(h, r, picksAll){
@@ -122,28 +127,34 @@ function card(h, r, picksAll){
       <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
       <span class="pill" style="margin-left:8px;">Total: <b>${totalDisp}</b></span>
     </div>
-    <div class="lane"><div class="name mat">Mat</div><div class="btnrow" data-user="mat"></div></div>
-    <div class="lane"><div class="name nikki">Nikki</div><div class="btnrow" data-user="nikki"></div></div>
   `;
 
-  // Build an inner grid wrapper so external CSS can't override it
   ["mat","nikki"].forEach(user=>{
-    const btnRow = el.querySelector(`.btnrow[data-user="${user}"]`);
+    const section = document.createElement("div");
+    section.style.marginTop = "10px";
 
-    // Create a wrapper that enforces a 2x2 grid no matter what
-    const grid = document.createElement("div");
-    grid.style.display = "grid";
-    grid.style.gridTemplateColumns = "1fr 1fr";
-    grid.style.columnGap = "8px";
-    grid.style.rowGap = "8px";
-    grid.style.marginTop = "6px";
+    // Inject neon pink divider above each name
+    section.appendChild(pinkDivider());
+
+    const nameDiv = document.createElement("div");
+    nameDiv.className = "name " + user;
+    nameDiv.textContent = user==="mat" ? "Mat" : "Nikki";
+    nameDiv.style.textAlign = "center"; // center the label
+    nameDiv.style.fontWeight = "600";
+    nameDiv.style.margin = "6px 0";
+    section.appendChild(nameDiv);
+
+    const btnRow = document.createElement("div");
+    btnRow.style.display = "grid";
+    btnRow.style.gridTemplateColumns = "1fr 1fr";
+    btnRow.style.columnGap = "8px";
+    btnRow.style.rowGap = "8px";
+    btnRow.style.marginTop = "6px";
 
     const color = user==="mat" ? "mat" : "nikki";
     const picksUser = picksAll[user] || {};
     const curPick = ensurePickShape(picksUser[key]);
 
-    // Order: Away spread | Over
-    //        Home spread | Under
     const btnAway  = makePickButton(`${away} ${spreadAway}`,      "spread", "away",  curPick, color);
     const btnOver  = makePickButton(`Over ${totalDisp}`,          "total",  "over",  curPick, color);
     const btnHome  = makePickButton(`${home} ${spreadHomeDisp}`,  "spread", "home",  curPick, color);
@@ -157,7 +168,7 @@ function card(h, r, picksAll){
 
         if(b.dataset.type === "spread"){
           current.spread = (current.spread === b.dataset.side) ? null : b.dataset.side;
-        }else{
+        }else if(b.dataset.type === "total"){
           current.total  = (current.total  === b.dataset.side) ? null : b.dataset.side;
         }
 
@@ -170,12 +181,11 @@ function card(h, r, picksAll){
         savePicks(all);
         render();
       };
-      grid.appendChild(b);
+      btnRow.appendChild(b);
     });
 
-    // Clear any existing children and mount our grid
-    btnRow.innerHTML = "";
-    btnRow.appendChild(grid);
+    section.appendChild(btnRow);
+    el.appendChild(section);
   });
 
   return el;
