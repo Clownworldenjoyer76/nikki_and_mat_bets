@@ -5,60 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nikki & Mat — NFL Picks</title>
   <style>
-    :root { --bg:#000; --fg:#fff; --muted:#bbb; --accent:#1f6feb; --neon:#39ff14; }
+    :root { --bg:#000; --fg:#fff; --muted:#bbb; --accent:#1f6feb; --neon:#39ff14; --pink:#ff00ff; }
     html,body{background:#000;color:#fff;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 
+    /* Top nav */
     .topbar{background:#111;border-bottom:1px solid #333;padding:6px 10px;position:sticky;top:0;z-index:1000}
     .topbar nav{display:flex;gap:14px;justify-content:center}
     .topbar a{color:#fff;text-decoration:none;font-size:.9rem}
     .topbar a:hover{color:var(--accent)}
 
-    .wrap{max-width:1000px;margin:0 auto;padding:10px; position:relative; z-index:1;}
-    header.main-header {
-      display:flex; align-items:center; justify-content:space-between;
-      margin:12px 0 0; gap:10px; padding-bottom:8px;
+    /* Header block */
+    .wrap{max-width:1000px;margin:0 auto;padding:10px;position:relative;z-index:1}
+    header.main-header{
+      display:flex;align-items:center;justify-content:space-between;margin:12px 0 0;gap:10px;padding-bottom:8px
     }
-    header.main-header img { width:60px; height:auto; }
-    header.main-header .titles { flex:1; text-align:center; }
+    header.main-header img{width:60px;height:auto}
+    header.main-header .titles{flex:1;text-align:center}
     header.main-header .titles h1,
-    header.main-header .titles .sub { margin:0; font-size:1.2rem; font-weight:500; }
+    header.main-header .titles .sub{margin:0;font-size:1.2rem;font-weight:500}
 
-    /* Neon separator under the header */
-    .neon-separator {
-      height:3px; background:var(--neon); margin:0 0 12px; border-radius:2px; box-shadow:0 0 8px var(--neon);
-      pointer-events:none; z-index:0;
+    /* Neon separator under header */
+    .neon-separator{
+      height:3px;background:var(--neon);margin:0 0 12px;border-radius:2px;box-shadow:0 0 8px var(--neon);
+      pointer-events:none;z-index:0
     }
 
-    /* Bottom bar */
+    /* Footer bar */
     .bar{position:sticky;bottom:0;background:#1a1a1a;border-top:1px solid #333;padding:8px;z-index:50}
     .bar .row{display:flex;gap:10px;justify-content:center;align-items:center}
     .btn{background:#111;color:#fff;border:1px solid #444;border-radius:10px;padding:8px 14px;font-weight:600}
     .btn.primary{background:#0b5cff;border-color:#0b5cff}
 
-    #games{display:flex;flex-direction:column;gap:14px;margin:12px 0 70px; position:relative; z-index:10;}
+    /* Games list */
+    #games{display:flex;flex-direction:column;gap:14px;margin:12px 0 70px;position:relative;z-index:10}
 
-    .matchgrid { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .matchtext { display:flex; flex-direction:column; align-items:center; line-height:1.2; }
-    .team-logo { width:50px; height:auto; }
+    /* Matchup header inside each card */
+    .matchgrid{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .matchtext{display:flex;flex-direction:column;align-items:center;line-height:1.2}
+    .team-logo{width:50px;height:auto}
 
-    /* ---- CRITICAL TAP PATCH ----
-       Ensure the interactive stack sits above any stray overlay.
-    */
-    .card, .lane, .btnrow, .pick-grid, .pickbtn, .when, .line {
-      position:relative; z-index:1001; pointer-events:auto !important;
-    }
-    .pickbtn {
-      width:100%;
-      cursor:pointer;
-      touch-action:manipulation;
-    }
-
-    /* Any decorative divider must never intercept taps */
-    .pink-divider, .neon-divider, .neon-separator,
-    [class*="divider"], [class*="Divider"] {
-      pointer-events:none !important;
-      position:relative;
-      z-index:0 !important;
+    /* --- CRITICAL TAP PATCH (strong) --- */
+    .card *{pointer-events:auto !important;z-index:10 !important}
+    .pickbtn{cursor:pointer;touch-action:manipulation;position:relative;z-index:20 !important;width:100%}
+    .pink-divider,.neon-divider,.neon-separator,[class*="divider"],[class*="Divider"]{
+      pointer-events:none !important;z-index:0 !important
     }
   </style>
 </head>
@@ -93,7 +83,7 @@
     </div>
   </div>
 
-  <!-- bump query string to ensure fresh load -->
-  <script src="./apps.js?12" defer></script>
+  <!-- bump query string to ensure a fresh JS load -->
+  <script src="./apps.js?13" defer></script>
 </body>
 </html>
