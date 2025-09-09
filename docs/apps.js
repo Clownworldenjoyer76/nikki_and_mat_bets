@@ -6,20 +6,6 @@ const CSV_CANDIDATES = [
   "data/weekly/latest.csv"
 ];
 
-// ---------- SAFETY CSS (force taps to reach buttons) ----------
-(function(){
-  const s = document.createElement("style");
-  s.textContent = `
-    .card{ position:relative; }
-    /* ensure separators never intercept taps */
-    .neon-divider, .pink-divider { pointer-events:none; }
-    /* grids and buttons must be interactive */
-    .btnrow, .pick-grid, .pickbtn { pointer-events:auto; }
-    .pickbtn{ cursor:pointer; touch-action:manipulation; }
-  `;
-  document.head.appendChild(s);
-})();
-
 // ---------- UTILS ----------
 function normalizeTeamName(name){
   if(name === "Washington Commanders") return "Washington Redskins";
@@ -27,9 +13,9 @@ function normalizeTeamName(name){
 }
 async function fetchFirstAvailable(urls){
   for(const p of urls){
-    const bust = (p.includes("?") ? "&" : "?") + "v=" + Date.now();
+    const url = p + (p.includes("?") ? "&" : "?") + "v=" + Date.now();
     try{
-      const r = await fetch(p + bust, { cache: "no-store" });
+      const r = await fetch(url, { cache: "no-store" });
       if(r.ok) return { txt: await r.text(), used: p };
     }catch(_e){}
   }
@@ -97,17 +83,31 @@ function makePickButton(label, type, side, curPick, color){
   b.textContent = label;
   b.dataset.type = type;
   b.dataset.side = side;
-  b.style.width = "100%";
-  b.style.justifySelf = "stretch";
-  b.style.position = "relative";
-  b.style.zIndex = "1";
   if( (type === "spread" && curPick.spread === side) ||
       (type === "total"  && curPick.total  === side) ){
     b.classList.add("active", color);
   }
-  // keyboard support
-  b.tabIndex = 0;
-  b.setAttribute("role", "button");
+  b.onclick = ()=>{
+    const all = loadPicks();
+    const mine = all[user] || {};
+    const current = ensurePickShape(mine[key]);
+
+    if(type === "spread"){
+      current.spread = (current.spread === side) ? null : side;
+    }else if(type === "total"){
+      current.total  = (current.total  === side) ? null : side;
+    }
+
+    if(current.spread === null && current.total === null){
+      delete mine[key];
+    }else{
+      mine[key] = current;
+    }
+
+    all[user] = mine;
+    savePicks(all);
+    render();
+  };
   return b;
 }
 
@@ -182,33 +182,7 @@ function card(h, r, picksAll){
     const btnHome  = makePickButton(`${home} ${spreadHomeDisp}`,  "spread", "home",  curPick, color);
     const btnUnder = makePickButton(`Under ${totalDisp}`,         "total",  "under", curPick, color);
 
-    [btnAway, btnOver, btnHome, btnUnder].forEach(b=>{
-      b.onclick = ()=>{
-        const all = loadPicks();
-        const mine = all[user] || {};
-        const current = ensurePickShape(mine[key]);
-
-        if(b.dataset.type === "spread"){
-          current.spread = (current.spread === b.dataset.side) ? null : b.dataset.side;
-        }else if(b.dataset.type === "total"){
-          current.total  = (current.total  === b.dataset.side) ? null : b.dataset.side;
-        }
-
-        if(current.spread === null && current.total === null){
-          delete mine[key];
-        }else{
-          mine[key] = current;
-        }
-        all[user] = mine;
-        savePicks(all);
-        render();
-      };
-      // Enter/space activation for accessibility
-      b.onkeydown = (e)=>{
-        if(e.key === "Enter" || e.key === " "){ e.preventDefault(); b.click(); }
-      };
-      grid.appendChild(b);
-    });
+    [btnAway, btnOver, btnHome, btnUnder].forEach(b=> grid.appendChild(b));
 
     section.appendChild(grid);
     el.appendChild(section);
