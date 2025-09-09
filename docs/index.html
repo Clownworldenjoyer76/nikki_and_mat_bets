@@ -1,89 +1,202 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nikki & Mat — NFL Picks</title>
-  <style>
-    :root { --bg:#000; --fg:#fff; --muted:#bbb; --accent:#1f6feb; --neon:#39ff14; --pink:#ff00ff; }
-    html,body{background:#000;color:#fff;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+/* apps.js (mobile-strong) */
 
-    /* Top nav */
-    .topbar{background:#111;border-bottom:1px solid #333;padding:6px 10px;position:sticky;top:0;z-index:1000}
-    .topbar nav{display:flex;gap:14px;justify-content:center}
-    .topbar a{color:#fff;text-decoration:none;font-size:.9rem}
-    .topbar a:hover{color:var(--accent)}
+// ---------- CONFIG ----------
+const PRIMARY_CSV = "docs/data/weekly/latest.csv";
+const CSV_CANDIDATES = [PRIMARY_CSV, "/nikki_and_mat_bets/docs/data/weekly/latest.csv", "data/weekly/latest.csv"];
 
-    /* Header block */
-    .wrap{max-width:1000px;margin:0 auto;padding:10px;position:relative;z-index:1}
-    header.main-header{
-      display:flex;align-items:center;justify-content:space-between;margin:12px 0 0;gap:10px;padding-bottom:8px
+// ---------- INLINE MOBILE CSS SAFEGUARDS ----------
+(function(){
+  const s = document.createElement("style");
+  s.textContent = `
+    .pickbtn{min-height:44px;width:100%;cursor:pointer;touch-action:manipulation;position:relative;z-index:20;-webkit-tap-highlight-color:transparent}
+    .pick-grid,.btnrow,.lane,.card{position:relative;z-index:10}
+    .pink-divider,.neon-divider,.neon-separator,[class*="divider"]{pointer-events:none !important;z-index:0 !important}
+  `;
+  document.head.appendChild(s);
+})();
+
+// ---------- UTILS ----------
+function normalizeTeamName(n){ return n==="Washington Commanders" ? "Washington Redskins" : n; }
+async function fetchFirstAvailable(urls){
+  for(const p of urls){
+    const url = p + (p.includes("?")?"&":"?") + "v=" + Date.now();
+    try{
+      const r = await fetch(url, { cache: "no-store" });
+      if(r.ok) return { txt: await r.text(), used:p };
+    }catch(e){}
+  }
+  throw new Error("Schedule CSV not found");
+}
+function parseCSV(txt){
+  const rows = txt.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/));
+  const hdr = rows.shift() || []; return { hdr, rows };
+}
+function onlyConsensus(rows,h){
+  const iB = h.indexOf("book"), iC = h.indexOf("is_consensus");
+  return rows.filter(r =>
+    (iC!==-1 && String(r[iC]).trim()==="1") ||
+    (iB!==-1 && String(r[iB]).trim().toUpperCase()==="CONSENSUS")
+  );
+}
+function keyOf(r,h){ return `${r[h.indexOf("away_team")]}@${r[h.indexOf("home_team")]}_${r[h.indexOf("commence_time_utc")]}`; }
+function fmtDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleString("en-US",{weekday:"long",month:"long",day:"numeric",hour:"numeric",minute:"2-digit",hour12:true});
+}
+function nflWeekLabel(w){ const base=36; return ((parseInt(w,10)-base)%18+18)%18+1; }
+function fmtSigned(n){ if(n===""||n==null) return ""; const v=Number(n); return Number.isNaN(v)?String(n):(v>0?`+${v}`:`${v}`); }
+function logoPath(team){
+  const cleaned = team.replace(/[^A-Za-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+  const parts = cleaned.split(" "); const nick = parts[parts.length-1].toLowerCase();
+  return `assets/logos/${nick}.png`;
+}
+
+// ---------- STORAGE ----------
+const LS_MAT="picks_mat", LS_NIK="picks_nikki";
+function loadPicks(){ return { mat: JSON.parse(localStorage.getItem(LS_MAT)||"{}"), nikki: JSON.parse(localStorage.getItem(LS_NIK)||"{}") }; }
+function savePicks(all){ localStorage.setItem(LS_MAT, JSON.stringify(all.mat||{})); localStorage.setItem(LS_NIK, JSON.stringify(all.nikki||{})); }
+function ensurePickShape(o){ if(!o||typeof o!=="object") return {spread:null,total:null}; return {spread:o.spread??null,total:o.total??null}; }
+
+// ---------- RENDER HELPERS ----------
+function makePickButton(label, type, side, curPick, color){
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "pickbtn";
+  b.textContent = label;
+  b.dataset.type = type;
+  b.dataset.side = side;
+  if((type==="spread" && curPick.spread===side) || (type==="total" && curPick.total===side)){
+    b.classList.add("active", color);
+  }
+  b.tabIndex = 0; b.setAttribute("role","button");
+  return b;
+}
+
+function attachPickHandler(btn, user, key){
+  const activate = ()=>{
+    const all = loadPicks();
+    const mine = all[user] || {};
+    const current = ensurePickShape(mine[key]);
+
+    if(btn.dataset.type === "spread"){
+      current.spread = (current.spread === btn.dataset.side) ? null : btn.dataset.side;
+    }else{
+      current.total  = (current.total  === btn.dataset.side) ? null : btn.dataset.side;
     }
-    header.main-header img{width:60px;height:auto}
-    header.main-header .titles{flex:1;text-align:center}
-    header.main-header .titles h1,
-    header.main-header .titles .sub{margin:0;font-size:1.2rem;font-weight:500}
 
-    /* Neon separator under header */
-    .neon-separator{
-      height:3px;background:var(--neon);margin:0 0 12px;border-radius:2px;box-shadow:0 0 8px var(--neon);
-      pointer-events:none;z-index:0
-    }
+    if(current.spread===null && current.total===null){ delete mine[key]; } else { mine[key]=current; }
+    all[user]=mine; savePicks(all);
+    render();
+  };
 
-    /* Footer bar */
-    .bar{position:sticky;bottom:0;background:#1a1a1a;border-top:1px solid #333;padding:8px;z-index:50}
-    .bar .row{display:flex;gap:10px;justify-content:center;align-items:center}
-    .btn{background:#111;color:#fff;border:1px solid #444;border-radius:10px;padding:8px 14px;font-weight:600}
-    .btn.primary{background:#0b5cff;border-color:#0b5cff}
+  // Mobile-first: pointerup is reliable on iOS/Android; also keep click as fallback.
+  btn.addEventListener("pointerup", (e)=>{ e.preventDefault(); e.stopPropagation(); activate(); }, { passive:false });
+  btn.addEventListener("click",     (e)=>{ e.preventDefault(); e.stopPropagation(); activate(); }, { passive:false });
+  btn.addEventListener("keydown",   (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); activate(); }});
+}
 
-    /* Games list */
-    #games{display:flex;flex-direction:column;gap:14px;margin:12px 0 70px;position:relative;z-index:10}
+function pinkDivider(){
+  const d=document.createElement("div");
+  d.className="pink-divider";
+  d.style.cssText="height:2px;background:#ff00ff;margin:10px 0;border-radius:2px;box-shadow:0 0 6px #ff00ff;pointer-events:none";
+  return d;
+}
 
-    /* Matchup header inside each card */
-    .matchgrid{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .matchtext{display:flex;flex-direction:column;align-items:center;line-height:1.2}
-    .team-logo{width:50px;height:auto}
+function card(h, r, picksAll){
+  const when = fmtDate(r[h.indexOf("commence_time_utc")]);
+  const home = normalizeTeamName(r[h.indexOf("home_team")]);
+  const away = normalizeTeamName(r[h.indexOf("away_team")]);
 
-    /* --- CRITICAL TAP PATCH (strong) --- */
-    .card *{pointer-events:auto !important;z-index:10 !important}
-    .pickbtn{cursor:pointer;touch-action:manipulation;position:relative;z-index:20 !important;width:100%}
-    .pink-divider,.neon-divider,.neon-separator,[class*="divider"],[class*="Divider"]{
-      pointer-events:none !important;z-index:0 !important
-    }
-  </style>
-</head>
-<body>
-  <header class="topbar">
-    <nav>
-      <a href="./index.html">🏈 Picks</a>
-      <a href="./picks.html">📊 Weekly</a>
-      <a href="./insights.html">📐 Insights</a>
-      <a href="./metrics.html">📏 By Team</a>
-    </nav>
-  </header>
+  const spreadHome  = r[h.indexOf("spread_home")] || "";
+  const total       = r[h.indexOf("total")] || "";
+  const spreadAway  = spreadHome==="" ? "" : fmtSigned(-Number(spreadHome));
+  const spreadHomeDisp = fmtSigned(spreadHome);
+  const totalDisp   = total;
+  const key = keyOf(r,h);
 
-  <div class="wrap">
-    <header class="main-header">
-      <img src="assets/logos/IMG_0931.jpeg" alt="Left logo">
-      <div class="titles">
-        <h1>Nikki and Mat’s NFL Picks</h1>
-        <div class="sub" id="seasonWeek">Loading…</div>
+  const el = document.createElement("article");
+  el.className = "card";
+  el.innerHTML = `
+    <div class="matchgrid">
+      <img class="team-logo" src="${logoPath(away)}" alt="${away} logo">
+      <div class="matchtext">
+        <div class="team">${away}</div>
+        <div class="at">@</div>
+        <div class="team">${home}</div>
       </div>
-      <img src="assets/logos/IMG_0930.jpeg" alt="Right logo">
-    </header>
-    <div class="neon-separator"></div>
-
-    <main id="games"></main>
-  </div>
-
-  <div class="bar">
-    <div class="row">
-      <button class="btn" id="clearBtn">Clear Picks</button>
-      <button class="btn primary" id="issueBtn">Submit Picks</button>
+      <img class="team-logo right" src="${logoPath(home)}" alt="${home} logo">
     </div>
-  </div>
+    <div class="when" style="text-align:center;margin-top:6px;">${when}</div>
+    <div class="line" style="text-align:center;margin-top:6px;">
+      <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
+      <span class="pill" style="margin-left:8px;">Total: <b>${totalDisp}</b></span>
+    </div>
+  `;
 
-  <!-- bump query string to ensure a fresh JS load -->
-  <script src="./apps.js?13" defer></script>
-</body>
-</html>
+  ["mat","nikki"].forEach(user=>{
+    const section = document.createElement("div");
+    section.style.marginTop = "10px";
+    section.appendChild(pinkDivider());
+
+    const nameDiv = document.createElement("div");
+    nameDiv.className = "name " + user;
+    nameDiv.textContent = user==="mat" ? "Mat" : "Nikki";
+    nameDiv.style.textAlign = "center";
+    nameDiv.style.fontWeight = "600";
+    nameDiv.style.margin = "6px 0";
+    section.appendChild(nameDiv);
+
+    const grid = document.createElement("div");
+    grid.className = "pick-grid";
+    grid.style.cssText = "display:grid;grid-template-columns:1fr 1fr;column-gap:8px;row-gap:8px;margin-top:6px";
+
+    const color = user==="mat" ? "mat" : "nikki";
+    const picksUser = picksAll[user] || {};
+    const curPick = ensurePickShape(picksUser[key]);
+
+    const btnAway  = makePickButton(`${away} ${spreadAway}`,     "spread","away", curPick, color);
+    const btnOver  = makePickButton(`Over ${totalDisp}`,         "total","over", curPick, color);
+    const btnHome  = makePickButton(`${home} ${spreadHomeDisp}`, "spread","home", curPick, color);
+    const btnUnder = makePickButton(`Under ${totalDisp}`,        "total","under", curPick, color);
+
+    [btnAway, btnOver, btnHome, btnUnder].forEach(b=>{ attachPickHandler(b, user, key); grid.appendChild(b); });
+
+    section.appendChild(grid);
+    el.appendChild(section);
+  });
+
+  return el;
+}
+
+function neonDivider(){
+  const d=document.createElement("div");
+  d.className="neon-divider";
+  d.style.cssText="height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;pointer-events:none";
+  return d;
+}
+
+// ---------- RENDER ----------
+async function render(){
+  const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
+  const { hdr, rows } = parseCSV(txt);
+  const source = (function(){ const c = onlyConsensus(rows,hdr); return c.length?c:rows; })();
+  if(!source.length) throw new Error("No rows found in latest.csv");
+
+  const iWeek = hdr.indexOf("week");
+  const wk = iWeek!==-1 ? nflWeekLabel(source[0][iWeek]) : "";
+  document.getElementById("seasonWeek").textContent = wk ? `NFL Week ${wk}` : "NFL Schedule";
+
+  const picksAll = loadPicks();
+  const games = document.getElementById("games");
+  games.innerHTML = "";
+  source.forEach((r,i)=>{
+    games.appendChild(card(hdr,r,picksAll));
+    if(i < source.length-1) games.appendChild(neonDivider());
+  });
+}
+
+// ---------- CONTROLS ----------
+document.getElementById("clearBtn").onclick = ()=>{ localStorage.removeItem(LS_MAT); localStorage.removeItem(LS_NIK); render(); };
+document.getElementById("issueBtn").onclick = ()=>{ alert("Submit Picks clicked (placeholder)."); };
+
+render().catch(err=>{ console.error(err); alert("Failed to load schedule CSV."); });
