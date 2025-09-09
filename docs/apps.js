@@ -1,17 +1,16 @@
 // ---------- CONFIG ----------
-const CSV_URL = "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/data/weekly/latest.csv"; // served from /docs
+const CSV_URL = "docs/data/weekly/latest.csv"; // served from /docs
 
 // Where "Submit Picks" opens the issue:
 const GH_OWNER = "clownworldenjoyer76";
 const GH_REPO  = "nikki_and_mat_bets";
 
-
-// ----- Data path resolver: fetch from raw GitHub when path starts with "data/" or "docs/data/"
+// ----- Data path resolver: normalize site-rooted data paths
 function resolveDataPath(path){
   if(/^https?:\/\//.test(path)) return path;
   if(path.startsWith("./")) path = path.slice(2);
-  if(path.startsWith("docs/data/")) return "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/" + path.replace(/^docs\//,"");
-  if(path.startsWith("data/")) return "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/" + path;
+  if(path.startsWith("docs/")) path = path.replace(/^docs\//,"");
+  // leave 'data/' as-is; from /docs pages it resolves to /docs/data/...
   return path;
 }
 

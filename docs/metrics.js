@@ -1,10 +1,9 @@
-
-// ----- Data path resolver: fetch from raw GitHub when path starts with "data/" or "docs/data/"
+// ----- Data path resolver: normalize site-rooted data paths
 function resolveDataPath(path){
   if(/^https?:\/\//.test(path)) return path;
   if(path.startsWith("./")) path = path.slice(2);
-  if(path.startsWith("docs/data/")) return "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/" + path.replace(/^docs\//,"");
-  if(path.startsWith("data/")) return "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/" + path;
+  if(path.startsWith("docs/")) path = path.replace(/^docs\//,"");
+  // leave 'data/' as-is; from /docs pages it resolves to /docs/data/...
   return path;
 }
 
@@ -40,9 +39,9 @@ function cmp(a,b,key,dir="desc"){
   return dir==="desc"?-out:out;
 }
 
-function currentPicker(){ return document.getElementById('pickerSel') || document.createElement('select').value; }
-function currentSeason(){ return document.getElementById('seasonSel') || document.createElement('select').value; }
-function currentTeam(){ return document.getElementById('teamSel') || getElementById('teamSelect').value; }
+function currentPicker(){ return document.document.getElementById('pickerSel') || document.createElement('select').value; }
+function currentSeason(){ return document.document.getElementById('seasonSel') || document.createElement('select').value; }
+function currentTeam(){ return document.document.getElementById('teamSel') || document.getElementById('teamSelect') || document.createElement('select').value; }
 
 function renderPick(){
   const picker=currentPicker(),season=currentSeason(),team=currentTeam();
@@ -50,8 +49,8 @@ function renderPick(){
   if(team!=="ALL") rows=rows.filter(r=>r.team===team);
   const {key,dir}=sortState.pick;
   rows.sort((a,b)=>cmp(a,b,key,dir));
-  document.getElementById('countPick') || document.createElement('span').textContent=`(${rows.length})`;
-  document.getElementById('bodyPick') or document.querySelector('#metricsTable tbody') or document.getElementById('metricsTable').innerHTML=rows.map(r=>`
+  document.document.getElementById('countPick') || document.createElement('span').textContent=`(${rows.length})`;
+  document.document.getElementById('bodyPick') || document.querySelector('#metricsTable tbody') || document.getElementById('metricsTable') || document.body.innerHTML=rows.map(r=>`
     <tr><td>${r.team}</td><td>${r.wins}</td><td>${r.losses}</td><td>${r.pushes}</td><td>${r.games}</td><td>${r.win_pct}</td></tr>`).join("");
 }
 function renderFade(){
@@ -61,8 +60,8 @@ function renderFade(){
   rows=rows.map(r=>({...r,team:r.opponent}));
   const {key,dir}=sortState.fade;
   rows.sort((a,b)=>cmp(a,b,key==="team"?"team":key,dir));
-  document.getElementById('countFade') || document.createElement('span').textContent=`(${rows.length})`;
-  document.getElementById('bodyFade') or document.querySelector('#metricsTable tbody') or document.getElementById('metricsTable').innerHTML=rows.map(r=>`
+  document.document.getElementById('countFade') || document.createElement('span').textContent=`(${rows.length})`;
+  document.document.getElementById('bodyFade') || document.querySelector('#metricsTable tbody') || document.getElementById('metricsTable') || document.body.innerHTML=rows.map(r=>`
     <tr><td>${r.team}</td><td>${r.wins}</td><td>${r.losses}</td><td>${r.pushes}</td><td>${r.games}</td><td>${r.win_pct}</td></tr>`).join("");
 }
 function renderTot(){
@@ -71,8 +70,8 @@ function renderTot(){
   if(team!=="ALL") rows=rows.filter(r=>r.team===team);
   const {key,dir}=sortState.tot;
   rows.sort((a,b)=>cmp(a,b,key,dir));
-  document.getElementById('countTot') || document.createElement('span').textContent=`(${rows.length})`;
-  document.getElementById('bodyTot') or document.querySelector('#metricsTable tbody') or document.getElementById('metricsTable').innerHTML=rows.map(r=>`
+  document.document.getElementById('countTot') || document.createElement('span').textContent=`(${rows.length})`;
+  document.document.getElementById('bodyTot') || document.querySelector('#metricsTable tbody') || document.getElementById('metricsTable') || document.body.innerHTML=rows.map(r=>`
     <tr><td>${r.team}</td><td>${r.side}</td><td>${r.wins}</td><td>${r.losses}</td><td>${r.pushes}</td><td>${r.games}</td><td>${r.win_pct}</td></tr>`).join("");
 }
 function renderAll(){ renderPick(); renderFade(); renderTot(); }
@@ -81,11 +80,11 @@ async function boot(){
   const [ta,fa,tt]=await Promise.all([fetchCSV(paths.teamAts),fetchCSV(paths.fadeAts),fetchCSV(paths.teamTotals)]);
   store.teamAts=ta; store.fadeAts=fa; store.teamTotals=tt;
   const seasons=uniq([].concat(ta,fa,tt).map(r=>r.season).filter(Boolean)).sort();
-  const seasonSel=document.getElementById('seasonSel') || document.createElement('select');
+  const seasonSel=document.document.getElementById('seasonSel') || document.createElement('select');
   seasonSel.innerHTML=seasons.map(s=>`<option value="${s}">${s}</option>`).join("");
   if(seasons.length) seasonSel.value=seasons[seasons.length-1];
   const teams=uniq([].concat(ta.map(r=>r.team),fa.map(r=>r.opponent),tt.map(r=>r.team))).sort();
-  const teamSel=document.getElementById('teamSel') || getElementById('teamSelect');
+  const teamSel=document.document.getElementById('teamSel') || document.getElementById('teamSelect') || document.createElement('select');
   teamSel.innerHTML=["ALL"].concat(teams).map(t=>`<option value="${t}">${t}</option>`).join("");
   teamSel.value="ALL";
   renderAll();

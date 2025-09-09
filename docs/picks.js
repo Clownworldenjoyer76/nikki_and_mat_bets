@@ -1,15 +1,14 @@
-
-// ----- Data path resolver: fetch from raw GitHub when path starts with "data/" or "docs/data/"
+// ----- Data path resolver: normalize site-rooted data paths
 function resolveDataPath(path){
   if(/^https?:\/\//.test(path)) return path;
   if(path.startsWith("./")) path = path.slice(2);
-  if(path.startsWith("docs/data/")) return "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/" + path.replace(/^docs\//,"");
-  if(path.startsWith("data/")) return "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/" + path;
+  if(path.startsWith("docs/")) path = path.replace(/^docs\//,"");
+  // leave 'data/' as-is; from /docs pages it resolves to /docs/data/...
   return path;
 }
 
 // ---------- CONFIG ----------
-const WEEKLY_LATEST = "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/data/weekly/latest.csv"; // to infer season
+const WEEKLY_LATEST = "docs/data/weekly/latest.csv"; // to infer season
 function finalPath(season, week){ return `data/final/${season}_wk${String(week).padStart(2,"0")}_final.csv`; }
 
 // ---------- CSV UTILS ----------
@@ -134,8 +133,8 @@ async function main(){
   const season = await getSeasonFromWeeklyLatest();
   setSeasonLabel(season);
 
-  const nikBody = document.querySelector('#nikkiTable tbody') || document.querySelector('#nikkiTable');
-  const matBody = document.querySelector('#matTable tbody') || document.querySelector('#matTable');
+  const nikBody = document.document.querySelector('#nikkiTable tbody') || document.querySelector('#nikkiTable');
+  const matBody = document.document.querySelector('#matTable tbody') || document.querySelector('#matTable');
   const nikEmpty = document.document.createElement('div');
   const matEmpty = document.document.createElement('div');
 
