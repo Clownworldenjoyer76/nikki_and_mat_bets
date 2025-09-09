@@ -1,143 +1,78 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Nikki and Mat’s NFL Picks</title>
-    <link rel="stylesheet" href="https://unpkg.com/mvp.css" />
-    <style>
-      :root {
-        --mat:#1f6feb;
-        --nikki:#e11d48;
-        --muted:#666;
-        --mast-size: 1.55rem;
-        --mast-lines: 3;
-        --mast-cap: calc(var(--mast-size) * var(--mast-lines) * 1.05);
-      }
-
-      body { background:#000; color:#fff; max-width:900px; margin:0 auto; padding:10px; }
-
-      .mast {
-        display:grid;
-        grid-template-columns: minmax(36px,64px) 1fr minmax(36px,64px);
-        align-items:center;
-        gap:10px;
-        margin:6px 0 6px;
-      }
-      .mast-img {
-        max-height: var(--mast-cap);
-        width:auto;
-        object-fit:contain;
-      }
-      .mast-title {
-        text-align:center;
-        line-height:1.15;
-        margin:0;
-        font-size: var(--mast-size);
-        font-weight: 800;
-      }
-      .mast-title .line { display:block; margin:2px 0; }
-
-      #games { display:grid; grid-template-columns:1fr; gap:12px; }
-      .game-card {
-        background:#fff; color:#000; border-radius:12px; padding:12px;
-        box-shadow:0 2px 10px rgba(0,0,0,.25);
-      }
-      .logos-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
-      .logos-row img { max-height:48px; width:auto; object-fit:contain; }
-
-      .game-header { text-align:center; margin-bottom:8px; }
-      .game-title { font-weight:800; }
-      .game-time { color:#333; }
-
-      .section-title { text-align:center; color:#555; font-size:.9rem; margin:8px 0 6px; }
-      .divider { height:1px; background:#ddd; margin:10px 0; }
-
-      .pick-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-      .pick-col h4 { margin:0 0 6px; font-size:1rem; text-align:center; }
-      .pick-col .mat   { color:var(--mat); }
-      .pick-col .nikki { color:#e11d48; font-weight:800; }
-
-      .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-      .option {
-        border:1px solid #000; background:#fff; color:#000;
-        border-radius:8px; padding:10px; text-align:center; cursor:pointer; user-select:none;
-      }
-      .option.small { font-size:.95rem; }
-      .selected-mat { outline:3px solid var(--mat); }
-      .selected-nikki { outline:3px solid var(--nikki); }
-
-      .sticky-bar {
-        position:sticky; bottom:0; z-index:5;
-        background:#222; color:#fff; border-top:1px solid #444;
-        display:flex; justify-content:center; gap:8px; padding:6px;
-      }
-      .sticky-bar button {
-        background:#111; color:#fff; border:1px solid #333; border-radius:8px;
-        padding:6px 10px; font-size:.9rem;
-      }
-
-      @media (min-width:720px){
-        #games { grid-template-columns:1fr 1fr; }
-      }
-
-      .nav-container { position: relative; text-align: center; margin: 6px 0; }
-      .nav-toggle { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#fff; }
-      .nav-menu {
-        display:none; position:absolute; top:100%; left:50%; transform:translateX(-50%);
-        background:#111; border:1px solid #333; border-radius:6px; min-width:180px; z-index:999;
-      }
-      .nav-menu a {
-        display:block; padding:8px 12px; color:#fff; text-decoration:none;
-        font-size:0.9rem; border-bottom:1px solid #222;
-      }
-      .nav-menu a:last-child{ border-bottom:none; }
-      .nav-menu a:hover{ background:#222; }
-    </style>
-  </head>
-  <body>
-
-    <!-- BEGIN NAV -->
-    <div class="nav-container">
-      <button class="nav-toggle" id="navToggle">☰</button>
-      <div class="nav-menu" id="navMenu">
-        <a href="index.html">🏈 Main Picks</a>
-        <a href="picks.html">📊 Weekly Records</a>
-        <a href="insights.html">📐 Granular Insights</a>
-        <a href="metrics.html">📏 Team Metrics</a>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nikki & Mat — NFL Picks</title>
+  <style>
+    :root { --bg:#000; --fg:#fff; --muted:#bbb; --accent:#1f6feb; --nikki:#e11d48; }
+    html,body{background:#000;color:#fff;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:1000px;margin:0 auto;padding:10px}
+    /* tiny, centered burger nav */
+    .nav-wrap{display:flex;justify-content:center;margin:6px 0}
+    .nav { position:relative }
+    .nav-btn{background:#111;color:#fff;border:1px solid #444;border-radius:8px;padding:6px 10px;font-size:.9rem}
+    .nav-menu{position:absolute;left:50%;transform:translateX(-50%);top:42px;background:#111;border:1px solid #444;border-radius:10px;padding:8px;display:none;min-width:220px;z-index:10}
+    .nav-menu a{display:block;color:#fff;text-decoration:none;padding:6px 8px;border-radius:6px}
+    .nav-menu a:hover{background:#222}
+    header{ text-align:center; margin:12px 0 8px }
+    header h1{ margin:.2rem 0; line-height:1.1; font-size:2.2rem }
+    header .sub{ color:#ddd; margin-top:4px; font-size:1.2rem }
+    /* sticky action bar */
+    .bar{position:sticky;bottom:0;background:#1a1a1a;border-top:1px solid #333;padding:8px}
+    .bar .row{display:flex;gap:10px;justify-content:center;align-items:center}
+    .btn{background:#111;color:#fff;border:1px solid #444;border-radius:10px;padding:8px 14px;font-weight:600}
+    .btn.primary{background:#0b5cff;border-color:#0b5cff}
+    /* game list container (apps.js renders cards) */
+    #games{display:flex;flex-direction:column;gap:14px;margin:12px 0 70px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- tiny centered burger -->
+    <div class="nav-wrap">
+      <div class="nav" id="topNav">
+        <button class="nav-btn" id="navToggle" aria-expanded="false" aria-controls="navMenu">☰ Menu</button>
+        <div class="nav-menu" id="navMenu" role="menu">
+          <a href="./index.html">🏈 Main Picks</a>
+          <a href="./picks.html">📊 Weekly Records</a>
+          <a href="./insights.html">📐 Granular Insights</a>
+          <a href="./metrics.html">📏 Team Metrics</a>
+        </div>
       </div>
     </div>
-    <script>
-      const navToggle=document.getElementById("navToggle");
-      const navMenu=document.getElementById("navMenu");
-      if(navToggle && navMenu){
-        navToggle.addEventListener("click",e=>{
-          e.stopPropagation();
-          navMenu.style.display=navMenu.style.display==="block"?"none":"block";
-        });
-        document.addEventListener("click",()=>{navMenu.style.display="none";});
-      }
-    </script>
-    <!-- END NAV -->
 
-    <header class="mast">
-      <img class="mast-img" src="assets/logos/IMG_0931.jpeg" alt="Left" />
-      <h1 class="mast-title">
-        <span class="line">Nikki and Mat’s</span>
-        <span class="line">NFL Picks</span>
-        <span class="line" id="seasonWeek"></span>
-      </h1>
-      <img class="mast-img" src="assets/logos/IMG_0930.jpeg" alt="Right" />
+    <header>
+      <h1>Nikki and Mat’s<br/>NFL Picks</h1>
+      <div class="sub" id="seasonWeek">Loading…</div>
     </header>
 
     <main id="games"></main>
+  </div>
 
-    <div class="sticky-bar">
-      <button id="clearBtn">Clear Picks</button>
-      <button id="submitBtn">Submit Picks</button>
+  <div class="bar">
+    <div class="row">
+      <button class="btn" id="clearBtn">Clear Picks</button>
+      <button class="btn primary" id="issueBtn">Submit Picks</button>
     </div>
+  </div>
 
-    <!-- FIXED: point to apps.js -->
-    <script src="apps.js"></script>
-  </body>
+  <script>
+    // safe, non-invasive nav
+    (function(){
+      const btn=document.getElementById('navToggle');
+      const menu=document.getElementById('navMenu');
+      if(!btn||!menu) return;
+      btn.addEventListener('click',()=> {
+        const open = menu.style.display === 'block';
+        menu.style.display = open ? 'none' : 'block';
+        btn.setAttribute('aria-expanded', String(!open));
+      });
+      document.addEventListener('click',(e)=>{
+        if(!menu.contains(e.target) && e.target!==btn) menu.style.display='none';
+      });
+    })();
+  </script>
+  <script src="./apps.js" defer></script>
+</body>
 </html>
