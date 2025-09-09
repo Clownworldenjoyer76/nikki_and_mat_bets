@@ -6,6 +6,20 @@ const CSV_CANDIDATES = [
   "data/weekly/latest.csv"
 ];
 
+// ---------- SAFETY CSS (force taps to reach buttons) ----------
+(function(){
+  const s = document.createElement("style");
+  s.textContent = `
+    .card{ position:relative; }
+    /* ensure separators never intercept taps */
+    .neon-divider, .pink-divider { pointer-events:none; }
+    /* grids and buttons must be interactive */
+    .btnrow, .pick-grid, .pickbtn { pointer-events:auto; }
+    .pickbtn{ cursor:pointer; touch-action:manipulation; }
+  `;
+  document.head.appendChild(s);
+})();
+
 // ---------- UTILS ----------
 function normalizeTeamName(name){
   if(name === "Washington Commanders") return "Washington Redskins";
@@ -79,21 +93,29 @@ function ensurePickShape(obj){
 function makePickButton(label, type, side, curPick, color){
   const b = document.createElement("button");
   b.className = "pickbtn";
+  b.type = "button";
   b.textContent = label;
   b.dataset.type = type;
   b.dataset.side = side;
   b.style.width = "100%";
+  b.style.justifySelf = "stretch";
+  b.style.position = "relative";
+  b.style.zIndex = "1";
   if( (type === "spread" && curPick.spread === side) ||
       (type === "total"  && curPick.total  === side) ){
     b.classList.add("active", color);
   }
+  // keyboard support
+  b.tabIndex = 0;
+  b.setAttribute("role", "button");
   return b;
 }
 
 function pinkDivider(){
   const div = document.createElement("div");
+  div.className = "pink-divider";
   div.setAttribute("style",
-    "height:2px;background:#ff00ff;margin:10px 0;border-radius:2px;box-shadow:0 0 6px #ff00ff;");
+    "height:2px;background:#ff00ff;margin:10px 0;border-radius:2px;box-shadow:0 0 6px #ff00ff;pointer-events:none;");
   return div;
 }
 
@@ -133,23 +155,23 @@ function card(h, r, picksAll){
     const section = document.createElement("div");
     section.style.marginTop = "10px";
 
-    // Inject neon pink divider above each name
     section.appendChild(pinkDivider());
 
     const nameDiv = document.createElement("div");
     nameDiv.className = "name " + user;
     nameDiv.textContent = user==="mat" ? "Mat" : "Nikki";
-    nameDiv.style.textAlign = "center"; // center the label
+    nameDiv.style.textAlign = "center";
     nameDiv.style.fontWeight = "600";
     nameDiv.style.margin = "6px 0";
     section.appendChild(nameDiv);
 
-    const btnRow = document.createElement("div");
-    btnRow.style.display = "grid";
-    btnRow.style.gridTemplateColumns = "1fr 1fr";
-    btnRow.style.columnGap = "8px";
-    btnRow.style.rowGap = "8px";
-    btnRow.style.marginTop = "6px";
+    const grid = document.createElement("div");
+    grid.className = "pick-grid";
+    grid.style.display = "grid";
+    grid.style.gridTemplateColumns = "1fr 1fr";
+    grid.style.columnGap = "8px";
+    grid.style.rowGap = "8px";
+    grid.style.marginTop = "6px";
 
     const color = user==="mat" ? "mat" : "nikki";
     const picksUser = picksAll[user] || {};
@@ -181,10 +203,14 @@ function card(h, r, picksAll){
         savePicks(all);
         render();
       };
-      btnRow.appendChild(b);
+      // Enter/space activation for accessibility
+      b.onkeydown = (e)=>{
+        if(e.key === "Enter" || e.key === " "){ e.preventDefault(); b.click(); }
+      };
+      grid.appendChild(b);
     });
 
-    section.appendChild(btnRow);
+    section.appendChild(grid);
     el.appendChild(section);
   });
 
@@ -193,8 +219,9 @@ function card(h, r, picksAll){
 
 function neonDivider(){
   const div = document.createElement("div");
+  div.className = "neon-divider";
   div.setAttribute("style",
-    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;");
+    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;pointer-events:none;");
   return div;
 }
 
