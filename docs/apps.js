@@ -107,6 +107,8 @@ function makePickButton(label, type, side, curPick, color, key, user){
 
       all[user] = mine;
       savePicks(all);
+
+      alert("About to render...");
       await render();
     } catch (e) {
       alert("Error: " + e.message);
