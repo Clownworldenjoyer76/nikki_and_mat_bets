@@ -1,5 +1,5 @@
 // ---------- CONFIG ----------
-const CSV_URL = "docs/data/weekly/latest.csv"; // served from /docs
+const CSV_URL = "docs/data/weekly/latest.csv"; // schedule CSV served from /docs
 
 // ---------- UTILS ----------
 function normalizeTeamName(name){
@@ -17,7 +17,17 @@ function parseCSV(txt){
   const hdr = rows.shift();
   return { hdr, rows };
 }
-function onlyConsensus(rows, hdr){ return rows.filter(r => r[hdr.indexOf("book")] === "CONSENSUS"); }
+
+// ✅ Robust consensus filter: accepts `is_consensus=1` OR `book="CONSENSUS"`
+function onlyConsensus(rows, hdr){
+  const iBook = hdr.indexOf("book");
+  const iCons = hdr.indexOf("is_consensus");
+  return rows.filter(r =>
+    (iCons !== -1 && String(r[iCons]).trim() === "1") ||
+    (iBook !== -1 && String(r[iBook]).trim().toUpperCase() === "CONSENSUS")
+  );
+}
+
 function keyOf(r,h){ return `${r[h.indexOf("away_team")]}@${r[h.indexOf("home_team")]}_${r[h.indexOf("commence_time_utc")]}`; }
 function fmtDate(iso){
   const d = new Date(iso);
@@ -159,15 +169,21 @@ function card(h, r, picksAll){
 async function render(){
   const txt = await fetchCSV(CSV_URL);
   const { hdr, rows } = parseCSV(txt);
-  const consensus = onlyConsensus(rows, hdr);
 
-  const week = nflWeekLabel(consensus[0][hdr.indexOf("week")]);
-  document.getElementById("seasonWeek").textContent = `NFL Week ${week}`;
+  // ✅ Use consensus when available, otherwise gracefully fall back to all rows
+  const consensus = onlyConsensus(rows, hdr);
+  const source = consensus.length ? consensus : rows;
+  if(!source.length) throw new Error("No rows found in latest.csv");
+
+  const iWeek = hdr.indexOf("week");
+  const wkVal = iWeek !== -1 ? source[0][iWeek] : "";
+  const week = wkVal ? nflWeekLabel(wkVal) : "";
+  document.getElementById("seasonWeek").textContent = week ? `NFL Week ${week}` : "NFL Schedule";
 
   const picksAll = loadPicks();
   const gamesDiv = document.getElementById("games");
   gamesDiv.innerHTML = "";
-  consensus.forEach(r=>{
+  source.forEach(r=>{
     gamesDiv.appendChild(card(hdr,r,picksAll));
   });
 }
