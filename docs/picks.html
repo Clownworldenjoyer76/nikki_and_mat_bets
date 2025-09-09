@@ -3,97 +3,63 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>2025 Records</title>
+  <title>Nikki & Mat — Weekly Records</title>
   <link rel="stylesheet" href="https://unpkg.com/mvp.css" />
   <style>
-    :root { --mat:#1f6feb; --nikki:#e11d48; }
-    html,body { background:#000; color:#fff; }
-    body { max-width:1000px; margin:0 auto; padding:10px 8px; }
+    html,body{ background:#000; color:#fff; }
+    body{ max-width:1000px; margin:0 auto; padding:10px 8px; }
 
-    /* Header */
-    header{
-      display:flex; align-items:center; justify-content:space-between;
-      margin:4px 0 10px;
+    /* NAV */
+    .nav-container { position: relative; text-align: center; margin: 6px 0; }
+    .nav-toggle { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#fff; }
+    .nav-menu {
+      display:none; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+      background:#111; border:1px solid #333; border-radius:6px; min-width:180px; z-index:999;
     }
-    header h1{ margin:0; font-size:1.25rem; font-weight:800; text-align:center; flex:1; }
+    .nav-menu a {
+      display:block; padding:8px 12px; color:#fff; text-decoration:none;
+      font-size:0.9rem; border-bottom:1px solid #222;
+    }
+    .nav-menu a:last-child{ border-bottom:none; }
+    .nav-menu a:hover{ background:#222; }
+
+    header{ display:flex; align-items:center; justify-content:space-between; margin:6px 0 14px; }
+    header h1{ margin:0; font-size:1.4rem; font-weight:800; text-align:center; flex:1; }
     header img{ max-height:52px; width:auto; }
-
-    /* Two fixed columns, always same row */
-    .records-container{
-      display:flex; justify-content:center; align-items:stretch; gap:10px;
-    }
-    .record-card{
-      flex:0 0 50%;
-      max-width:50%;
-      background:#101010; border:1px solid #202020; border-radius:10px;
-      padding:8px 8px 10px;
-      box-shadow:0 2px 10px rgba(0,0,0,.35);
-      text-align:center; display:flex; flex-direction:column;
-    }
-    .record-card h2{ margin:0 0 6px; font-size:0.85rem; font-weight:800; letter-spacing:.2px; }
-    .record-card.nikki h2{ color:var(--nikki); }
-    .record-card.mat   h2{ color:var(--mat); }
-
-    /* Tight table */
-    table{
-      width:100%; border-collapse:collapse; table-layout:fixed;
-      font-size:0.68rem; line-height:1.1;
-    }
-    thead th{ background:#101010; }
-    th,td{ border-bottom:1px solid #222; padding:3px 2px; text-align:center; }
-    th:first-child, td:first-child{ text-align:left; }
-    tr:last-child td{ border-bottom:none; }
-
-    /* Fixed column widths so nothing wraps off-screen */
-    colgroup col.col-week  { width:34%; }
-    colgroup col.col-spread{ width:33%; }
-    colgroup col.col-ou    { width:33%; }
-
-    /* Extra-tight on small phones */
-    @media (max-width:600px){
-      header h1{ font-size:1.1rem; }
-      header img{ max-height:46px; }
-      .record-card{ padding:6px; }
-      table{ font-size:0.62rem; }
-      th,td{ padding:2px; }
-    }
+    /* rest of your styles … */
   </style>
 </head>
 <body>
+
+  <!-- BEGIN NAV -->
+  <div class="nav-container">
+    <button class="nav-toggle" id="navToggle">☰</button>
+    <div class="nav-menu" id="navMenu">
+      <a href="index.html">🏈 Main Picks</a>
+      <a href="picks.html">📊 Weekly Records</a>
+      <a href="insights.html">📐 Granular Insights</a>
+      <a href="metrics.html">📏 Team Metrics</a>
+    </div>
+  </div>
+  <script>
+    const navToggle=document.getElementById("navToggle");
+    const navMenu=document.getElementById("navMenu");
+    navToggle.addEventListener("click",e=>{
+      e.stopPropagation();
+      navMenu.style.display=navMenu.style.display==="block"?"none":"block";
+    });
+    document.addEventListener("click",()=>{navMenu.style.display="none";});
+  </script>
+  <!-- END NAV -->
+
   <header>
     <img src="assets/logos/IMG_0931.jpeg" alt="Left Logo" />
     <h1>2025 Records</h1>
     <img src="assets/logos/IMG_0930.jpeg" alt="Right Logo" />
   </header>
 
-  <main class="records-container">
-    <section class="record-card nikki">
-      <h2>Nikki</h2>
-      <table>
-        <colgroup>
-          <col class="col-week"><col class="col-spread"><col class="col-ou">
-        </colgroup>
-        <thead>
-          <tr><th>Week</th><th>Spread</th><th>O/U</th></tr>
-        </thead>
-        <tbody id="nikkiBody"></tbody>
-      </table>
-      <div id="nikkiEmpty" hidden></div>
-    </section>
-
-    <section class="record-card mat">
-      <h2>Mat</h2>
-      <table>
-        <colgroup>
-          <col class="col-week"><col class="col-spread"><col class="col-ou">
-        </colgroup>
-        <thead>
-          <tr><th>Week</th><th>Spread</th><th>O/U</th></tr>
-        </thead>
-        <tbody id="matBody"></tbody>
-      </table>
-      <div id="matEmpty" hidden></div>
-    </section>
+  <main>
+    <div id="recordsContainer"></div>
   </main>
 
   <script src="picks.js"></script>
