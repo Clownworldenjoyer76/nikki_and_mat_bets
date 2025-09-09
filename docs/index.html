@@ -10,15 +10,13 @@
         --mat:#1f6feb;
         --nikki:#e11d48;
         --muted:#666;
-        /* Controls header text size & image cap height (3 lines) */
-        --mast-size: 1.55rem;      /* base font for header lines */
-        --mast-lines: 3;           /* “3 lines” block */
+        --mast-size: 1.55rem;
+        --mast-lines: 3;
         --mast-cap: calc(var(--mast-size) * var(--mast-lines) * 1.05);
       }
 
       body { background:#000; color:#fff; max-width:900px; margin:0 auto; padding:10px; }
 
-      /* ===== Masthead with side images ===== */
       .mast {
         display:grid;
         grid-template-columns: minmax(36px,64px) 1fr minmax(36px,64px);
@@ -40,7 +38,6 @@
       }
       .mast-title .line { display:block; margin:2px 0; }
 
-      /* ===== Game cards ===== */
       #games { display:grid; grid-template-columns:1fr; gap:12px; }
       .game-card {
         background:#fff; color:#000; border-radius:12px; padding:12px;
@@ -53,7 +50,6 @@
       .game-title { font-weight:800; }
       .game-time { color:#333; }
 
-      /* Pick sections */
       .section-title { text-align:center; color:#555; font-size:.9rem; margin:8px 0 6px; }
       .divider { height:1px; background:#ddd; margin:10px 0; }
 
@@ -71,7 +67,6 @@
       .selected-mat { outline:3px solid var(--mat); }
       .selected-nikki { outline:3px solid var(--nikki); }
 
-      /* Sticky action bar (compact) */
       .sticky-bar {
         position:sticky; bottom:0; z-index:5;
         background:#222; color:#fff; border-top:1px solid #444;
@@ -86,7 +81,6 @@
         #games { grid-template-columns:1fr 1fr; }
       }
 
-      /* NAV */
       .nav-container { position: relative; text-align: center; margin: 6px 0; }
       .nav-toggle { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#fff; }
       .nav-menu {
@@ -116,11 +110,13 @@
     <script>
       const navToggle=document.getElementById("navToggle");
       const navMenu=document.getElementById("navMenu");
-      navToggle.addEventListener("click",e=>{
-        e.stopPropagation();
-        navMenu.style.display=navMenu.style.display==="block"?"none":"block";
-      });
-      document.addEventListener("click",()=>{navMenu.style.display="none";});
+      if(navToggle && navMenu){
+        navToggle.addEventListener("click",e=>{
+          e.stopPropagation();
+          navMenu.style.display=navMenu.style.display==="block"?"none":"block";
+        });
+        document.addEventListener("click",()=>{navMenu.style.display="none";});
+      }
     </script>
     <!-- END NAV -->
 
@@ -141,6 +137,7 @@
       <button id="submitBtn">Submit Picks</button>
     </div>
 
-    <script src="app.js"></script>
+    <!-- FIXED: point to apps.js -->
+    <script src="apps.js"></script>
   </body>
 </html>
