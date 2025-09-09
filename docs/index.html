@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nikki & Mat — NFL Picks</title>
   <style>
-    :root { --bg:#000; --fg:#fff; --muted:#bbb; --accent:#1f6feb; --neon:#39ff14; --pink:#ff00ff; }
+    :root { --bg:#000; --fg:#fff; --muted:#bbb; --accent:#1f6feb; --neon:#39ff14; }
     html,body{background:#000;color:#fff;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 
     .topbar{background:#111;border-bottom:1px solid #333;padding:6px 10px;position:sticky;top:0;z-index:1000}
@@ -60,7 +60,6 @@
     }
     .team-logo { width:50px; height:auto; }
 
-    /* --- TAP FIX --- */
     .pickbtn {
       pointer-events:auto !important;
       position:relative;
@@ -69,10 +68,6 @@
       touch-action:manipulation;
       width:100%;
       min-height:44px;
-    }
-    .pink-divider, .neon-divider, .neon-separator {
-      pointer-events:none !important;
-      z-index:0 !important;
     }
   </style>
 </head>
