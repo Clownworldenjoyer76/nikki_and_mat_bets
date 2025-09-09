@@ -111,14 +111,6 @@ function makePickButton(label, type, side, curPick, color){
   return b;
 }
 
-function pinkDivider(){
-  const div = document.createElement("div");
-  div.className = "pink-divider";
-  div.setAttribute("style",
-    "height:2px;background:#ff00ff;margin:10px 0;border-radius:2px;box-shadow:0 0 6px #ff00ff;pointer-events:none;");
-  return div;
-}
-
 function card(h, r, picksAll){
   const when = fmtDate(r[h.indexOf("commence_time_utc")]);
   const home = normalizeTeamName(r[h.indexOf("home_team")]);
@@ -154,8 +146,6 @@ function card(h, r, picksAll){
   ["mat","nikki"].forEach(user=>{
     const section = document.createElement("div");
     section.style.marginTop = "10px";
-
-    section.appendChild(pinkDivider());
 
     const nameDiv = document.createElement("div");
     nameDiv.className = "name " + user;
