@@ -196,32 +196,37 @@ function neonDivider(){
 }
 
 async function render(){
-  const { txt, used } = await fetchFirstAvailable(CSV_CANDIDATES);
+  try {
+    const { txt, used } = await fetchFirstAvailable(CSV_CANDIDATES);
 
-  const { hdr, rows } = parseCSV(txt);
-  const consensus = onlyConsensus(rows, hdr);
-  const source = consensus.length ? consensus : rows;
-  if(!source.length) throw new Error("No rows found in latest.csv");
+    const { hdr, rows } = parseCSV(txt);
+    const consensus = onlyConsensus(rows, hdr);
+    const source = consensus.length ? consensus : rows;
+    if(!source.length) throw new Error("No rows found in latest.csv");
 
-  const iWeek = hdr.indexOf("week");
-  const wkVal = iWeek !== -1 ? source[0][iWeek] : "";
-  const week = wkVal ? nflWeekLabel(wkVal) : "";
-  const season = iWeek !== -1 ? source[0][hdr.indexOf("season")] : "";
+    const iWeek = hdr.indexOf("week");
+    const wkVal = iWeek !== -1 ? source[0][iWeek] : "";
+    const week = wkVal ? nflWeekLabel(wkVal) : "";
+    const season = iWeek !== -1 ? source[0][hdr.indexOf("season")] : "";
 
-  document.getElementById("seasonWeek").textContent = week ? `NFL Week ${week}` : "NFL Schedule";
-  window._season = season;
-  window._week = String(week).padStart(2,"0");
+    document.getElementById("seasonWeek").textContent = week ? `NFL Week ${week}` : "NFL Schedule";
+    window._season = season;
+    window._week = String(week).padStart(2,"0");
 
-  const picksAll = loadPicks();
-  const gamesDiv = document.getElementById("games");
-  gamesDiv.innerHTML = "";
-  source.forEach((r, i)=>{
-    const c = card(hdr,r,picksAll);
-    gamesDiv.appendChild(c);
-    if(i < source.length - 1){
-      gamesDiv.appendChild(neonDivider());
-    }
-  });
+    const picksAll = loadPicks();
+    const gamesDiv = document.getElementById("games");
+    gamesDiv.innerHTML = "";
+    source.forEach((r, i)=>{
+      const c = card(hdr,r,picksAll);
+      gamesDiv.appendChild(c);
+      if(i < source.length - 1){
+        gamesDiv.appendChild(neonDivider());
+      }
+    });
+  } catch(err) {
+    alert("Render Error: " + err.message);
+    console.error(err);
+  }
 }
 
 document.getElementById("clearBtn").onclick = ()=>{
