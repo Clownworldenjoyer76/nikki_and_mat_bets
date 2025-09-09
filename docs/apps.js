@@ -1,13 +1,9 @@
 // ---------- CONFIG ----------
-// Primary path exactly as you specified:
 const PRIMARY_CSV = "docs/data/weekly/latest.csv";
-
-// If a CDN/page-base quirk 404s the primary path, we silently try
-// equivalent, common paths so the page never bricks.
 const CSV_CANDIDATES = [
   PRIMARY_CSV,
-  "/nikki_and_mat_bets/docs/data/weekly/latest.csv", // absolute project path on GitHub Pages
-  "data/weekly/latest.csv"                            // repo-root equivalent
+  "/nikki_and_mat_bets/docs/data/weekly/latest.csv",
+  "data/weekly/latest.csv"
 ];
 
 // ---------- UTILS ----------
@@ -15,29 +11,21 @@ function normalizeTeamName(name){
   if(name === "Washington Commanders") return "Washington Redskins";
   return name;
 }
-
 async function fetchFirstAvailable(urls){
   for(const p of urls){
     const bust = (p.includes("?") ? "&" : "?") + "v=" + Date.now();
-    const url = p + bust;
     try{
-      const r = await fetch(url, { cache: "no-store" });
-      if(r.ok){
-        const txt = await r.text();
-        return { txt, used: p };
-      }
+      const r = await fetch(p + bust, { cache: "no-store" });
+      if(r.ok) return { txt: await r.text(), used: p };
     }catch(_e){}
   }
   throw new Error("Schedule CSV not found at: " + urls.join(" | "));
 }
-
 function parseCSV(txt){
   const rows = txt.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/));
   const hdr = rows.shift() || [];
   return { hdr, rows };
 }
-
-// Robust: accept is_consensus=1 OR book=CONSENSUS
 function onlyConsensus(rows, hdr){
   const iBook = hdr.indexOf("book");
   const iCons = hdr.indexOf("is_consensus");
@@ -46,14 +34,13 @@ function onlyConsensus(rows, hdr){
     (iBook !== -1 && String(r[iBook]).trim().toUpperCase() === "CONSENSUS")
   );
 }
-
 function keyOf(r,h){ return `${r[h.indexOf("away_team")]}@${r[h.indexOf("home_team")]}_${r[h.indexOf("commence_time_utc")]}`; }
 function fmtDate(iso){
   const d = new Date(iso);
   return d.toLocaleString("en-US", { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", hour12:true });
 }
 function nflWeekLabel(csvWeek){
-  const base = 36; // season week offset in your pipeline
+  const base = 36;
   const w = ((parseInt(csvWeek,10) - base) % 18 + 18) % 18 + 1;
   return w;
 }
@@ -88,13 +75,16 @@ function ensurePickShape(obj){
   return { spread: obj.spread ?? null, total: obj.total ?? null };
 }
 
-// ---------- RENDER ----------
+// ---------- RENDER HELPERS ----------
 function makePickButton(label, type, side, curPick, color){
   const b = document.createElement("button");
   b.className = "pickbtn";
   b.textContent = label;
   b.dataset.type = type;
   b.dataset.side = side;
+  // make sure grid cells line up nicely
+  b.style.width = "100%";
+  b.style.justifySelf = "stretch";
   if( (type === "spread" && curPick.spread === side) ||
       (type === "total"  && curPick.total  === side) ){
     b.classList.add("active", color);
@@ -129,31 +119,35 @@ function card(h, r, picksAll){
     </div>
     <div class="when" style="text-align:center; margin-top:6px;">${when}</div>
     <div class="line" style="text-align:center; margin-top:6px;">
-      <span class="pill">${home} spread: <b>${spreadHomeDisp}</b></span>
+      <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
       <span class="pill" style="margin-left:8px;">Total: <b>${totalDisp}</b></span>
     </div>
     <div class="lane"><div class="name mat">Mat</div><div class="btnrow" data-user="mat"></div></div>
     <div class="lane"><div class="name nikki">Nikki</div><div class="btnrow" data-user="nikki"></div></div>
   `;
 
-  // Build 2×2 grid: (Away spread, Over) / (Home spread, Under)
+  // Build an inner grid wrapper so external CSS can't override it
   ["mat","nikki"].forEach(user=>{
-    const row = el.querySelector(`.btnrow[data-user="${user}"]`);
-    row.setAttribute("style",
-      "display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;align-items:stretch;");
+    const btnRow = el.querySelector(`.btnrow[data-user="${user}"]`);
+
+    // Create a wrapper that enforces a 2x2 grid no matter what
+    const grid = document.createElement("div");
+    grid.style.display = "grid";
+    grid.style.gridTemplateColumns = "1fr 1fr";
+    grid.style.columnGap = "8px";
+    grid.style.rowGap = "8px";
+    grid.style.marginTop = "6px";
 
     const color = user==="mat" ? "mat" : "nikki";
     const picksUser = picksAll[user] || {};
     const curPick = ensurePickShape(picksUser[key]);
 
-    // Top-left: Away spread
-    const btnAway = makePickButton(`${away} ${spreadAway}`, "spread", "away", curPick, color);
-    // Top-right: Over
-    const btnOver = makePickButton(`Over ${totalDisp}`, "total", "over", curPick, color);
-    // Bottom-left: Home spread
-    const btnHome = makePickButton(`${home} ${spreadHomeDisp}`, "spread", "home", curPick, color);
-    // Bottom-right: Under
-    const btnUnder = makePickButton(`Under ${totalDisp}`, "total", "under", curPick, color);
+    // Order: Away spread | Over
+    //        Home spread | Under
+    const btnAway  = makePickButton(`${away} ${spreadAway}`,      "spread", "away",  curPick, color);
+    const btnOver  = makePickButton(`Over ${totalDisp}`,          "total",  "over",  curPick, color);
+    const btnHome  = makePickButton(`${home} ${spreadHomeDisp}`,  "spread", "home",  curPick, color);
+    const btnUnder = makePickButton(`Under ${totalDisp}`,         "total",  "under", curPick, color);
 
     [btnAway, btnOver, btnHome, btnUnder].forEach(b=>{
       b.onclick = ()=>{
@@ -163,7 +157,7 @@ function card(h, r, picksAll){
 
         if(b.dataset.type === "spread"){
           current.spread = (current.spread === b.dataset.side) ? null : b.dataset.side;
-        }else if(b.dataset.type === "total"){
+        }else{
           current.total  = (current.total  === b.dataset.side) ? null : b.dataset.side;
         }
 
@@ -172,18 +166,16 @@ function card(h, r, picksAll){
         }else{
           mine[key] = current;
         }
-
         all[user] = mine;
         savePicks(all);
-        render(); // re-render to refresh button states
+        render();
       };
+      grid.appendChild(b);
     });
 
-    // Append in the exact 2×2 order
-    row.appendChild(btnAway);  // col1 row1
-    row.appendChild(btnOver);  // col2 row1
-    row.appendChild(btnHome);  // col1 row2
-    row.appendChild(btnUnder); // col2 row2
+    // Clear any existing children and mount our grid
+    btnRow.innerHTML = "";
+    btnRow.appendChild(grid);
   });
 
   return el;
