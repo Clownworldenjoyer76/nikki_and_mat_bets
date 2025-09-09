@@ -88,6 +88,7 @@ function makePickButton(label, type, side, curPick, color, key, user){
     b.classList.add("active", color);
   }
   b.onclick = async ()=>{
+    alert("Button clicked!"); // This is the new diagnostic line
     try {
       const all = loadPicks();
       const mine = all[user] || {};
