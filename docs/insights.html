@@ -1,184 +1,85 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Nikki & Mat — Insights</title>
-    <link rel="stylesheet" href="https://unpkg.com/mvp.css" />
-    <style>
-      :root { --mat:#1f6feb; --nikki:#e11d48; }
-      body { background:#000; color:#fff; max-width:1100px; margin:0 auto; padding:10px; }
-
-      header{
-        display:flex; align-items:center; justify-content:space-between;
-        margin:6px 0 12px;
-      }
-      header h1{ margin:0; font-size:1.35rem; font-weight:800; text-align:center; flex:1; }
-      header img{ max-height:52px; width:auto; }
-
-      .controls{
-        display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;
-        margin:6px 0 14px;
-      }
-      .controls label{ font-size:.9rem; color:#ccc; }
-      .controls select{
-        background:#111; color:#fff; border:1px solid #333; border-radius:8px; padding:6px 10px;
-      }
-
-      .tabs{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:10px; }
-      .tab{ background:#111; color:#fff; border:1px solid #333; border-radius:999px; padding:6px 10px; cursor:pointer; font-size:.85rem; }
-      .tab.active{ background:#1f2937; }
-
-      section.panel{ display:none; }
-      section.panel.active{ display:block; }
-      table{ width:100%; border-collapse:collapse; table-layout:fixed; font-size:0.82rem; }
-      th,td{ border-bottom:1px solid #222; padding:6px 6px; text-align:center; }
-      th:first-child,td:first-child{ text-align:left; }
-      tr:last-child td{ border-bottom:none; }
-      thead th button{
-        background:transparent; color:#fff; border:none; cursor:pointer; font-weight:700;
-      }
-      .muted{ color:#9aa; font-size:.85rem; }
-
-      @media (max-width:600px){
-        header h1{ font-size:1.2rem; }
-        table{ font-size:0.74rem; }
-        th,td{ padding:4px; }
-      }
-
-      /* NAV */
-      .nav-container { position: relative; text-align: center; margin: 6px 0; }
-      .nav-toggle { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#fff; }
-      .nav-menu {
-        display:none; position:absolute; top:100%; left:50%; transform:translateX(-50%);
-        background:#111; border:1px solid #333; border-radius:6px; min-width:180px; z-index:999;
-      }
-      .nav-menu a {
-        display:block; padding:8px 12px; color:#fff; text-decoration:none;
-        font-size:0.9rem; border-bottom:1px solid #222;
-      }
-      .nav-menu a:last-child{ border-bottom:none; }
-      .nav-menu a:hover{ background:#222; }
-    </style>
-  </head>
-  <body>
-
-    <!-- BEGIN NAV -->
-    <div class="nav-container">
-      <button class="nav-toggle" id="navToggle">☰</button>
-      <div class="nav-menu" id="navMenu">
-        <a href="index.html">🏈 Main Picks</a>
-        <a href="picks.html">📊 Weekly Records</a>
-        <a href="insights.html">📐 Granular Insights</a>
-        <a href="metrics.html">📏 Team Metrics</a>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nikki & Mat — Insights</title>
+  <style>
+    :root { --bg:#000; --fg:#fff; --muted:#bbb }
+    html,body{background:#000;color:#fff;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:1000px;margin:0 auto;padding:10px}
+    /* tiny centered burger */
+    .nav-wrap{display:flex;justify-content:center;margin:6px 0}
+    .nav { position:relative }
+    .nav-btn{background:#111;color:#fff;border:1px solid #444;border-radius:8px;padding:6px 10px;font-size:.9rem}
+    .nav-menu{position:absolute;left:50%;transform:translateX(-50%);top:42px;background:#111;border:1px solid #444;border-radius:10px;padding:8px;display:none;min-width:220px;z-index:10}
+    .nav-menu a{display:block;color:#fff;text-decoration:none;padding:6px 8px;border-radius:6px}
+    .nav-menu a:hover{background:#222}
+    header{text-align:center;margin:12px 0}
+    header h1{margin:.2rem 0;font-size:1.8rem}
+    .controls{display:flex;gap:10px;justify-content:center;align-items:center;margin:8px 0}
+    select{background:#111;color:#fff;border:1px solid #444;border-radius:8px;padding:6px 8px}
+    .tabs{display:flex;gap:6px;justify-content:center;margin:6px 0}
+    .tab-btn{background:#111;color:#fff;border:1px solid #444;border-radius:8px;padding:6px 10px}
+    table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #444;border-radius:10px;overflow:hidden;background:#111}
+    th,td{padding:8px 10px;border-bottom:1px solid #333;font-size:.95rem}
+    thead th{background:#151515;text-align:left}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- tiny centered burger -->
+    <div class="nav-wrap">
+      <div class="nav" id="topNav">
+        <button class="nav-btn" id="navToggle" aria-expanded="false" aria-controls="navMenu">☰ Menu</button>
+        <div class="nav-menu" id="navMenu" role="menu">
+          <a href="./index.html">🏈 Main Picks</a>
+          <a href="./picks.html">📊 Weekly Records</a>
+          <a href="./insights.html">📐 Granular Insights</a>
+          <a href="./metrics.html">📏 Team Metrics</a>
+        </div>
       </div>
     </div>
-    <script>
-      const navToggle=document.getElementById("navToggle");
-      const navMenu=document.getElementById("navMenu");
-      navToggle.addEventListener("click",e=>{
-        e.stopPropagation();
-        navMenu.style.display=navMenu.style.display==="block"?"none":"block";
-      });
-      document.addEventListener("click",()=>{navMenu.style.display="none";});
-    </script>
-    <!-- END NAV -->
 
     <header>
-      <img src="assets/logos/IMG_0931.jpeg" alt="Left Logo" />
-      <h1>Insights</h1>
-      <img src="assets/logos/IMG_0930.jpeg" alt="Right Logo" />
+      <h1>Granular Insights</h1>
     </header>
 
-    <main>
-      <!-- Your existing insights sections remain; JS populates them -->
-      <div class="controls">
-        <label for="pickerSel">Picker</label>
-        <select id="pickerSel">
-          <option value="Nikki">Nikki</option>
-          <option value="Mat">Mat</option>
-        </select>
+    <div class="controls">
+      <label for="teamFilter">Filter Team:</label>
+      <select id="teamFilter">
+        <option value="">All Teams</option>
+      </select>
+    </div>
 
-        <label for="seasonSel">Season</label>
-        <select id="seasonSel"></select>
-      </div>
+    <div class="tabs" id="tabs">
+      <button class="tab-btn" data-tab="overall">Overall</button>
+      <button class="tab-btn" data-tab="home">Home</button>
+      <button class="tab-btn" data-tab="away">Away</button>
+      <button class="tab-btn" data-tab="ou">Over/Under</button>
+    </div>
 
-      <div class="tabs">
-        <button class="tab active" data-tab="team-ats">ATS by Team (Picked)</button>
-        <button class="tab" data-tab="team-fade">ATS vs Team (Faded)</button>
-        <button class="tab" data-tab="home-away">Home / Away Split</button>
-        <button class="tab" data-tab="totals">Totals Over/Under</button>
-      </div>
+    <table id="table">
+      <thead><tr><th>Metric</th><th>Nikki</th><th>Mat</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-      <section id="team-ats" class="panel active">
-        <h2>ATS — Picked Team <span class="muted" id="countPick"></span></h2>
-        <table>
-          <thead>
-            <tr>
-              <th><button data-sort="team">Team</button></th>
-              <th><button data-sort="wins">W</button></th>
-              <th><button data-sort="losses">L</button></th>
-              <th><button data-sort="pushes">P</button></th>
-              <th><button data-sort="games">Games</button></th>
-              <th><button data-sort="win_pct">Win %</button></th>
-            </tr>
-          </thead>
-          <tbody id="bodyPick"></tbody>
-        </table>
-      </section>
-
-      <section id="team-fade" class="panel">
-        <h2>ATS — Faded Team <span class="muted" id="countFade"></span></h2>
-        <table>
-          <thead>
-            <tr>
-              <th><button data-sort="team">Opponent</button></th>
-              <th><button data-sort="wins">W</button></th>
-              <th><button data-sort="losses">L</button></th>
-              <th><button data-sort="pushes">P</button></th>
-              <th><button data-sort="games">Games</button></th>
-              <th><button data-sort="win_pct">Win %</button></th>
-            </tr>
-          </thead>
-          <tbody id="bodyFade"></tbody>
-        </table>
-      </section>
-
-      <section id="home-away" class="panel">
-        <h2>Home / Away Split <span class="muted" id="countHA"></span></h2>
-        <table>
-          <thead>
-            <tr>
-              <th><button data-sort="side">Side</button></th>
-              <th><button data-sort="wins">W</button></th>
-              <th><button data-sort="losses">L</button></th>
-              <th><button data-sort="pushes">P</button></th>
-              <th><button data-sort="games">Games</button></th>
-              <th><button data-sort="win_pct">Win %</button></th>
-            </tr>
-          </thead>
-          <tbody id="bodyHA"></tbody>
-        </table>
-      </section>
-
-      <section id="totals" class="panel">
-        <h2>Totals Over / Under <span class="muted" id="countTot"></span></h2>
-        <table>
-          <thead>
-            <tr>
-              <th><button data-sort="side">Side</button></th>
-              <th><button data-sort="wins">W</button></th>
-              <th><button data-sort="losses">L</button></th>
-              <th><button data-sort="pushes">P</button></th>
-              <th><button data-sort="games">Games</button></th>
-              <th><button data-sort="win_pct">Win %</button></th>
-            </tr>
-          </thead>
-          <tbody id="bodyTot"></tbody>
-        </table>
-      </section>
-    </main>
-
-    <script src="insights.js"></script>
-  </body>
+  <script>
+    (function(){
+      const btn=document.getElementById('navToggle');
+      const menu=document.getElementById('navMenu');
+      if(!btn||!menu) return;
+      btn.addEventListener('click',()=> {
+        const open = menu.style.display === 'block';
+        menu.style.display = open ? 'none' : 'block';
+        btn.setAttribute('aria-expanded', String(!open));
+      });
+      document.addEventListener('click',(e)=>{
+        if(!menu.contains(e.target) && e.target!==btn) menu.style.display='none';
+      });
+    })();
+  </script>
+  <script src="./insights.js" defer></script>
+</body>
 </html>
