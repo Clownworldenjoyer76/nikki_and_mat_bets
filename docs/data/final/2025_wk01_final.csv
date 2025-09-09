@@ -14,4 +14,4 @@ season,week,game_id,commence_time_utc,home_team,away_team,spread_home,total,mat_
 2025,1,8e0e2d9237098222f9ca7554b11b12bb,2025-09-07T20:25:00+00:00,Green Bay Packers,Detroit Lions,-2.5,47.5,home,over,away,over,27.0,13.0
 2025,1,dc0e3db61983a138098f28226788d2d3,2025-09-07T20:25:00+00:00,Los Angeles Rams,Houston Texans,-3.0,44.0,home,over,away,under,14.0,9.0
 2025,1,dee0a41ed5e8201a96d457899adbe918,2025-09-08T00:20:00+00:00,Buffalo Bills,Baltimore Ravens,0.0,50.5,away,over,away,over,41.0,40.0
-2025,1,c6d7807cee33d5e81c671527b9c8b3f1,2025-09-09T00:15:00+00:00,Chicago Bears,Minnesota Vikings,1.5,44.0,away,under,home,under,,
+2025,1,c6d7807cee33d5e81c671527b9c8b3f1,2025-09-09T00:15:00+00:00,Chicago Bears,Minnesota Vikings,1.5,44.0,away,under,home,under,24.0,
