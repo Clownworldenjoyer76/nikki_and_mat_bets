@@ -108,7 +108,6 @@ function makePickButton(label, type, side, curPick, color, key, user){
       all[user] = mine;
       savePicks(all);
 
-      alert("About to render...");
       await render();
     } catch (e) {
       alert("Error: " + e.message);
@@ -187,46 +186,39 @@ function card(h, r, picksAll){
   return el;
 }
 
-function neonDivider(){
-  const div = document.createElement("div");
-  div.className = "neon-divider";
-  div.setAttribute("style",
-    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;pointer-events:none;");
-  return div;
-}
-
+// Replace the entire render function with this
 async function render(){
-  try {
-    const { txt, used } = await fetchFirstAvailable(CSV_CANDIDATES);
+  const { txt, used } = await fetchFirstAvailable(CSV_CANDIDATES);
 
-    const { hdr, rows } = parseCSV(txt);
-    const consensus = onlyConsensus(rows, hdr);
-    const source = consensus.length ? consensus : rows;
-    if(!source.length) throw new Error("No rows found in latest.csv");
+  alert("Parsing CSV...");
+  const { hdr, rows } = parseCSV(txt);
+  const consensus = onlyConsensus(rows, hdr);
+  const source = consensus.length ? consensus : rows;
+  if(!source.length) throw new Error("No rows found in latest.csv");
 
-    const iWeek = hdr.indexOf("week");
-    const wkVal = iWeek !== -1 ? source[0][iWeek] : "";
-    const week = wkVal ? nflWeekLabel(wkVal) : "";
-    const season = iWeek !== -1 ? source[0][hdr.indexOf("season")] : "";
+  alert("Updating header...");
+  const iWeek = hdr.indexOf("week");
+  const wkVal = iWeek !== -1 ? source[0][iWeek] : "";
+  const week = wkVal ? nflWeekLabel(wkVal) : "";
+  const season = iWeek !== -1 ? source[0][hdr.indexOf("season")] : "";
 
-    document.getElementById("seasonWeek").textContent = week ? `NFL Week ${week}` : "NFL Schedule";
-    window._season = season;
-    window._week = String(week).padStart(2,"0");
+  document.getElementById("seasonWeek").textContent = week ? `NFL Week ${week}` : "NFL Schedule";
+  window._season = season;
+  window._week = String(week).padStart(2,"0");
 
-    const picksAll = loadPicks();
-    const gamesDiv = document.getElementById("games");
-    gamesDiv.innerHTML = "";
-    source.forEach((r, i)=>{
-      const c = card(hdr,r,picksAll);
-      gamesDiv.appendChild(c);
-      if(i < source.length - 1){
-        gamesDiv.appendChild(neonDivider());
-      }
-    });
-  } catch(err) {
-    alert("Render Error: " + err.message);
-    console.error(err);
-  }
+  alert("Drawing cards...");
+  const picksAll = loadPicks();
+  const gamesDiv = document.getElementById("games");
+  gamesDiv.innerHTML = "";
+  source.forEach((r, i)=>{
+    const c = card(hdr,r,picksAll);
+    gamesDiv.appendChild(c);
+    if(i < source.length - 1){
+      gamesDiv.appendChild(neonDivider());
+    }
+  });
+
+  alert("Render complete.");
 }
 
 document.getElementById("clearBtn").onclick = ()=>{
