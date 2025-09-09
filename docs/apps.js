@@ -1,5 +1,14 @@
 // ---------- CONFIG ----------
-const CSV_URL = "docs/data/weekly/latest.csv"; // schedule CSV served from /docs
+// Primary path exactly as you specified:
+const PRIMARY_CSV = "docs/data/weekly/latest.csv";
+
+// If a CDN/page-base quirk 404s the primary path, we silently try
+// equivalent, common paths so the page never bricks.
+const CSV_CANDIDATES = [
+  PRIMARY_CSV,
+  "/nikki_and_mat_bets/docs/data/weekly/latest.csv", // absolute project path on GitHub Pages
+  "data/weekly/latest.csv"                            // repo-root equivalent
+];
 
 // ---------- UTILS ----------
 function normalizeTeamName(name){
@@ -7,18 +16,28 @@ function normalizeTeamName(name){
   return name;
 }
 
-async function fetchCSV(url){
-  const r = await fetch(url, { cache: "no-store" });
-  if(!r.ok) throw new Error("CSV not found: " + url);
-  return r.text();
+async function fetchFirstAvailable(urls){
+  for(const p of urls){
+    const bust = (p.includes("?") ? "&" : "?") + "v=" + Date.now();
+    const url = p + bust;
+    try{
+      const r = await fetch(url, { cache: "no-store" });
+      if(r.ok){
+        const txt = await r.text();
+        return { txt, used: p };
+      }
+    }catch(_e){}
+  }
+  throw new Error("Schedule CSV not found at: " + urls.join(" | "));
 }
+
 function parseCSV(txt){
-  const rows = txt.trim().split("\n").map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/));
-  const hdr = rows.shift();
+  const rows = txt.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/));
+  const hdr = rows.shift() || [];
   return { hdr, rows };
 }
 
-// ✅ Robust consensus filter: accepts `is_consensus=1` OR `book="CONSENSUS"`
+// Robust: accept is_consensus=1 OR book=CONSENSUS
 function onlyConsensus(rows, hdr){
   const iBook = hdr.indexOf("book");
   const iCons = hdr.indexOf("is_consensus");
@@ -31,17 +50,10 @@ function onlyConsensus(rows, hdr){
 function keyOf(r,h){ return `${r[h.indexOf("away_team")]}@${r[h.indexOf("home_team")]}_${r[h.indexOf("commence_time_utc")]}`; }
 function fmtDate(iso){
   const d = new Date(iso);
-  return d.toLocaleString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
+  return d.toLocaleString("en-US", { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", hour12:true });
 }
 function nflWeekLabel(csvWeek){
-  const base = 36;
+  const base = 36; // season week offset in your pipeline
   const w = ((parseInt(csvWeek,10) - base) % 18 + 18) % 18 + 1;
   return w;
 }
@@ -49,7 +61,7 @@ function fmtSigned(n){
   if(n === "" || n === null || n === undefined) return "";
   const v = Number(n);
   if(Number.isNaN(v)) return String(n);
-  return (v>0?`+${v}`:`${v}`);
+  return v>0?`+${v}`:`${v}`;
 }
 function logoPath(team){
   const cleaned = team.replace(/[^A-Za-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
@@ -167,25 +179,27 @@ function card(h, r, picksAll){
 }
 
 async function render(){
-  const txt = await fetchCSV(CSV_URL);
-  const { hdr, rows } = parseCSV(txt);
+  // 1) Fetch schedule CSV from your requested path; if that fails,
+  //    try two equivalent site paths so the page still works.
+  const { txt, used } = await fetchFirstAvailable(CSV_CANDIDATES);
 
-  // ✅ Use consensus when available, otherwise gracefully fall back to all rows
+  // 2) Parse and pick a source set (CONSENSUS preferred, else all rows)
+  const { hdr, rows } = parseCSV(txt);
   const consensus = onlyConsensus(rows, hdr);
   const source = consensus.length ? consensus : rows;
   if(!source.length) throw new Error("No rows found in latest.csv");
 
+  // 3) Week label (safe)
   const iWeek = hdr.indexOf("week");
   const wkVal = iWeek !== -1 ? source[0][iWeek] : "";
   const week = wkVal ? nflWeekLabel(wkVal) : "";
   document.getElementById("seasonWeek").textContent = week ? `NFL Week ${week}` : "NFL Schedule";
 
+  // 4) Render cards
   const picksAll = loadPicks();
   const gamesDiv = document.getElementById("games");
   gamesDiv.innerHTML = "";
-  source.forEach(r=>{
-    gamesDiv.appendChild(card(hdr,r,picksAll));
-  });
+  source.forEach(r=> gamesDiv.appendChild(card(hdr,r,picksAll)));
 }
 
 document.getElementById("clearBtn").onclick = ()=>{
