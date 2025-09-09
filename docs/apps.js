@@ -197,13 +197,11 @@ function neonDivider(){
 async function render(){
   const { txt, used } = await fetchFirstAvailable(CSV_CANDIDATES);
 
-  alert("Parsing CSV...");
   const { hdr, rows } = parseCSV(txt);
   const consensus = onlyConsensus(rows, hdr);
   const source = consensus.length ? consensus : rows;
   if(!source.length) throw new Error("No rows found in latest.csv");
 
-  alert("Updating header...");
   const iWeek = hdr.indexOf("week");
   const wkVal = iWeek !== -1 ? source[0][iWeek] : "";
   const week = wkVal ? nflWeekLabel(wkVal) : "";
@@ -213,7 +211,6 @@ async function render(){
   window._season = season;
   window._week = String(week).padStart(2,"0");
 
-  alert("Drawing cards...");
   const picksAll = loadPicks();
   const gamesDiv = document.getElementById("games");
   gamesDiv.innerHTML = "";
@@ -224,8 +221,6 @@ async function render(){
       gamesDiv.appendChild(neonDivider());
     }
   });
-
-  alert("Render complete.");
 }
 
 document.getElementById("clearBtn").onclick = ()=>{
