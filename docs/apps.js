@@ -76,7 +76,7 @@ function ensurePickShape(obj){
 }
 
 // ---------- RENDER HELPERS ----------
-function makePickButton(label, type, side, curPick, color){
+function makePickButton(label, type, side, curPick, color, key, user){
   const b = document.createElement("button");
   b.className = "pickbtn";
   b.type = "button";
@@ -167,10 +167,10 @@ function card(h, r, picksAll){
     const picksUser = picksAll[user] || {};
     const curPick = ensurePickShape(picksUser[key]);
 
-    const btnAway  = makePickButton(`${away} ${spreadAway}`,      "spread", "away",  curPick, color);
-    const btnOver  = makePickButton(`Over ${totalDisp}`,          "total",  "over",  curPick, color);
-    const btnHome  = makePickButton(`${home} ${spreadHomeDisp}`,  "spread", "home",  curPick, color);
-    const btnUnder = makePickButton(`Under ${totalDisp}`,         "total",  "under", curPick, color);
+    const btnAway  = makePickButton(`${away} ${spreadAway}`,      "spread", "away",  curPick, color, key, user);
+    const btnOver  = makePickButton(`Over ${totalDisp}`,          "total",  "over",  curPick, color, key, user);
+    const btnHome  = makePickButton(`${home} ${spreadHomeDisp}`,  "spread", "home",  curPick, color, key, user);
+    const btnUnder = makePickButton(`Under ${totalDisp}`,         "total",  "under", curPick, color, key, user);
 
     [btnAway, btnOver, btnHome, btnUnder].forEach(b=> grid.appendChild(b));
 
