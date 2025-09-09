@@ -186,7 +186,14 @@ function card(h, r, picksAll){
   return el;
 }
 
-// Replace the entire render function with this
+function neonDivider(){
+  const div = document.createElement("div");
+  div.className = "neon-divider";
+  div.setAttribute("style",
+    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;pointer-events:none;");
+  return div;
+}
+
 async function render(){
   const { txt, used } = await fetchFirstAvailable(CSV_CANDIDATES);
 
