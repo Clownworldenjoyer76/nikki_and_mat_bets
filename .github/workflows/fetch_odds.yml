@@ -1,9 +1,6 @@
-name: Fetch NFL odds weekly
+name: Fetch NFL odds (manual)
 
 on:
-  schedule:
-    - cron: "0 10 * * 2"   # Tue 10:00 UTC (6:00 AM ET standard time)
-    - cron: "0 11 * * 2"   # Tue 11:00 UTC (6:00 AM ET daylight saving)
   workflow_dispatch:
 
 permissions:
@@ -16,11 +13,6 @@ jobs:
       TZ: America/New_York
     steps:
       - uses: actions/checkout@v4
-
-      - name: Run only at 06:00 New York
-        run: |
-          HOUR=$(TZ=America/New_York date +%H)
-          [ "$HOUR" = "06" ] || { echo "Not 06:00 NY; exiting."; exit 78; }
 
       - uses: actions/setup-python@v5
         with:
@@ -48,5 +40,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
           git add data/weekly/*.csv docs/data/weekly/*.csv
-          git commit -m "Weekly odds update (auto)" || echo "No changes"
+          git commit -m "Weekly odds update (manual run)" || echo "No changes"
           git push
