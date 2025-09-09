@@ -190,7 +190,7 @@ function neonDivider(){
 }
 
 async function render(){
-  const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
+  const { txt, used } = await fetchFirstAvailable(CSV_CANDIDATES);
 
   const { hdr, rows } = parseCSV(txt);
   const consensus = onlyConsensus(rows, hdr);
@@ -200,7 +200,11 @@ async function render(){
   const iWeek = hdr.indexOf("week");
   const wkVal = iWeek !== -1 ? source[0][iWeek] : "";
   const week = wkVal ? nflWeekLabel(wkVal) : "";
+  const season = iWeek !== -1 ? source[0][hdr.indexOf("season")] : "";
+
   document.getElementById("seasonWeek").textContent = week ? `NFL Week ${week}` : "NFL Schedule";
+  window._season = season;
+  window._week = String(week).padStart(2,"0");
 
   const picksAll = loadPicks();
   const gamesDiv = document.getElementById("games");
@@ -220,7 +224,13 @@ document.getElementById("clearBtn").onclick = ()=>{
   render();
 };
 document.getElementById("issueBtn").onclick = ()=>{
-  alert("Submit Picks clicked (placeholder).");
+  const season = window._season || new Date().getFullYear();
+  const week = window._week || "01";
+  const picks = localStorage.getItem("picks_mat") || "{}" ;
+  const picks2 = localStorage.getItem("picks_nikki") || "{}";
+  const title = encodeURIComponent(`Nikki and Mat’s NFL Picks — ${season} WK${week}`);
+  const body  = encodeURIComponent(`Paste (do not edit) between the fences:\n\n\`\`\`json\n{ "mat": ${picks}, "nikki": ${picks2} }\n\`\`\`\n`);
+  window.open(`https://github.com/Clownworldenjoyer76/bet-duel/issues/new?title=${title}&body=${body}`, "_blank");
 };
 
 render().catch(err=>{
