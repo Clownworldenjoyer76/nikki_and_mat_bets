@@ -89,6 +89,19 @@ function ensurePickShape(obj){
 }
 
 // ---------- RENDER ----------
+function makePickButton(label, type, side, curPick, color){
+  const b = document.createElement("button");
+  b.className = "pickbtn";
+  b.textContent = label;
+  b.dataset.type = type;
+  b.dataset.side = side;
+  if( (type === "spread" && curPick.spread === side) ||
+      (type === "total"  && curPick.total  === side) ){
+    b.classList.add("active", color);
+  }
+  return b;
+}
+
 function card(h, r, picksAll){
   const when = fmtDate(r[h.indexOf("commence_time_utc")]);
   const home = normalizeTeamName(r[h.indexOf("home_team")]);
@@ -116,49 +129,42 @@ function card(h, r, picksAll){
     </div>
     <div class="when" style="text-align:center; margin-top:6px;">${when}</div>
     <div class="line" style="text-align:center; margin-top:6px;">
-      <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
+      <span class="pill">${home} spread: <b>${spreadHomeDisp}</b></span>
       <span class="pill" style="margin-left:8px;">Total: <b>${totalDisp}</b></span>
     </div>
     <div class="lane"><div class="name mat">Mat</div><div class="btnrow" data-user="mat"></div></div>
     <div class="lane"><div class="name nikki">Nikki</div><div class="btnrow" data-user="nikki"></div></div>
   `;
 
-  // Button labels now show TEAM NAMES instead of Home/Away
-  const opts = [
-    {label:`${home} ${spreadHomeDisp}`, type:"spread", side:"home"},
-    {label:`${away} ${spreadAway}`,     type:"spread", side:"away"},
-    {label:`Over ${totalDisp}`,         type:"total",  side:"over"},
-    {label:`Under ${totalDisp}`,        type:"total",  side:"under"},
-  ];
-
+  // Build 2×2 grid: (Away spread, Over) / (Home spread, Under)
   ["mat","nikki"].forEach(user=>{
     const row = el.querySelector(`.btnrow[data-user="${user}"]`);
-    const color = user==="mat" ? "mat" : "nikki";
+    row.setAttribute("style",
+      "display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;align-items:stretch;");
 
+    const color = user==="mat" ? "mat" : "nikki";
     const picksUser = picksAll[user] || {};
     const curPick = ensurePickShape(picksUser[key]);
 
-    opts.forEach(o=>{
-      const b = document.createElement("button");
-      b.className = "pickbtn";
-      b.textContent = o.label;
-      b.dataset.type = o.type;
-      b.dataset.side = o.side;
+    // Top-left: Away spread
+    const btnAway = makePickButton(`${away} ${spreadAway}`, "spread", "away", curPick, color);
+    // Top-right: Over
+    const btnOver = makePickButton(`Over ${totalDisp}`, "total", "over", curPick, color);
+    // Bottom-left: Home spread
+    const btnHome = makePickButton(`${home} ${spreadHomeDisp}`, "spread", "home", curPick, color);
+    // Bottom-right: Under
+    const btnUnder = makePickButton(`Under ${totalDisp}`, "total", "under", curPick, color);
 
-      if( (o.type === "spread" && curPick.spread === o.side) ||
-          (o.type === "total"  && curPick.total  === o.side) ){
-        b.classList.add("active", color);
-      }
-
+    [btnAway, btnOver, btnHome, btnUnder].forEach(b=>{
       b.onclick = ()=>{
         const all = loadPicks();
         const mine = all[user] || {};
         const current = ensurePickShape(mine[key]);
 
-        if(o.type === "spread"){
-          current.spread = (current.spread === o.side) ? null : o.side;
-        }else if(o.type === "total"){
-          current.total  = (current.total  === o.side) ? null : o.side;
+        if(b.dataset.type === "spread"){
+          current.spread = (current.spread === b.dataset.side) ? null : b.dataset.side;
+        }else if(b.dataset.type === "total"){
+          current.total  = (current.total  === b.dataset.side) ? null : b.dataset.side;
         }
 
         if(current.spread === null && current.total === null){
@@ -169,11 +175,15 @@ function card(h, r, picksAll){
 
         all[user] = mine;
         savePicks(all);
-        render(); // re-render
+        render(); // re-render to refresh button states
       };
-
-      row.appendChild(b);
     });
+
+    // Append in the exact 2×2 order
+    row.appendChild(btnAway);  // col1 row1
+    row.appendChild(btnOver);  // col2 row1
+    row.appendChild(btnHome);  // col1 row2
+    row.appendChild(btnUnder); // col2 row2
   });
 
   return el;
@@ -181,29 +191,24 @@ function card(h, r, picksAll){
 
 function neonDivider(){
   const div = document.createElement("div");
-  // Inline style so you don't need to edit CSS/HTML:
   div.setAttribute("style",
     "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;");
   return div;
 }
 
 async function render(){
-  // 1) Fetch schedule CSV (your path + safe fallbacks)
   const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
 
-  // 2) Parse and pick source (CONSENSUS preferred, else all rows)
   const { hdr, rows } = parseCSV(txt);
   const consensus = onlyConsensus(rows, hdr);
   const source = consensus.length ? consensus : rows;
   if(!source.length) throw new Error("No rows found in latest.csv");
 
-  // 3) Week label (safe)
   const iWeek = hdr.indexOf("week");
   const wkVal = iWeek !== -1 ? source[0][iWeek] : "";
   const week = wkVal ? nflWeekLabel(wkVal) : "";
   document.getElementById("seasonWeek").textContent = week ? `NFL Week ${week}` : "NFL Schedule";
 
-  // 4) Render cards + neon divider between each game
   const picksAll = loadPicks();
   const gamesDiv = document.getElementById("games");
   gamesDiv.innerHTML = "";
