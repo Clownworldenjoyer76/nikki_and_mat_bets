@@ -1,6 +1,6 @@
 * Run Action  Export CSV to XLSX (Manual)
 * Enter "Scores" and Week Number
-* Download data/scores/2025_wk??_scores.xlsx
+* Download docs/data/scores/2025_wk*_scores.xlsx
 *Open and Update CSV in Google Sheets
 *
 * Upload Updated xlsx file
