@@ -1,9 +1,19 @@
 // ---------- CONFIG ----------
-const CSV_URL = "data/weekly/latest.csv"; // served from /docs
+const CSV_URL = "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/data/weekly/latest.csv"; // served from /docs
 
 // Where "Submit Picks" opens the issue:
 const GH_OWNER = "clownworldenjoyer76";
 const GH_REPO  = "nikki_and_mat_bets";
+
+
+// ----- Data path resolver: fetch from raw GitHub when path starts with "data/" or "docs/data/"
+function resolveDataPath(path){
+  if(/^https?:\/\//.test(path)) return path;
+  if(path.startsWith("./")) path = path.slice(2);
+  if(path.startsWith("docs/data/")) return "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/" + path.replace(/^docs\//,"");
+  if(path.startsWith("data/")) return "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/" + path;
+  return path;
+}
 
 // ---------- UTILS ----------
 function normalizeTeamName(name){
@@ -12,7 +22,7 @@ function normalizeTeamName(name){
 }
 
 async function fetchCSV(url){
-  const r = await fetch(url, { cache: "no-store" });
+  const r = await fetch(resolveDataPath(\1), { cache: "no-store" });
   if(!r.ok) throw new Error("CSV not found: " + url);
   return r.text();
 }
@@ -251,7 +261,7 @@ async function load(){
       window._week = csvWeek;
       window._week_label = labelWeek;
 
-      const label = document.getElementById("weeklabel");
+      const label = document.getElementById("seasonWeek");
       if(label) label.textContent = `${season} • Week ${labelWeek}`;
     }
   }catch(e){
@@ -261,7 +271,7 @@ async function load(){
   }
 }
 
-document.getElementById("openIssue").onclick = openIssue;
-document.getElementById("clear").onclick = clearPicks;
+document.getElementById("issueBtn").onclick = openIssue;
+document.getElementById("clearBtn").onclick = clearPicks;
 
 load();

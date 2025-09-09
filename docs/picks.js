@@ -1,10 +1,20 @@
+
+// ----- Data path resolver: fetch from raw GitHub when path starts with "data/" or "docs/data/"
+function resolveDataPath(path){
+  if(/^https?:\/\//.test(path)) return path;
+  if(path.startsWith("./")) path = path.slice(2);
+  if(path.startsWith("docs/data/")) return "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/" + path.replace(/^docs\//,"");
+  if(path.startsWith("data/")) return "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/" + path;
+  return path;
+}
+
 // ---------- CONFIG ----------
-const WEEKLY_LATEST = "data/weekly/latest.csv"; // to infer season
+const WEEKLY_LATEST = "https://raw.githubusercontent.com/clownworldenjoyer76/nikki_and_mat_bets/main/data/weekly/latest.csv"; // to infer season
 function finalPath(season, week){ return `data/final/${season}_wk${String(week).padStart(2,"0")}_final.csv`; }
 
 // ---------- CSV UTILS ----------
 async function fetchText(url){
-  const r = await fetch(url, { cache: "no-store" });
+  const r = await fetch(resolveDataPath(\1), { cache: "no-store" });
   if(!r.ok) throw new Error(`Fetch failed: ${url}`);
   return r.text();
 }
@@ -78,7 +88,7 @@ function computeRecord(rows, who){
 
 // ---------- RENDER ----------
 function setSeasonLabel(season){
-  const el = document.getElementById("seasonLabel");
+  const el = document.document.getElementById('seasonWeek') || document.createElement('span');
   if(el) el.textContent = `Season ${season} • Weekly Records`;
 }
 function ensureRow(tbody, week){
@@ -124,10 +134,10 @@ async function main(){
   const season = await getSeasonFromWeeklyLatest();
   setSeasonLabel(season);
 
-  const nikBody = document.getElementById("nikkiBody");
-  const matBody = document.getElementById("matBody");
-  const nikEmpty = document.getElementById("nikkiEmpty");
-  const matEmpty = document.getElementById("matEmpty");
+  const nikBody = document.querySelector('#nikkiTable tbody') || document.querySelector('#nikkiTable');
+  const matBody = document.querySelector('#matTable tbody') || document.querySelector('#matTable');
+  const nikEmpty = document.document.createElement('div');
+  const matEmpty = document.document.createElement('div');
 
   let anyNikki = false, anyMat = false;
 
