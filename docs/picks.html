@@ -1,67 +1,83 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nikki & Mat — Weekly Records</title>
-  <link rel="stylesheet" href="https://unpkg.com/mvp.css" />
-  <style>
-    html,body{ background:#000; color:#fff; }
-    body{ max-width:1000px; margin:0 auto; padding:10px 8px; }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nikki & Mat — Weekly Records</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css" />
+    <style>
+      body { background:#000; color:#fff; max-width:900px; margin:0 auto; padding:10px; }
 
-    /* NAV */
-    .nav-container { position: relative; text-align: center; margin: 6px 0; }
-    .nav-toggle { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#fff; }
-    .nav-menu {
-      display:none; position:absolute; top:100%; left:50%; transform:translateX(-50%);
-      background:#111; border:1px solid #333; border-radius:6px; min-width:180px; z-index:999;
-    }
-    .nav-menu a {
-      display:block; padding:8px 12px; color:#fff; text-decoration:none;
-      font-size:0.9rem; border-bottom:1px solid #222;
-    }
-    .nav-menu a:last-child{ border-bottom:none; }
-    .nav-menu a:hover{ background:#222; }
+      header {
+        display:flex; align-items:center; justify-content:space-between;
+        margin:6px 0 10px;
+      }
+      header h1 { margin:0; font-size:1.4rem; font-weight:800; text-align:center; }
+      header img { max-height:80px; width:auto; }
 
-    header{ display:flex; align-items:center; justify-content:space-between; margin:6px 0 14px; }
-    header h1{ margin:0; font-size:1.4rem; font-weight:800; text-align:center; flex:1; }
-    header img{ max-height:52px; width:auto; }
-    /* rest of your styles … */
-  </style>
-</head>
-<body>
+      #recordsContainer { display:flex; flex-direction:column; gap:10px; }
+      .week-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+      .person-card { background:#111; border:1px solid #333; border-radius:10px; padding:10px; }
+      .person-title { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+      .name { font-weight:800; }
+      .name.nikki { color:#e11d48; }
+      .name.mat { color:#1f6feb; }
+      .sub { color:#9aa; font-size:.85rem; }
 
-  <!-- BEGIN NAV -->
-  <div class="nav-container">
-    <button class="nav-toggle" id="navToggle">☰</button>
-    <div class="nav-menu" id="navMenu">
-      <a href="index.html">🏈 Main Picks</a>
-      <a href="picks.html">📊 Weekly Records</a>
-      <a href="insights.html">📐 Granular Insights</a>
-      <a href="metrics.html">📏 Team Metrics</a>
+      @media (max-width:600px){
+        .week-row { grid-template-columns:1fr 1fr; }
+        .name { font-size:0.95rem; }
+        .sub { font-size:0.8rem; }
+      }
+
+      /* NAV */
+      .nav-container { position: relative; text-align: center; margin: 6px 0; }
+      .nav-toggle { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#fff; }
+      .nav-menu {
+        display:none; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+        background:#111; border:1px solid #333; border-radius:6px; min-width:180px; z-index:999;
+      }
+      .nav-menu a {
+        display:block; padding:8px 12px; color:#fff; text-decoration:none;
+        font-size:0.9rem; border-bottom:1px solid #222;
+      }
+      .nav-menu a:last-child{ border-bottom:none; }
+      .nav-menu a:hover{ background:#222; }
+    </style>
+  </head>
+  <body>
+
+    <!-- BEGIN NAV -->
+    <div class="nav-container">
+      <button class="nav-toggle" id="navToggle">☰</button>
+      <div class="nav-menu" id="navMenu">
+        <a href="index.html">🏈 Main Picks</a>
+        <a href="picks.html">📊 Weekly Records</a>
+        <a href="insights.html">📐 Granular Insights</a>
+        <a href="metrics.html">📏 Team Metrics</a>
+      </div>
     </div>
-  </div>
-  <script>
-    const navToggle=document.getElementById("navToggle");
-    const navMenu=document.getElementById("navMenu");
-    navToggle.addEventListener("click",e=>{
-      e.stopPropagation();
-      navMenu.style.display=navMenu.style.display==="block"?"none":"block";
-    });
-    document.addEventListener("click",()=>{navMenu.style.display="none";});
-  </script>
-  <!-- END NAV -->
+    <script>
+      const navToggle=document.getElementById("navToggle");
+      const navMenu=document.getElementById("navMenu");
+      navToggle.addEventListener("click",e=>{
+        e.stopPropagation();
+        navMenu.style.display=navMenu.style.display==="block"?"none":"block";
+      });
+      document.addEventListener("click",()=>{navMenu.style.display="none";});
+    </script>
+    <!-- END NAV -->
 
-  <header>
-    <img src="assets/logos/IMG_0931.jpeg" alt="Left Logo" />
-    <h1>2025 Records</h1>
-    <img src="assets/logos/IMG_0930.jpeg" alt="Right Logo" />
-  </header>
+    <header>
+      <img src="assets/logos/IMG_0931.jpeg" alt="Left Logo" />
+      <h1>2025 Records</h1>
+      <img src="assets/logos/IMG_0930.jpeg" alt="Right Logo" />
+    </header>
 
-  <main>
-    <div id="recordsContainer"></div>
-  </main>
+    <main>
+      <div id="recordsContainer"></div>
+    </main>
 
-  <script src="picks.js"></script>
-</body>
+    <script src="picks.js"></script>
+  </body>
 </html>
