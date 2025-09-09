@@ -1,83 +1,82 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Nikki & Mat — Weekly Records</title>
-    <link rel="stylesheet" href="https://unpkg.com/mvp.css" />
-    <style>
-      body { background:#000; color:#fff; max-width:900px; margin:0 auto; padding:10px; }
-
-      header {
-        display:flex; align-items:center; justify-content:space-between;
-        margin:6px 0 10px;
-      }
-      header h1 { margin:0; font-size:1.4rem; font-weight:800; text-align:center; }
-      header img { max-height:80px; width:auto; }
-
-      #recordsContainer { display:flex; flex-direction:column; gap:10px; }
-      .week-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-      .person-card { background:#111; border:1px solid #333; border-radius:10px; padding:10px; }
-      .person-title { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
-      .name { font-weight:800; }
-      .name.nikki { color:#e11d48; }
-      .name.mat { color:#1f6feb; }
-      .sub { color:#9aa; font-size:.85rem; }
-
-      @media (max-width:600px){
-        .week-row { grid-template-columns:1fr 1fr; }
-        .name { font-size:0.95rem; }
-        .sub { font-size:0.8rem; }
-      }
-
-      /* NAV */
-      .nav-container { position: relative; text-align: center; margin: 6px 0; }
-      .nav-toggle { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#fff; }
-      .nav-menu {
-        display:none; position:absolute; top:100%; left:50%; transform:translateX(-50%);
-        background:#111; border:1px solid #333; border-radius:6px; min-width:180px; z-index:999;
-      }
-      .nav-menu a {
-        display:block; padding:8px 12px; color:#fff; text-decoration:none;
-        font-size:0.9rem; border-bottom:1px solid #222;
-      }
-      .nav-menu a:last-child{ border-bottom:none; }
-      .nav-menu a:hover{ background:#222; }
-    </style>
-  </head>
-  <body>
-
-    <!-- BEGIN NAV -->
-    <div class="nav-container">
-      <button class="nav-toggle" id="navToggle">☰</button>
-      <div class="nav-menu" id="navMenu">
-        <a href="index.html">🏈 Main Picks</a>
-        <a href="picks.html">📊 Weekly Records</a>
-        <a href="insights.html">📐 Granular Insights</a>
-        <a href="metrics.html">📏 Team Metrics</a>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2025 Records — Nikki & Mat</title>
+  <style>
+    :root { --bg:#000; --fg:#fff; --card:#0e0e0e; --muted:#bbb; --mat:#1f6feb; --nikki:#e11d48; }
+    html,body{background:#000;color:#fff;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:1000px;margin:0 auto;padding:10px}
+    /* tiny centered burger */
+    .nav-wrap{display:flex;justify-content:center;margin:6px 0}
+    .nav { position:relative }
+    .nav-btn{background:#111;color:#fff;border:1px solid #444;border-radius:8px;padding:6px 10px;font-size:.9rem}
+    .nav-menu{position:absolute;left:50%;transform:translateX(-50%);top:42px;background:#111;border:1px solid #444;border-radius:10px;padding:8px;display:none;min-width:220px;z-index:10}
+    .nav-menu a{display:block;color:#fff;text-decoration:none;padding:6px 8px;border-radius:6px}
+    .nav-menu a:hover{background:#222}
+    header{text-align:center;margin:12px 0}
+    header h1{margin:.2rem 0;font-size:2.0rem}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:720px){ .grid{grid-template-columns:1fr 1fr} }
+    .card{background:#0e0e0e;border:1px solid #333;border-radius:14px;padding:10px}
+    .card h2{margin:4px 0 8px;font-size:1.2rem}
+    .card h2 .nikki{color:var(--nikki)} .card h2 .mat{color:var(--mat)}
+    table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #444;border-radius:10px;overflow:hidden;background:#111}
+    th,td{padding:8px 10px;border-bottom:1px solid #333;font-size:.95rem}
+    thead th{background:#151515;text-align:left}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- tiny centered burger -->
+    <div class="nav-wrap">
+      <div class="nav" id="topNav">
+        <button class="nav-btn" id="navToggle" aria-expanded="false" aria-controls="navMenu">☰ Menu</button>
+        <div class="nav-menu" id="navMenu" role="menu">
+          <a href="./index.html">🏈 Main Picks</a>
+          <a href="./picks.html">📊 Weekly Records</a>
+          <a href="./insights.html">📐 Granular Insights</a>
+          <a href="./metrics.html">📏 Team Metrics</a>
+        </div>
       </div>
     </div>
-    <script>
-      const navToggle=document.getElementById("navToggle");
-      const navMenu=document.getElementById("navMenu");
-      navToggle.addEventListener("click",e=>{
-        e.stopPropagation();
-        navMenu.style.display=navMenu.style.display==="block"?"none":"block";
+
+    <header><h1>2025 Records</h1></header>
+
+    <section class="grid">
+      <div class="card">
+        <h2><span class="nikki">Nikki</span></h2>
+        <table id="nikkiTable">
+          <thead><tr><th>Week</th><th>Spread</th><th>O/U</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2><span class="mat">Mat</span></h2>
+        <table id="matTable">
+          <thead><tr><th>Week</th><th>Spread</th><th>O/U</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function(){
+      const btn=document.getElementById('navToggle');
+      const menu=document.getElementById('navMenu');
+      if(!btn||!menu) return;
+      btn.addEventListener('click',()=> {
+        const open = menu.style.display === 'block';
+        menu.style.display = open ? 'none' : 'block';
+        btn.setAttribute('aria-expanded', String(!open));
       });
-      document.addEventListener("click",()=>{navMenu.style.display="none";});
-    </script>
-    <!-- END NAV -->
-
-    <header>
-      <img src="assets/logos/IMG_0931.jpeg" alt="Left Logo" />
-      <h1>2025 Records</h1>
-      <img src="assets/logos/IMG_0930.jpeg" alt="Right Logo" />
-    </header>
-
-    <main>
-      <div id="recordsContainer"></div>
-    </main>
-
-    <script src="picks.js"></script>
-  </body>
+      document.addEventListener('click',(e)=>{
+        if(!menu.contains(e.target) && e.target!==btn) menu.style.display='none';
+      });
+    })();
+  </script>
+  <script src="./picks.js" defer></script>
+</body>
 </html>
