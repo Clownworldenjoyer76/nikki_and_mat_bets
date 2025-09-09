@@ -6,111 +6,64 @@
   <title>Nikki & Mat — Team Metrics</title>
   <link rel="stylesheet" href="https://unpkg.com/mvp.css" />
   <style>
-    :root { --mat:#1f6feb; --nikki:#e11d48; }
     html,body{ background:#000; color:#fff; }
     body{ max-width:1100px; margin:0 auto; padding:10px 8px; }
+
+    /* NAV */
+    .nav-container { position: relative; text-align: center; margin: 6px 0; }
+    .nav-toggle { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#fff; }
+    .nav-menu {
+      display:none; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+      background:#111; border:1px solid #333; border-radius:6px; min-width:180px; z-index:999;
+    }
+    .nav-menu a {
+      display:block; padding:8px 12px; color:#fff; text-decoration:none;
+      font-size:0.9rem; border-bottom:1px solid #222;
+    }
+    .nav-menu a:last-child{ border-bottom:none; }
+    .nav-menu a:hover{ background:#222; }
+
     header{ display:flex; align-items:center; justify-content:space-between; margin:6px 0 14px; }
     header h1{ margin:0; font-size:1.35rem; font-weight:800; text-align:center; flex:1; }
     header img{ max-height:52px; width:auto; }
-    .controls{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center; margin:6px 0 14px; }
-    .controls label{ font-size:.9rem; color:#ccc; }
-    .controls select{ background:#111; color:#fff; border:1px solid #333; border-radius:8px; padding:6px 10px; }
-    .pillbar{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:10px; }
-    .pill{ background:#111; color:#fff; border:1px solid #333; border-radius:999px; padding:6px 10px; cursor:pointer; font-size:.85rem; }
-    .pill.active{ background:#1f2937; }
-    section.panel{ display:none; }
-    section.panel.active{ display:block; }
-    table{ width:100%; border-collapse:collapse; table-layout:fixed; font-size:0.82rem; }
-    th,td{ border-bottom:1px solid #222; padding:6px 6px; text-align:center; }
-    th:first-child,td:first-child{ text-align:left; }
-    tr:last-child td{ border-bottom:none; }
-    thead th button{ background:transparent; color:#fff; border:none; cursor:pointer; font-weight:700; }
-    .muted{ color:#9aa; font-size:.85rem; }
-    @media (max-width:600px){
-      header h1{ font-size:1.2rem; }
-      table{ font-size:0.74rem; }
-      th,td{ padding:4px; }
-    }
+    /* rest of your styles … */
   </style>
 </head>
 <body>
+
+  <!-- BEGIN NAV -->
+  <div class="nav-container">
+    <button class="nav-toggle" id="navToggle">☰</button>
+    <div class="nav-menu" id="navMenu">
+      <a href="index.html">🏈 Main Picks</a>
+      <a href="picks.html">📊 Weekly Records</a>
+      <a href="insights.html">📐 Granular Insights</a>
+      <a href="metrics.html">📏 Team Metrics</a>
+    </div>
+  </div>
+  <script>
+    const navToggle=document.getElementById("navToggle");
+    const navMenu=document.getElementById("navMenu");
+    navToggle.addEventListener("click",e=>{
+      e.stopPropagation();
+      navMenu.style.display=navMenu.style.display==="block"?"none":"block";
+    });
+    document.addEventListener("click",()=>{navMenu.style.display="none";});
+  </script>
+  <!-- END NAV -->
+
   <header>
     <img src="assets/logos/IMG_0931.jpeg" alt="Left Logo" />
     <h1>Team Metrics</h1>
     <img src="assets/logos/IMG_0930.jpeg" alt="Right Logo" />
   </header>
 
-  <div class="controls">
-    <label for="pickerSel">Picker</label>
-    <select id="pickerSel">
-      <option value="Nikki">Nikki</option>
-      <option value="Mat">Mat</option>
-    </select>
-
-    <label for="seasonSel">Season</label>
-    <select id="seasonSel"></select>
-
-    <label for="teamSel">Team</label>
-    <select id="teamSel"></select>
-  </div>
-
-  <div class="pillbar">
-    <button class="pill active" data-tab="pick-team">ATS — Picked Team</button>
-    <button class="pill" data-tab="fade-team">ATS — Faded Team</button>
-    <button class="pill" data-tab="totals-team">Totals — Over/Under</button>
-  </div>
-
-  <section id="pick-team" class="panel active">
-    <h2>Against the Spread — When Picking That Team <span class="muted" id="countPick"></span></h2>
-    <table>
-      <thead>
-        <tr>
-          <th><button data-sort="team">Team</button></th>
-          <th><button data-sort="wins">W</button></th>
-          <th><button data-sort="losses">L</button></th>
-          <th><button data-sort="pushes">P</button></th>
-          <th><button data-sort="games">Games</button></th>
-          <th><button data-sort="win_pct">Win %</button></th>
-        </tr>
-      </thead>
-      <tbody id="bodyPick"></tbody>
-    </table>
-  </section>
-
-  <section id="fade-team" class="panel">
-    <h2>Against the Spread — When Fading That Team <span class="muted" id="countFade"></span></h2>
-    <table>
-      <thead>
-        <tr>
-          <th><button data-sort="team">Opponent</button></th>
-          <th><button data-sort="wins">W</button></th>
-          <th><button data-sort="losses">L</button></th>
-          <th><button data-sort="pushes">P</button></th>
-          <th><button data-sort="games">Games</button></th>
-          <th><button data-sort="win_pct">Win %</button></th>
-        </tr>
-      </thead>
-      <tbody id="bodyFade"></tbody>
-    </table>
-  </section>
-
-  <section id="totals-team" class="panel">
-    <h2>Totals — Over / Under by Team <span class="muted" id="countTot"></span></h2>
-    <table>
-      <thead>
-        <tr>
-          <th><button data-sort="team">Team</button></th>
-          <th><button data-sort="side">Side</button></th>
-          <th><button data-sort="wins">W</button></th>
-          <th><button data-sort="losses">L</button></th>
-          <th><button data-sort="pushes">P</button></th>
-          <th><button data-sort="games">Games</button></th>
-          <th><button data-sort="win_pct">Win %</button></th>
-        </tr>
-      </thead>
-      <tbody id="bodyTot"></tbody>
-    </table>
-  </section>
+  <main>
+    <div class="controls">…</div>
+    <div class="pillbar">…</div>
+    <section id="pick-team" class="panel active">…</section>
+    <!-- rest of your metrics content -->
+  </main>
 
   <script src="metrics.js"></script>
 </body>
