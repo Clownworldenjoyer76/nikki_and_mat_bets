@@ -26,7 +26,7 @@ function parseCSV(txt){
   const hdr = rows.shift() || [];
   return { hdr, rows };
 }
-function onlyConsensus(rows, hdr){
+function onlyConsensus(rows, hdr){p
   const iBook = hdr.indexOf("book");
   const iCons = hdr.indexOf("is_consensus");
   return rows.filter(r =>
@@ -246,7 +246,7 @@ document.getElementById("issueBtn").onclick = ()=>{
   const picks2 = localStorage.getItem("picks_nikki") || "{}";
   const title = encodeURIComponent(`Nikki and Mat’s NFL Picks — ${season} WK${week}`);
   const body  = encodeURIComponent(`Paste (do not edit) between the fences:\n\n\`\`\`json\n{ "mat": ${picks}, "nikki": ${picks2} }\n\`\`\`\n`);
-  window.open(`https://github.com/Clownworldenjoyer76/bet-duel/issues/new?title=${title}&body=${body}`, "_blank");
+  window.open(`https://github.com/Clownworldenjoyer76/nikki_and_mat_bets/issues/new?title=${title}&body=${body}`, "_blank");
 };
 
 render().catch(err=>{
