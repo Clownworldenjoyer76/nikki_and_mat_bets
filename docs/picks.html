@@ -1,60 +1,46 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>2025 Records — Nikki & Mat</title>
-  <style>
-    :root { --bg:#000; --fg:#fff; --card:#0e0e0e; --muted:#bbb; --mat:#1f6feb; --nikki:#e11d48; }
-    html,body{background:#000;color:#fff;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-
-    .topbar{background:#111;border-bottom:1px solid #333;padding:6px 10px;position:sticky;top:0;z-index:1000}
-    .topbar nav{display:flex;gap:14px;justify-content:center}
-    .topbar a{color:#fff;text-decoration:none;font-size:.9rem}
-    .topbar a:hover{color:var(--mat)}
-
-    .wrap{max-width:1000px;margin:0 auto;padding:10px}
-    header{text-align:center;margin:12px 0}
-    header h1{margin:.2rem 0;font-size:2rem}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .card{background:#0e0e0e;border:1px solid #333;border-radius:14px;padding:10px}
-    .card h2{margin:4px 0 8px;font-size:1.2rem}
-    .card h2 .nikki{color:var(--nikki)} .card h2 .mat{color:var(--mat)}
-    table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #444;border-radius:10px;overflow:hidden;background:#111}
-    th,td{padding:8px 10px;border-bottom:1px solid #333;font-size:.95rem}
-    thead th{background:#151515;text-align:left}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Insights</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <nav>
-      <a href="./index.html">🏈 Main Picks</a>
-      <a href="./picks.html">📊 Weekly Records</a>
-      <a href="./insights.html">📐 Insights</a>
-      <a href="./metrics.html">📏 Metrics</a>
-    </nav>
-  </header>
+    <div class="wrap">
+        <header class="main-header">
+            <img src="assets/logos/IMG_0931.jpeg" alt="Left logo">
+            <div class="titles">
+                <h1>Nikki and Mat’s NFL Picks</h1>
+                <div class="sub" id="seasonWeek">Weekly Insights</div>
+            </div>
+            <img src="assets/logos/IMG_0930.jpeg" alt="Right logo">
+        </header>
 
-  <div class="wrap">
-    <header><h1>2025 Records</h1></header>
-    <section class="grid">
-      <div class="card">
-        <h2><span class="nikki">Nikki</span></h2>
-        <table id="nikkiTable">
-          <thead><tr><th>Week</th><th>Spread</th><th>O/U</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div class="card">
-        <h2><span class="mat">Mat</span></h2>
-        <table id="matTable">
-          <thead><tr><th>Week</th><th>Spread</th><th>O/U</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-  </div>
+        <main id="insights">
+            <article class="card">
+                <div class="card-inner">
+                    <h1>Best Picks</h1>
+                    <p>The best picks so far this season.</p>
+                </div>
+            </article>
+            <article class="card">
+                <div class="card-inner">
+                    <h1>Worst Picks</h1>
+                    <p>The worst picks so far this season.</p>
+                </div>
+            </article>
+        </main>
+    </div>
 
-  <script src="./picks.js" defer></script>
+    <div class="bar" id="bottombar">
+        <nav>
+            <a href="./index.html">🏈 Picks</a>
+            <a href="./picks.html">📊 Weekly</a>
+            <a href="./insights.html">📐 Insights</a>
+            <a href="./metrics.html">📏 By Team</a>
+        </nav>
+    </div>
+
 </body>
 </html>
