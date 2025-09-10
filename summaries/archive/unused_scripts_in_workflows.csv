@@ -1,0 +1,9 @@
+path,referenced_in_workflows
+scripts/aggregate_metrics.py,YES
+scripts/combine_picks_and_scores.py,YES
+scripts/csv_to_xlsx.py,YES
+scripts/ingest_issue.py,YES
+scripts/init_scores_sheet.py,YES
+scripts/parse_and_save_picks.py,YES
+scripts/pull_nfl_odds.py,YES
+scripts/xlsx_to_csv.py,YES
