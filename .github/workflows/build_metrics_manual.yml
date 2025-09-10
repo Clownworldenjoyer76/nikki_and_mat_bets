@@ -53,8 +53,8 @@ jobs:
           # Install deps your aggregator might need
           python -m pip install --upgrade pip pandas
 
-          # Call your aggregator (adjust the script name if different)
-          python scripts/aggregator.py "${IN_SEASON}"
+          # Call your aggregator (adjusted to your script name)
+          python scripts/aggregate_metrics.py "${IN_SEASON}"
 
       - name: Commit metrics
         if: always()
