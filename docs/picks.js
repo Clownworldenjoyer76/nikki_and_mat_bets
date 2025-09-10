@@ -1,5 +1,5 @@
 // ===== SOURCE: single file accumulating all weeks of the season =====
-const METRICS_CSV = "docs/data/metrics/2025_metrics.csv";
+const METRICS_CSV = "data/metrics/2025_metrics.csv";
 
 // ===== CSV HELPERS =====
 async function fetchText(url) {
