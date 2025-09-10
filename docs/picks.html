@@ -23,7 +23,8 @@
     .table.compact th, .table.compact td {
       padding: 6px 6px;
       text-align: center;
-      font-size: clamp(10px, 2.9vw, 14px);
+      font-size: clamp(9px, 2vw, 14px);  /* allow smaller min size on mobile */
+      white-space: nowrap;                /* prevent wrapping like “5-10-1” */
     }
     .table.compact td:first-child, .table.compact th:first-child { text-align: left; width: 48%; }
     .year-row td { font-weight: 700; }
