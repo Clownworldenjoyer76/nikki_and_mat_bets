@@ -1,139 +1,152 @@
-// ----- Data path resolver: normalize site-rooted data paths
-function resolveDataPath(path){
-  if(/^https?:\/\//.test(path)) return path;
-  if(path.startsWith("./")) path = path.slice(2);
-  if(path.startsWith("docs/")) path = path.replace(/^docs\//,"");
-  // leave 'data/' as-is; from /docs pages it resolves to /docs/data/...
-  return path;
-}
+// ===== Data sources =====
+const PATHS = {
+  teamAts:  "data/metrics/team_ats_by_picker.csv",
+  fadeAts:  "data/metrics/team_fade_ats_by_picker.csv",
+  homeAway: "data/metrics/home_away_ats_by_picker.csv",
+  totals:   "data/metrics/totals_by_picker.csv",
+};
 
-// Simple CSV fetcher
-async function fetchCSV(path) {
-  const res = await fetch(path + "?v=" + Date.now());
-  if (!res.ok) throw new Error(`Failed to load ${path}`);
-  const text = await res.text();
-  const [header, ...lines] = text.trim().split(/\r?\n/);
-  const cols = header.split(",");
+// ===== CSV helpers (robust to quoted commas) =====
+async function fetchText(url) {
+  const r = await fetch(url + "?v=" + Date.now(), { cache: "no-store" });
+  if (!r.ok) throw new Error(`Fetch failed: ${url} (${r.status})`);
+  return r.text();
+}
+function smartSplit(line) {
+  const out = [];
+  let cur = "", inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
+      else { inQ = !inQ; }
+    } else if (ch === "," && !inQ) {
+      out.push(cur); cur = "";
+    } else {
+      cur += ch;
+    }
+  }
+  out.push(cur);
+  return out;
+}
+function parseCSV(txt) {
+  const lines = txt.replace(/\r/g,"").trim().split("\n");
+  if (!lines.length) return [];
+  const headers = smartSplit(lines.shift()).map(h => h.trim());
   return lines.map(l => {
-    const vals = l.split(","); // fine for our simple numeric/text rows
+    const cells = smartSplit(l);
     const o = {};
-    cols.forEach((c, i) => o[c] = vals[i] ?? "");
+    headers.forEach((h, i) => o[h] = (cells[i] ?? "").trim());
     return o;
   });
 }
+const toNum = (v) => (v === "" || v == null ? null : (Number.isFinite(+v) ? +v : null));
 
-function unique(arr) {
-  return Array.from(new Set(arr));
-}
-
-function byNum(a,b,field){ return Number(a[field]) - Number(b[field]); }
-function formatPct(v){ return Number(v).toFixed(1) + "%"; }
-
-const paths = {
-  teamAts: "data/metrics/team_ats_by_picker.csv",
-  fadeAts: "data/metrics/team_fade_ats_by_picker.csv",
-  homeAway: "data/metrics/home_away_ats_by_picker.csv",
-  totals: "data/metrics/totals_by_picker.csv"
-};
-
-let dataStore = { teamAts:[], fadeAts:[], homeAway:[], totals:[] };
+// ===== Store =====
+const store = { teamAts:[], fadeAts:[], homeAway:[], totals:[] };
 
 async function loadAll() {
   const [ta, fa, ha, to] = await Promise.all([
-    fetchCSV(paths.teamAts),
-    fetchCSV(paths.fadeAts),
-    fetchCSV(paths.homeAway),
-    fetchCSV(paths.totals),
+    fetchText(PATHS.teamAts).then(parseCSV),
+    fetchText(PATHS.fadeAts).then(parseCSV),
+    fetchText(PATHS.homeAway).then(parseCSV),
+    fetchText(PATHS.totals).then(parseCSV),
   ]);
-  dataStore.teamAts = ta;
-  dataStore.fadeAts = fa;
-  dataStore.homeAway = ha;
-  dataStore.totals = to;
+  store.teamAts = ta;
+  store.fadeAts = fa;
+  store.homeAway = ha;
+  store.totals = to;
 
-  // seasons from files
-  const seasons = unique(
-    [].concat(ta,fa,ha,to).map(r => r.season).filter(Boolean)
-  ).sort();
-  const seasonSel = document.document.getElementById('seasonSel') || document.createElement('select');
+  // Seasons list
+  const seasons = Array.from(new Set(
+    [...ta, ...fa, ...ha, ...to].map(r => r.season).filter(Boolean)
+  )).map(s => +s).filter(n => Number.isFinite(n)).sort((a,b)=>a-b);
+
+  const seasonSel = document.getElementById("seasonSel");
   seasonSel.innerHTML = seasons.map(s => `<option value="${s}">${s}</option>`).join("");
-  seasonSel.value = seasons[seasons.length-1] || "";
+  seasonSel.value = seasons.length ? String(seasons[seasons.length-1]) : "";
 
+  // Team filter options from teamAts + fadeAts (team and opponent columns)
+  const teamSet = new Set();
+  ta.forEach(r => teamSet.add(r.team));
+  fa.forEach(r => teamSet.add(r.opponent));
+  const teamFilter = document.getElementById("teamFilter");
+  const sortedTeams = Array.from(teamSet).filter(Boolean).sort((a,b)=>a.localeCompare(b));
+  teamFilter.innerHTML = `<option value="">All Teams</option>` + sortedTeams.map(t => `<option value="${t}">${t}</option>`).join("");
+
+  setSubtitle(seasonSel.value);
   render();
 }
 
-function render() {
-  const picker = document.document.getElementById('pickerSel') || document.createElement('select').value;
-  const season = document.document.getElementById('seasonSel') || document.createElement('select').value;
-
-  // Team ATS
-  const ta = dataStore.teamAts.filter(r => r.picker === picker && r.season === season);
-  ta.sort((a,b) => b.win_pct - a.win_pct || a.team.localeCompare(b.team));
-  document.document.getElementById('teamAtsBody') || document.querySelector('#table tbody') || document.getElementById('table') || document.body.innerHTML = ta.map(r => `
-    <tr>
-      <td>${r.team}</td>
-      <td>${r.wins}</td>
-      <td>${r.losses}</td>
-      <td>${r.pushes}</td>
-      <td>${r.games}</td>
-      <td>${r.win_pct}</td>
-    </tr>`).join("");
-
-  // Fade ATS
-  const fa = dataStore.fadeAts.filter(r => r.picker === picker && r.season === season);
-  fa.sort((a,b) => b.win_pct - a.win_pct || a.opponent.localeCompare(b.opponent));
-  document.document.getElementById('fadeAtsBody') || document.querySelector('#table tbody') || document.getElementById('table') || document.body.innerHTML = fa.map(r => `
-    <tr>
-      <td>${r.opponent}</td>
-      <td>${r.wins}</td>
-      <td>${r.losses}</td>
-      <td>${r.pushes}</td>
-      <td>${r.games}</td>
-      <td>${r.win_pct}</td>
-    </tr>`).join("");
-
-  // Home/Away ATS
-  const ha = dataStore.homeAway.filter(r => r.picker === picker && r.season === season);
-  ha.sort((a,b) => a.side.localeCompare(b.side));
-  document.document.getElementById('homeAwayBody') || document.querySelector('#table tbody') || document.getElementById('table') || document.body.innerHTML = ha.map(r => `
-    <tr>
-      <td>${r.side}</td>
-      <td>${r.wins}</td>
-      <td>${r.losses}</td>
-      <td>${r.pushes}</td>
-      <td>${r.games}</td>
-      <td>${r.win_pct}</td>
-    </tr>`).join("");
-
-  // Totals
-  const to = dataStore.totals.filter(r => r.picker === picker && r.season === season);
-  to.sort((a,b) => a.side.localeCompare(b.side));
-  document.document.getElementById('totalsBody') || document.querySelector('#table tbody') || document.getElementById('table') || document.body.innerHTML = to.map(r => `
-    <tr>
-      <td>${r.side}</td>
-      <td>${r.wins}</td>
-      <td>${r.losses}</td>
-      <td>${r.pushes}</td>
-      <td>${r.games}</td>
-      <td>${r.win_pct}</td>
-    </tr>`).join("");
+function setSubtitle(season) {
+  const el = document.getElementById("insightsSubtitle");
+  if (el) el.textContent = `Season ${season} — Insights by Picker`;
 }
 
-// Tabs
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".tab-btn");
-  if (!btn) return;
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  document.querySelectorAll("section.panel").forEach(p => p.classList.remove("active"));
-  btn.classList.add("active");
-  document.getElementById(btn.dataset.tab).classList.add("active");
-});
+// ===== Rendering per picker =====
+function fmtPct(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return "";
+  return (n * 100 >= 10 ? (n*100).toFixed(1) : (n*100).toFixed(2)) + "%";
+}
+function fmtRow(c1, w,l,p,g, pct) {
+  return `<tr><td>${c1}</td><td>${w||0}</td><td>${l||0}</td><td>${p||0}</td><td>${g||0}</td><td>${fmtPct(pct)}</td></tr>`;
+}
+function byWinPctDesc(a,b) {
+  const aw = toNum(a.win_pct) ?? -1;
+  const bw = toNum(b.win_pct) ?? -1;
+  if (bw !== aw) return bw - aw;
+  // tie-breakers
+  const an = (a.team ?? a.opponent ?? a.side ?? "").toString();
+  const bn = (b.team ?? b.opponent ?? b.side ?? "").toString();
+  return an.localeCompare(bn);
+}
+
+function renderPicker(picker, prefix, season, teamFilterVal) {
+  // team ats
+  let ta = store.teamAts.filter(r => r.picker === picker && String(r.season) === String(season));
+  if (teamFilterVal) ta = ta.filter(r => r.team === teamFilterVal);
+  ta.sort(byWinPctDesc);
+  document.getElementById(prefix + "teamAtsBody").innerHTML =
+    ta.map(r => fmtRow(r.team, r.wins, r.losses, r.pushes, r.games, r.win_pct)).join("");
+
+  // fade ats
+  let fa = store.fadeAts.filter(r => r.picker === picker && String(r.season) === String(season));
+  if (teamFilterVal) fa = fa.filter(r => r.opponent === teamFilterVal);
+  fa.sort(byWinPctDesc);
+  document.getElementById(prefix + "fadeAtsBody").innerHTML =
+    fa.map(r => fmtRow(r.opponent, r.wins, r.losses, r.pushes, r.games, r.win_pct)).join("");
+
+  // home/away ats
+  let ha = store.homeAway.filter(r => r.picker === picker && String(r.season) === String(season));
+  // (team filter not applicable here, this is global by side)
+  ha.sort((a,b) => (a.side||"").localeCompare(b.side||""));
+  document.getElementById(prefix + "homeAwayBody").innerHTML =
+    ha.map(r => fmtRow(r.side, r.wins, r.losses, r.pushes, r.games, r.win_pct)).join("");
+
+  // totals over/under
+  let to = store.totals.filter(r => r.picker === picker && String(r.season) === String(season));
+  // (team filter not applicable; totals are by side over/under)
+  to.sort((a,b) => (a.side||"").localeCompare(b.side||""));
+  document.getElementById(prefix + "totalsBody").innerHTML =
+    to.map(r => fmtRow(r.side, r.wins, r.losses, r.pushes, r.games, r.win_pct)).join("");
+}
+
+function render() {
+  const season = document.getElementById("seasonSel").value;
+  const teamFilterVal = document.getElementById("teamFilter").value;
+  setSubtitle(season);
+  renderPicker("Nikki", "nikki_", season, teamFilterVal);
+  renderPicker("Mat",   "mat_",   season, teamFilterVal);
+}
 
 // Controls
 document.addEventListener("change", (e) => {
-  if (e.target.id === "pickerSel" || e.target.id === "seasonSel") render();
+  if (e.target.id === "seasonSel" || e.target.id === "teamFilter") render();
 });
 
+// Init
 loadAll().catch(err => {
   console.error(err);
-  alert("Failed to load insights data. Make sure you ran the 'Build Insights Metrics' workflow and that docs/data/metrics/*.csv exist.");
+  alert("Failed to load insights data. Ensure docs/data/metrics/*.csv exist.");
 });
