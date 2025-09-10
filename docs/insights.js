@@ -4,6 +4,8 @@ const PATHS = {
   fadeAts:  "data/metrics/team_fade_ats_by_picker.csv",
   homeAway: "data/metrics/home_away_ats_by_picker.csv",
   totals:   "data/metrics/totals_by_picker.csv",
+  // IMPORTANT: this file must be under docs/ to be published by GitHub Pages
+  teamAbbr: "mappings/team_abbr.csv",
 };
 
 // ===== CSV helpers (robust to quoted commas) =====
@@ -44,22 +46,47 @@ const toNum = (v) => (v === "" || v == null ? null : (Number.isFinite(+v) ? +v :
 
 // ===== Store =====
 const store = { teamAts:[], fadeAts:[], homeAway:[], totals:[] };
+const abbrMap = Object.create(null); // full name -> ABBR
 
+// Load team abbreviation map: expects columns Team,Abbr
+async function loadAbbr() {
+  try {
+    const txt = await fetchText(PATHS.teamAbbr);
+    const rows = parseCSV(txt);
+    rows.forEach(r => {
+      const full = (r.Team || r.team || "").trim();
+      const abbr = (r.Abbr || r.abbr || "").trim();
+      if (full && abbr) abbrMap[full] = abbr;
+    });
+  } catch (e) {
+    console.warn("Team abbreviation file missing or failed to load:", e);
+  }
+}
+function shortName(name) {
+  if (!name) return "";
+  return abbrMap[name] || name;
+}
+
+// ===== Init all data =====
 async function loadAll() {
-  const [ta, fa, ha, to] = await Promise.all([
-    fetchText(PATHS.teamAts).then(parseCSV),
-    fetchText(PATHS.fadeAts).then(parseCSV),
-    fetchText(PATHS.homeAway).then(parseCSV),
-    fetchText(PATHS.totals).then(parseCSV),
+  const [taTxt, faTxt, haTxt, toTxt] = await Promise.all([
+    fetchText(PATHS.teamAts),
+    fetchText(PATHS.fadeAts),
+    fetchText(PATHS.homeAway),
+    fetchText(PATHS.totals),
   ]);
-  store.teamAts = ta;
-  store.fadeAts = fa;
-  store.homeAway = ha;
-  store.totals = to;
+  store.teamAts = parseCSV(taTxt);
+  store.fadeAts = parseCSV(faTxt);
+  store.homeAway = parseCSV(haTxt);
+  store.totals = parseCSV(toTxt);
+
+  // Load abbreviations AFTER other files kick off, but we await before render
+  await loadAbbr();
 
   // Seasons list
   const seasons = Array.from(new Set(
-    [...ta, ...fa, ...ha, ...to].map(r => r.season).filter(Boolean)
+    [...store.teamAts, ...store.fadeAts, ...store.homeAway, ...store.totals]
+      .map(r => r.season).filter(Boolean)
   )).map(s => +s).filter(n => Number.isFinite(n)).sort((a,b)=>a-b);
 
   const seasonSel = document.getElementById("seasonSel");
@@ -68,11 +95,15 @@ async function loadAll() {
 
   // Team filter options from teamAts + fadeAts (team and opponent columns)
   const teamSet = new Set();
-  ta.forEach(r => teamSet.add(r.team));
-  fa.forEach(r => teamSet.add(r.opponent));
+  store.teamAts.forEach(r => teamSet.add(r.team));
+  store.fadeAts.forEach(r => teamSet.add(r.opponent));
+
   const teamFilter = document.getElementById("teamFilter");
   const sortedTeams = Array.from(teamSet).filter(Boolean).sort((a,b)=>a.localeCompare(b));
-  teamFilter.innerHTML = `<option value="">All Teams</option>` + sortedTeams.map(t => `<option value="${t}">${t}</option>`).join("");
+  // Show abbreviations in the dropdown as well
+  teamFilter.innerHTML =
+    `<option value="">All Teams</option>` +
+    sortedTeams.map(t => `<option value="${t}">${shortName(t)}</option>`).join("");
 
   setSubtitle(seasonSel.value);
   render();
@@ -96,7 +127,6 @@ function byWinPctDesc(a,b) {
   const aw = toNum(a.win_pct) ?? -1;
   const bw = toNum(b.win_pct) ?? -1;
   if (bw !== aw) return bw - aw;
-  // tie-breakers
   const an = (a.team ?? a.opponent ?? a.side ?? "").toString();
   const bn = (b.team ?? b.opponent ?? b.side ?? "").toString();
   return an.localeCompare(bn);
@@ -108,25 +138,23 @@ function renderPicker(picker, prefix, season, teamFilterVal) {
   if (teamFilterVal) ta = ta.filter(r => r.team === teamFilterVal);
   ta.sort(byWinPctDesc);
   document.getElementById(prefix + "teamAtsBody").innerHTML =
-    ta.map(r => fmtRow(r.team, r.wins, r.losses, r.pushes, r.games, r.win_pct)).join("");
+    ta.map(r => fmtRow(shortName(r.team), r.wins, r.losses, r.pushes, r.games, r.win_pct)).join("");
 
   // fade ats
   let fa = store.fadeAts.filter(r => r.picker === picker && String(r.season) === String(season));
   if (teamFilterVal) fa = fa.filter(r => r.opponent === teamFilterVal);
   fa.sort(byWinPctDesc);
   document.getElementById(prefix + "fadeAtsBody").innerHTML =
-    fa.map(r => fmtRow(r.opponent, r.wins, r.losses, r.pushes, r.games, r.win_pct)).join("");
+    fa.map(r => fmtRow(shortName(r.opponent), r.wins, r.losses, r.pushes, r.games, r.win_pct)).join("");
 
-  // home/away ats
+  // home/away ats (no team dimension)
   let ha = store.homeAway.filter(r => r.picker === picker && String(r.season) === String(season));
-  // (team filter not applicable here, this is global by side)
   ha.sort((a,b) => (a.side||"").localeCompare(b.side||""));
   document.getElementById(prefix + "homeAwayBody").innerHTML =
     ha.map(r => fmtRow(r.side, r.wins, r.losses, r.pushes, r.games, r.win_pct)).join("");
 
-  // totals over/under
+  // totals over/under (no team dimension)
   let to = store.totals.filter(r => r.picker === picker && String(r.season) === String(season));
-  // (team filter not applicable; totals are by side over/under)
   to.sort((a,b) => (a.side||"").localeCompare(b.side||""));
   document.getElementById(prefix + "totalsBody").innerHTML =
     to.map(r => fmtRow(r.side, r.wins, r.losses, r.pushes, r.games, r.win_pct)).join("");
@@ -148,5 +176,5 @@ document.addEventListener("change", (e) => {
 // Init
 loadAll().catch(err => {
   console.error(err);
-  alert("Failed to load insights data. Ensure docs/data/metrics/*.csv exist.");
+  alert("Failed to load insights data. Ensure docs/data/metrics/*.csv and docs/mappings/team_abbr.csv exist.");
 });
