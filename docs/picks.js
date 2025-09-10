@@ -8,7 +8,6 @@ async function fetchText(url) {
   return r.text();
 }
 
-// Robust CSV splitter (handles quoted commas and escaped quotes)
 function smartSplit(line) {
   const out = [];
   let cur = "";
@@ -16,7 +15,7 @@ function smartSplit(line) {
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
     if (ch === '"') {
-      if (inQ && line[i + 1] === '"') { cur += '"'; i++; } // escaped quote
+      if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
       else { inQ = !inQ; }
     } else if (ch === "," && !inQ) {
       out.push(cur); cur = "";
@@ -44,14 +43,14 @@ function parseCSV(txt) {
 const toNum = v => (v === "" || v == null ? null : (Number.isFinite(+v) ? +v : null));
 const lc = s => (s || "").trim().toLowerCase();
 
-// ===== COLUMN MAP (supports both the new metrics names and the older names) =====
+// ===== COLUMN MAP =====
 const COLS = {
   season: ["season"],
   week: ["week"],
   homeScore: ["home_score"],
   awayScore: ["away_score"],
-  spreadHome: ["spread_home", "spread"], // prefer spread_home, else spread
-  total: ["total", "over_under"],         // prefer total, else over_under
+  spreadHome: ["spread_home", "spread"],
+  total: ["total", "over_under"],
   nikkiAts: ["nikki_spread", "nikki_pick"],
   matAts:   ["mat_spread",   "mat_pick"],
   nikkiOu:  ["nikki_total"],
@@ -65,7 +64,6 @@ function pickCol(row, keys) {
 
 // ===== GRADING =====
 function gradeByWeek(rows, who) {
-  // Resolve column names once based on the first row
   const probe = rows[0] || {};
   const cols = {
     season:     pickCol(probe, COLS.season),
@@ -78,7 +76,7 @@ function gradeByWeek(rows, who) {
     ou:         pickCol(probe, who === "nikki" ? COLS.nikkiOu  : COLS.matOu)
   };
 
-  const accByWeek = new Map(); // wk -> {wS,lS,pS,wT,lT,pT}
+  const accByWeek = new Map();
   const season = { wS:0, lS:0, pS:0, wT:0, lT:0, pT:0 };
 
   for (const r of rows) {
@@ -87,31 +85,25 @@ function gradeByWeek(rows, who) {
 
     const hs = toNum(r[cols.homeScore]);
     const as = toNum(r[cols.awayScore]);
-    if (hs === null || as === null) continue; // only grade finished games
+    if (hs === null || as === null) continue;
 
     const spreadHome = cols.spreadHome ? toNum(r[cols.spreadHome]) : null;
     const totalLine  = cols.total      ? toNum(r[cols.total])      : null;
     const sidePick   = cols.ats ? lc(r[cols.ats]) : "";
     let   totPickRaw = cols.ou  ? lc(r[cols.ou])  : "";
-
-    // Normalize possible O/U shorthands
-    const totPick = totPickRaw === "o" ? "over"
-                   : totPickRaw === "u" ? "under"
-                   : totPickRaw;
+    const totPick = totPickRaw === "o" ? "over" : totPickRaw === "u" ? "under" : totPickRaw;
 
     if (!accByWeek.has(wk)) accByWeek.set(wk, { wS:0,lS:0,pS:0, wT:0,lT:0,pT:0 });
     const W = accByWeek.get(wk);
 
-    // ATS grading (spread is home-centric: -3.5 means home favored by 3.5)
     if (spreadHome !== null && (sidePick === "home" || sidePick === "away")) {
-      const covered = (hs - as) + spreadHome; // >0 home covers; <0 away covers; 0 push
+      const covered = (hs - as) + spreadHome;
       const res = covered > 0 ? "home" : covered < 0 ? "away" : "push";
       if (res === "push") { W.pS++; season.pS++; }
       else if (res === sidePick)   { W.wS++; season.wS++; }
       else                         { W.lS++; season.lS++; }
     }
 
-    // Totals grading
     if (totalLine !== null && (totPick === "over" || totPick === "under")) {
       const sum = hs + as;
       const res = sum > totalLine ? "over" : sum < totalLine ? "under" : "push";
@@ -145,7 +137,7 @@ function addRow(tbody, label, ats, ou, cls = "") {
 }
 function fillTable(tbody, seasonLabel, graded) {
   clearBody(tbody);
-  addRow(tbody, seasonLabel, graded.overall.ats, graded.overall.ou, "year-row"); // season total
+  addRow(tbody, seasonLabel, graded.overall.ats, graded.overall.ou, "year-row");
   for (let wk = 1; wk <= 18; wk++) {
     const rec = graded.byWeek.get(wk);
     addRow(tbody, `Week ${wk}`, rec?.ats || "—", rec?.ou || "—");
@@ -154,6 +146,40 @@ function fillTable(tbody, seasonLabel, graded) {
 function setSubtitle(season) {
   const el = document.getElementById("seasonWeek");
   if (el) el.textContent = `Season ${season} — ATS & O/U by Week`;
+}
+
+// ===== HIGHLIGHT WINNERS =====
+function parseWins(str) {
+  if (!str || str === "—") return null;
+  const parts = str.split("-");
+  const wins = parseInt(parts[0], 10);
+  return Number.isFinite(wins) ? wins : null;
+}
+function outlineCompare(nikCell, matCell) {
+  const n = parseWins(nikCell.textContent);
+  const m = parseWins(matCell.textContent);
+  if (n == null || m == null) return;
+  if (n > m) {
+    nikCell.style.outline = "2px solid lime";
+    matCell.style.outline = "2px solid hotpink";
+  } else if (m > n) {
+    matCell.style.outline = "2px solid lime";
+    nikCell.style.outline = "2px solid hotpink";
+  } else {
+    nikCell.style.outline = "2px solid orange";
+    matCell.style.outline = "2px solid orange";
+  }
+}
+function highlightWinners() {
+  const nikRows = document.querySelectorAll("#nikkiTable tbody tr");
+  const matRows = document.querySelectorAll("#matTable tbody tr");
+  for (let i = 0; i < nikRows.length && i < matRows.length; i++) {
+    const nTds = nikRows[i].querySelectorAll("td");
+    const mTds = matRows[i].querySelectorAll("td");
+    if (nTds.length < 3 || mTds.length < 3) continue;
+    outlineCompare(nTds[1], mTds[1]); // ATS
+    outlineCompare(nTds[2], mTds[2]); // O/U
+  }
 }
 
 // ===== MAIN =====
@@ -177,6 +203,8 @@ async function main() {
   fillTable(nikBody, seasonLabel, nikki);
   fillTable(matBody, seasonLabel, mat);
   setSubtitle(seasonLabel);
+
+  highlightWinners();
 }
 
 main();
