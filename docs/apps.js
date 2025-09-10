@@ -26,7 +26,7 @@ function parseCSV(txt){
   const hdr = rows.shift() || [];
   return { hdr, rows };
 }
-function onlyConsensus(rows, hdr){p
+function onlyConsensus(rows, hdr){
   const iBook = hdr.indexOf("book");
   const iCons = hdr.indexOf("is_consensus");
   return rows.filter(r =>
@@ -149,9 +149,6 @@ function card(h, r, picksAll){
   `;
 
   ["mat","nikki"].forEach(user=>{
-    if (user === "mat") {
-        el.appendChild(pinkDivider());
-    }
     const section = document.createElement("div");
     section.style.marginTop = "10px";
 
@@ -197,14 +194,6 @@ function neonDivider(){
   return div;
 }
 
-function pinkDivider(){
-  const div = document.createElement("div");
-  div.className = "pink-divider";
-  div.setAttribute("style",
-    "height:3px;background:#ff39c3;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #ff39c3;pointer-events:none;");
-  return div;
-}
-
 async function render(){
   const { txt, used } = await fetchFirstAvailable(CSV_CANDIDATES);
 
@@ -240,13 +229,17 @@ document.getElementById("clearBtn").onclick = ()=>{
   render();
 };
 document.getElementById("issueBtn").onclick = ()=>{
-  const season = window._season || new Date().getFullYear();
-  const week = window._week || "01";
-  const picks = localStorage.getItem("picks_mat") || "{}" ;
-  const picks2 = localStorage.getItem("picks_nikki") || "{}";
-  const title = encodeURIComponent(`Nikki and Mat’s NFL Picks — ${season} WK${week}`);
-  const body  = encodeURIComponent(`Paste (do not edit) between the fences:\n\n\`\`\`json\n{ "mat": ${picks}, "nikki": ${picks2} }\n\`\`\`\n`);
-  window.open(`https://github.com/Clownworldenjoyer76/nikki_and_mat_bets/issues/new?title=${title}&body=${body}`, "_blank");
+  try {
+    const season = window._season || new Date().getFullYear();
+    const week = window._week || "01";
+    const picks = localStorage.getItem("picks_mat") || "{}" ;
+    const picks2 = localStorage.getItem("picks_nikki") || "{}";
+    const title = encodeURIComponent(`Nikki and Mat’s NFL Picks — ${season} WK${week}`);
+    const body  = encodeURIComponent(`Paste (do not edit) between the fences:\n\n\`\`\`json\n{ "mat": ${picks}, "nikki": ${picks2} }\n\`\`\`\n`);
+    window.open(`https://github.com/Clownworldenjoyer76/nikki_and_mat_bets/issues/new?title=${title}&body=${body}`, "_blank");
+  } catch (e) {
+    alert("Error: " + e.message);
+  }
 };
 
 render().catch(err=>{
