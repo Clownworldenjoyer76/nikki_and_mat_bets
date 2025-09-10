@@ -5,6 +5,7 @@ season,team,picker,wins,losses,pushes,games,win_pct
 2025,Baltimore Ravens,Mat,0,1,0,1,0.0
 2025,Baltimore Ravens,Nikki,0,1,0,1,0.0
 2025,Carolina Panthers,Mat,0,1,0,1,0.0
+2025,Chicago Bears,Nikki,0,1,0,1,0.0
 2025,Cincinnati Bengals,Mat,0,1,0,1,0.0
 2025,Cleveland Browns,Nikki,1,0,0,1,100.0
 2025,Dallas Cowboys,Mat,1,0,0,1,100.0
@@ -21,6 +22,7 @@ season,team,picker,wins,losses,pushes,games,win_pct
 2025,Los Angeles Chargers,Nikki,1,0,0,1,100.0
 2025,Los Angeles Rams,Mat,1,0,0,1,100.0
 2025,Miami Dolphins,Mat,0,1,0,1,0.0
+2025,Minnesota Vikings,Mat,1,0,0,1,100.0
 2025,New England Patriots,Nikki,0,1,0,1,0.0
 2025,New Orleans Saints,Nikki,0,1,0,1,0.0
 2025,New York Giants,Nikki,0,1,0,1,0.0
