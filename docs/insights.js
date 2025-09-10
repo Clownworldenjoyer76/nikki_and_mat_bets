@@ -157,18 +157,26 @@ function setSubtitle(season) {
   if (el) el.textContent = `Season ${season} — Insights by Picker`;
 }
 
-// ===== Rendering per picker =====
-function fmtPct(v) {
+// ===== Win% normalization (core fix) =====
+function pct100(v) {
   const n = Number(v);
-  if (!Number.isFinite(n)) return "";
-  return (n * 100 >= 10 ? (n*100).toFixed(1) : (n*100).toFixed(2)) + "%";
+  if (!Number.isFinite(n)) return null;
+  // If already in percent scale (e.g., 100.0), use as-is; else convert fraction to percent.
+  return n > 1 ? n : n * 100;
 }
+function fmtPct(v) {
+  const p = pct100(v);
+  if (p == null) return "";
+  return (p >= 10 ? p.toFixed(1) : p.toFixed(2)) + "%";
+}
+
+// ===== Rendering per picker =====
 function fmtRow(c1, w,l,p,g, pct) {
   return `<tr><td>${c1}</td><td>${w||0}</td><td>${l||0}</td><td>${p||0}</td><td>${g||0}</td><td>${fmtPct(pct)}</td></tr>`;
 }
 function byWinPctDesc(a,b) {
-  const aw = toNum(a.win_pct) ?? -1;
-  const bw = toNum(b.win_pct) ?? -1;
+  const aw = pct100(a.win_pct) ?? -1;
+  const bw = pct100(b.win_pct) ?? -1;
   if (bw !== aw) return bw - aw;
   const an = (a.team ?? a.opponent ?? a.side ?? "").toString();
   const bn = (b.team ?? b.opponent ?? b.side ?? "").toString();
