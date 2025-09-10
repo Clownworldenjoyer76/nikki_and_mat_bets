@@ -4,8 +4,43 @@ const PATHS = {
   fadeAts:  "data/metrics/team_fade_ats_by_picker.csv",
   homeAway: "data/metrics/home_away_ats_by_picker.csv",
   totals:   "data/metrics/totals_by_picker.csv",
-  // IMPORTANT: this file must be under docs/ to be published by GitHub Pages
-  teamAbbr: "mappings/team_abbr.csv",
+  teamAbbr: "mappings/team_abbr.csv", // optional; overrides defaults if present
+};
+
+// ===== Defaults (always available) =====
+const DEFAULT_ABBR = {
+  "arizona cardinals":"ARI",
+  "atlanta falcons":"ATL",
+  "baltimore ravens":"BAL",
+  "buffalo bills":"BUF",
+  "carolina panthers":"CAR",
+  "chicago bears":"CHI",
+  "cincinnati bengals":"CIN",
+  "cleveland browns":"CLE",
+  "dallas cowboys":"DAL",
+  "denver broncos":"DEN",
+  "detroit lions":"DET",
+  "green bay packers":"GB",
+  "houston texans":"HOU",
+  "indianapolis colts":"IND",
+  "jacksonville jaguars":"JAX",
+  "kansas city chiefs":"KC",
+  "las vegas raiders":"LV",
+  "los angeles chargers":"LAC",
+  "los angeles rams":"LAR",
+  "miami dolphins":"MIA",
+  "minnesota vikings":"MIN",
+  "new england patriots":"NE",
+  "new orleans saints":"NO",
+  "new york giants":"NYG",
+  "new york jets":"NYJ",
+  "philadelphia eagles":"PHI",
+  "pittsburgh steelers":"PIT",
+  "san francisco 49ers":"SF",
+  "seattle seahawks":"SEA",
+  "tampa bay buccaneers":"TB",
+  "tennessee titans":"TEN",
+  "washington commanders":"WAS"
 };
 
 // ===== CSV helpers (robust to quoted commas) =====
@@ -46,25 +81,34 @@ const toNum = (v) => (v === "" || v == null ? null : (Number.isFinite(+v) ? +v :
 
 // ===== Store =====
 const store = { teamAts:[], fadeAts:[], homeAway:[], totals:[] };
-const abbrMap = Object.create(null); // full name -> ABBR
+const abbrMap = Object.create(null); // normalized full name -> ABBR
 
-// Load team abbreviation map: expects columns Team,Abbr
-async function loadAbbr() {
+// Normalize keys for consistent lookup
+function normName(s) {
+  return (s || "").trim().toLowerCase().replace(/\s+/g," ");
+}
+
+// Build defaults first
+Object.entries(DEFAULT_ABBR).forEach(([k,v]) => { abbrMap[k] = v; });
+
+// Load team abbreviation map: expects columns Team,Abbr (optional file)
+async function loadAbbrOverrides() {
   try {
     const txt = await fetchText(PATHS.teamAbbr);
     const rows = parseCSV(txt);
     rows.forEach(r => {
-      const full = (r.Team || r.team || "").trim();
+      const full = normName(r.Team || r.team);
       const abbr = (r.Abbr || r.abbr || "").trim();
-      if (full && abbr) abbrMap[full] = abbr;
+      if (full && abbr) abbrMap[full] = abbr; // override default
     });
   } catch (e) {
-    console.warn("Team abbreviation file missing or failed to load:", e);
+    // If file is missing or fails to load, we silently keep defaults.
+    console.warn("Using built-in NFL abbreviations (override file not loaded).");
   }
 }
 function shortName(name) {
-  if (!name) return "";
-  return abbrMap[name] || name;
+  const key = normName(name);
+  return abbrMap[key] || name || "";
 }
 
 // ===== Init all data =====
@@ -80,8 +124,8 @@ async function loadAll() {
   store.homeAway = parseCSV(haTxt);
   store.totals = parseCSV(toTxt);
 
-  // Load abbreviations AFTER other files kick off, but we await before render
-  await loadAbbr();
+  // Load overrides (if present) AFTER defaults are set
+  await loadAbbrOverrides();
 
   // Seasons list
   const seasons = Array.from(new Set(
@@ -100,7 +144,6 @@ async function loadAll() {
 
   const teamFilter = document.getElementById("teamFilter");
   const sortedTeams = Array.from(teamSet).filter(Boolean).sort((a,b)=>a.localeCompare(b));
-  // Show abbreviations in the dropdown as well
   teamFilter.innerHTML =
     `<option value="">All Teams</option>` +
     sortedTeams.map(t => `<option value="${t}">${shortName(t)}</option>`).join("");
@@ -176,5 +219,5 @@ document.addEventListener("change", (e) => {
 // Init
 loadAll().catch(err => {
   console.error(err);
-  alert("Failed to load insights data. Ensure docs/data/metrics/*.csv and docs/mappings/team_abbr.csv exist.");
+  alert("Failed to load insights data. Ensure docs/data/metrics/*.csv exist. (Abbreviations fallback is built-in.)");
 });
