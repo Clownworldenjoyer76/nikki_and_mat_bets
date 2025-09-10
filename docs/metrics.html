@@ -46,7 +46,7 @@
       font-size: clamp(9px, 2vw, 14px);
       white-space: nowrap;
     }
-    /* Tighter first column (team/OPP) */
+    /* Team column tighter overall */
     .table.compact th:first-child, .table.compact td:first-child {
       text-align: left;
       width: 28%;
@@ -59,6 +59,29 @@
       text-align: center;
     }
     .section { margin-bottom: 10px; }
+
+    /* --- Totals tables: give 'Side' more room and extra gap before 'W' --- */
+    .totals-table th:nth-child(2),
+    .totals-table td:nth-child(2) {
+      width: 18%;           /* widen 'Side' */
+      padding-right: 10px;  /* add gap before 'W' */
+      text-align: left;     /* reads nicer on mobile */
+    }
+    /* Keep metrics legible but compact */
+    .totals-table th:nth-child(3), /* W */
+    .totals-table td:nth-child(3),
+    .totals-table th:nth-child(4), /* L */
+    .totals-table td:nth-child(4),
+    .totals-table th:nth-child(5), /* P */
+    .totals-table td:nth-child(5),
+    .totals-table th:nth-child(6), /* G */
+    .totals-table td:nth-child(6) {
+      width: 9%;
+    }
+    .totals-table th:nth-child(7), /* Win % */
+    .totals-table td:nth-child(7) {
+      width: 18%;
+    }
   </style>
 </head>
 <body>
@@ -104,7 +127,17 @@
 
           <div class="section">
             <h2>Totals (Over / Under) by Team</h2>
-            <table class="table compact">
+            <table class="table compact totals-table">
+              <!-- Column widths for Totals (Team | Side | W | L | P | G | Win %) -->
+              <colgroup>
+                <col style="width:28%" />
+                <col style="width:18%" />
+                <col style="width:9%" />
+                <col style="width:9%" />
+                <col style="width:9%" />
+                <col style="width:9%" />
+                <col style="width:18%" />
+              </colgroup>
               <thead>
                 <tr><th>Team</th><th>Side</th><th>W</th><th>L</th><th>P</th><th>G</th><th>Win %</th></tr>
               </thead>
@@ -131,7 +164,17 @@
 
           <div class="section">
             <h2>Totals (Over / Under) by Team</h2>
-            <table class="table compact">
+            <table class="table compact totals-table">
+              <!-- Column widths for Totals (Team | Side | W | L | P | G | Win %) -->
+              <colgroup>
+                <col style="width:28%" />
+                <col style="width:18%" />
+                <col style="width:9%" />
+                <col style="width:9%" />
+                <col style="width:9%" />
+                <col style="width:9%" />
+                <col style="width:18%" />
+              </colgroup>
               <thead>
                 <tr><th>Team</th><th>Side</th><th>W</th><th>L</th><th>P</th><th>G</th><th>Win %</th></tr>
               </thead>
