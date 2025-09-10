@@ -6,12 +6,12 @@
   <title>Nikki & Mat – Weekly Picks</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* minimal layout to guarantee the two side-by-side blocks */
     .two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
-    @media (max-width: 700px) { .two-up { gap: 8px; } }
+    @media (max-width: 700px) { .two-up { grid-template-columns: 1fr; gap: 8px; } }
     .table.compact th, .table.compact td { white-space: nowrap; text-align: center; }
     .table.compact td:first-child { text-align: left; }
     .year-row td { font-weight: 600; }
+    .muted { opacity: .72; }
   </style>
 </head>
 <body>
@@ -25,8 +25,8 @@
       <img src="assets/logos/IMG_0930.jpeg" alt="Right logo" />
     </header>
 
-    <main id="insights" class="two-up">
-      <!-- Nikki block -->
+    <main class="two-up">
+      <!-- Nikki -->
       <article class="card">
         <div class="card-inner">
           <h1>Nikki</h1>
@@ -34,21 +34,15 @@
           <div class="table-wrap">
             <table id="nikkiTable" class="table compact">
               <thead>
-                <tr>
-                  <th>Week</th>
-                  <th>ATS</th>
-                  <th>O/U</th>
-                </tr>
+                <tr><th>Week</th><th>ATS</th><th>O/U</th></tr>
               </thead>
-              <tbody>
-                <!-- populated by picks.js -->
-              </tbody>
+              <tbody></tbody>
             </table>
           </div>
         </div>
       </article>
 
-      <!-- Mat block -->
+      <!-- Mat -->
       <article class="card">
         <div class="card-inner">
           <h1>Mat</h1>
@@ -56,15 +50,9 @@
           <div class="table-wrap">
             <table id="matTable" class="table compact">
               <thead>
-                <tr>
-                  <th>Week</th>
-                  <th>ATS</th>
-                  <th>O/U</th>
-                </tr>
+                <tr><th>Week</th><th>ATS</th><th>O/U</th></tr>
               </thead>
-              <tbody>
-                <!-- populated by picks.js -->
-              </tbody>
+              <tbody></tbody>
             </table>
           </div>
         </div>
