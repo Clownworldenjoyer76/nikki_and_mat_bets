@@ -23,6 +23,19 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Pre-run snapshot
+        shell: bash
+        run: |
+          set -e
+          echo "=== Existing final files (newest first) ==="
+          ls -lt docs/data/final 2>/dev/null || true
+          echo "=== Existing metrics BEFORE ==="
+          ls -l docs/data/metrics 2>/dev/null || true
+          if ls docs/data/metrics/*.csv >/dev/null 2>&1; then
+            echo "=== Hashes BEFORE ==="
+            sha256sum docs/data/metrics/*.csv | sort
+          fi
+
       - name: Run aggregator
         shell: bash
         run: |
@@ -30,37 +43,57 @@ jobs:
 
           IN_SEASON="${{ inputs.season }}"
           if [ -z "$IN_SEASON" ]; then
-            # Auto-detect season from newest final csv
             latest=$(ls -t docs/data/final/*_wk*_final.csv 2>/dev/null | head -n1 || true)
             if [ -n "$latest" ]; then
               base=$(basename "$latest")
-              # e.g. 2025_wk01_final.csv -> 2025
               IN_SEASON="${base%%_*}"
               echo "Auto-detected season: $IN_SEASON"
             else
               echo "ERROR: No final CSVs found to auto-detect season."
               exit 78
             fi
+          else
+            echo "Season provided: $IN_SEASON"
           fi
 
-          # Sanity: ensure at least one final for this season exists
+          echo "=== Final files for season ${IN_SEASON} ==="
+          ls -1 docs/data/final/${IN_SEASON}_wk*_final.csv 2>/dev/null || true
           matches=$(ls docs/data/final/${IN_SEASON}_wk*_final.csv 2>/dev/null | wc -l | xargs)
           if [ "$matches" = "0" ]; then
             echo "ERROR: No final CSVs for season ${IN_SEASON}"
             exit 78
           fi
 
-          # Install deps your aggregator might need
           python -m pip install --upgrade pip pandas
 
-          # Call your aggregator (adjusted to your script name)
+          # Run your metrics builder
           python scripts/aggregate_metrics.py "${IN_SEASON}"
+
+      - name: Post-run snapshot
+        if: always()
+        shell: bash
+        run: |
+          echo "=== Metrics AFTER ==="
+          ls -l docs/data/metrics 2>/dev/null || true
+          if ls docs/data/metrics/*.csv >/dev/null 2>&1; then
+            echo "=== Hashes AFTER ==="
+            sha256sum docs/data/metrics/*.csv | sort
+          fi
 
       - name: Commit metrics
         if: always()
+        shell: bash
         run: |
+          set -e
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/data/metrics/*.csv || true
-          git commit -m "Metrics updated" || echo "No metric changes"
-          git push || true
+
+          # Show which files actually changed before committing
+          git add -N docs/data/metrics/*.csv 2>/dev/null || true
+          echo "=== Changed files (git diff --name-only) ==="
+          git diff --name-only -- docs/data/metrics || true
+          echo "=== Diffstat ==="
+          git diff --stat -- docs/data/metrics || true
+
+          git add docs/data/metrics/*.csv 2>/dev/null || true
+          git commit -m "Metrics updated" && git push || echo "No metric changes"
