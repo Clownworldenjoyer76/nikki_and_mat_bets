@@ -149,6 +149,9 @@ function card(h, r, picksAll){
   `;
 
   ["mat","nikki"].forEach(user=>{
+    if (user === "mat") {
+        el.appendChild(pinkDivider());
+    }
     const section = document.createElement("div");
     section.style.marginTop = "10px";
 
@@ -191,6 +194,14 @@ function neonDivider(){
   div.className = "neon-divider";
   div.setAttribute("style",
     "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;pointer-events:none;");
+  return div;
+}
+
+function pinkDivider(){
+  const div = document.createElement("div");
+  div.className = "pink-divider";
+  div.setAttribute("style",
+    "height:3px;background:#ff39c3;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #ff39c3;pointer-events:none;");
   return div;
 }
 
