@@ -1,66 +1,53 @@
-name: Build Metrics (Manual)
+#!/usr/bin/env python3
+import sys
+from pathlib import Path
+import pandas as pd
 
-on:
-  workflow_dispatch:
-    inputs:
-      season:
-        description: "Season year (e.g., 2025). Leave blank to auto-detect from final CSVs."
-        required: false
-        default: ""
+ROOT = Path(__file__).resolve().parents[1]
+FINAL_DIR = ROOT / "docs" / "data" / "final"
+METRICS_DIR = ROOT / "docs" / "data" / "metrics"
 
-permissions:
-  contents: write
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: aggregate_metrics.py <season>")
+        sys.exit(1)
 
-jobs:
-  run:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    season = sys.argv[1]
+    pattern = f"{season}_wk*_final.csv"
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+    files = sorted(FINAL_DIR.glob(pattern))
+    if not files:
+        print(f"No final CSVs found for season {season}")
+        sys.exit(1)
 
-      - name: Run aggregator
-        shell: bash
-        run: |
-          set -e
+    print(f"Found {len(files)} final CSVs for season {season}")
+    dfs = []
+    for f in files:
+        try:
+            df = pd.read_csv(f)
+            df["__source_file"] = f.name
+            dfs.append(df)
+        except Exception as e:
+            print(f"Error reading {f}: {e}")
 
-          IN_SEASON="${{ inputs.season }}"
-          if [ -z "$IN_SEASON" ]; then
-            # Auto-detect season from newest final csv
-            latest=$(ls -t docs/data/final/*_wk*_final.csv 2>/dev/null | head -n1 || true)
-            if [ -n "$latest" ]; then
-              base=$(basename "$latest")
-              # e.g. 2025_wk01_final.csv -> 2025
-              IN_SEASON="${base%%_*}"
-              echo "Auto-detected season: $IN_SEASON"
-            else
-              echo "ERROR: No final CSVs found to auto-detect season."
-              exit 78
-            fi
-          fi
+    if not dfs:
+        print("No valid CSVs loaded, exiting.")
+        sys.exit(1)
 
-          # Sanity: ensure at least one final for this season exists
-          matches=$(ls docs/data/final/${IN_SEASON}_wk*_final.csv 2>/dev/null | wc -l | xargs)
-          if [ "$matches" = "0" ]; then
-            echo "ERROR: No final CSVs for season ${IN_SEASON}"
-            exit 78
-          fi
+    combined = pd.concat(dfs, ignore_index=True)
 
-          # Install deps your aggregator might need
-          python -m pip install --upgrade pip pandas
+    # Example aggregations — adjust for your columns
+    metrics = {}
+    if "team" in combined.columns:
+        metrics["games_per_team"] = combined.groupby("team").size().to_dict()
+    if "winner" in combined.columns:
+        metrics["wins_per_team"] = combined.groupby("winner").size().to_dict()
 
-          # Call your aggregator (adjusted to your script name)
-          python scripts/aggregate_metrics.py "${IN_SEASON}"
+    # Save combined CSV
+    METRICS_DIR.mkdir(parents=True, exist_ok=True)
+    out_file = METRICS_DIR / f"{season}_metrics.csv"
+    combined.to_csv(out_file, index=False)
+    print(f"Saved metrics to {out_file}")
 
-      - name: Commit metrics
-        if: always()
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@users.noreply.github.com"
-          git add docs/data/metrics/*.csv || true
-          git commit -m "Metrics updated" || echo "No metric changes"
-          git push || true
+if __name__ == "__main__":
+    main()
