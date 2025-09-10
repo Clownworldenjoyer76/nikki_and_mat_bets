@@ -1,0 +1,17 @@
+season,week,game_id,commence_time_utc,home_team,away_team,spread_home,total,mat_spread,mat_total,nikki_spread,nikki_total,home_score,away_score,__source_file
+2025,1,f1bc532dff946d15cb85654b5c4b246e,2025-09-05T00:20:00+00:00,Philadelphia Eagles,Dallas Cowboys,-8.5,47.5,away,under,away,over,24.0,20.0,2025_wk01_final.csv
+2025,1,9535d3e3ee9d9fc83ea2b500ad0b587c,2025-09-06T00:00:00+00:00,Los Angeles Chargers,Kansas City Chiefs,3.0,46.5,away,under,home,under,27.0,21.0,2025_wk01_final.csv
+2025,1,557d13ef8f4c1d21044f3a478cda6d0b,2025-09-07T17:00:00+00:00,New Orleans Saints,Arizona Cardinals,6.5,43.5,away,over,home,over,13.0,20.0,2025_wk01_final.csv
+2025,1,1e09eb3fe1385796c1a32000de48ac64,2025-09-07T17:00:00+00:00,Atlanta Falcons,Tampa Bay Buccaneers,2.5,47.0,home,over,home,over,20.0,23.0,2025_wk01_final.csv
+2025,1,394256a6c3d0f5ecd1208fffaae6a72f,2025-09-07T17:00:00+00:00,Jacksonville Jaguars,Carolina Panthers,-3.5,47.0,away,under,home,under,26.0,10.0,2025_wk01_final.csv
+2025,1,e2d3b0596efcebc1c19dab92009f5e26,2025-09-07T17:00:00+00:00,Cleveland Browns,Cincinnati Bengals,5.0,47.5,away,over,home,under,16.0,17.0,2025_wk01_final.csv
+2025,1,b02a72c768a6c6dee87aa74f78e84176,2025-09-07T17:00:00+00:00,Indianapolis Colts,Miami Dolphins,0.0,46.5,away,under,home,under,33.0,8.0,2025_wk01_final.csv
+2025,1,0b2455795dfcd692dd607503e4f20d04,2025-09-07T17:00:00+00:00,New England Patriots,Las Vegas Raiders,-2.5,43.5,away,under,home,over,13.0,20.0,2025_wk01_final.csv
+2025,1,4cce00ca468c67eca17a9a061f778fb2,2025-09-07T17:00:00+00:00,Washington Commanders,New York Giants,-6.0,45.5,home,over,away,over,21.0,6.0,2025_wk01_final.csv
+2025,1,5ed483bb614b18955f8b43f177746371,2025-09-07T17:00:00+00:00,New York Jets,Pittsburgh Steelers,2.5,38.5,home,under,away,under,32.0,34.0,2025_wk01_final.csv
+2025,1,68397f3aa9eb847a421a49f990a11928,2025-09-07T20:05:00+00:00,Denver Broncos,Tennessee Titans,-8.0,42.5,home,under,home,over,20.0,12.0,2025_wk01_final.csv
+2025,1,9f1ad249959aacae89e5e74e43429a4a,2025-09-07T20:05:00+00:00,Seattle Seahawks,San Francisco 49ers,2.5,43.5,away,over,home,over,13.0,17.0,2025_wk01_final.csv
+2025,1,8e0e2d9237098222f9ca7554b11b12bb,2025-09-07T20:25:00+00:00,Green Bay Packers,Detroit Lions,-2.5,47.5,home,over,away,over,27.0,13.0,2025_wk01_final.csv
+2025,1,dc0e3db61983a138098f28226788d2d3,2025-09-07T20:25:00+00:00,Los Angeles Rams,Houston Texans,-3.0,44.0,home,over,away,under,14.0,9.0,2025_wk01_final.csv
+2025,1,dee0a41ed5e8201a96d457899adbe918,2025-09-08T00:20:00+00:00,Buffalo Bills,Baltimore Ravens,0.0,50.5,away,over,away,over,41.0,40.0,2025_wk01_final.csv
+2025,1,c6d7807cee33d5e81c671527b9c8b3f1,2025-09-09T00:15:00+00:00,Chicago Bears,Minnesota Vikings,1.5,44.0,away,under,home,under,24.0,,2025_wk01_final.csv
