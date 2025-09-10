@@ -5,6 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Nikki & Mat – Weekly Picks</title>
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    main.two-up {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+    .card .card-inner { padding: 10px; }
+    .card .card-inner > h1 {
+      margin: 0 0 8px 0;
+      font-size: clamp(16px, 4.6vw, 22px);
+      text-align: center;   /* centered titles */
+    }
+    .table.compact { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .table.compact th, .table.compact td {
+      padding: 6px 6px;
+      text-align: center;
+      font-size: clamp(9px, 2vw, 14px);  /* allow smaller min size on mobile */
+      white-space: nowrap;                /* prevent wrapping like “5-10-1” */
+    }
+    .table.compact td:first-child, .table.compact th:first-child { text-align: left; width: 48%; }
+    .year-row td { font-weight: 700; }
+  </style>
 </head>
 <body>
   <div class="wrap">

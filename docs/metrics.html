@@ -5,6 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Nikki & Mat — By Team</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Match site look (Picks/Insights) */
+    main.two-up {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+    .card .card-inner { padding: 10px; }
+    .card .card-inner > h1 {
+      margin: 0 0 8px 0;
+      font-size: clamp(16px, 4.6vw, 22px);
+      text-align: center;
+    }
+
+    /* Controls */
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .controls label {
+      font-size: clamp(12px, 3.4vw, 14px);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .controls select {
+      width: 100%;
+      padding: 6px;
+      font-size: clamp(12px, 3.4vw, 14px);
+    }
+
+    /* Compact tables */
+    .table.compact { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .table.compact th, .table.compact td {
+      padding: 6px 6px;
+      text-align: center;
+      font-size: clamp(9px, 2vw, 14px);
+      white-space: nowrap;
+    }
+    /* Team column tighter overall */
+    .table.compact th:first-child, .table.compact td:first-child {
+      text-align: left;
+      width: 28%;
+      padding-right: 4px;
+    }
+
+    .card h2 {
+      margin: 12px 0 6px 0;
+      font-size: clamp(14px, 3.8vw, 18px);
+      text-align: center;
+    }
+    .section { margin-bottom: 10px; }
+
+    /* --- Totals tables: give 'Side' more room and extra gap before 'W' --- */
+    .totals-table th:nth-child(2),
+    .totals-table td:nth-child(2) {
+      width: 18%;           /* widen 'Side' */
+      padding-right: 10px;  /* add gap before 'W' */
+      text-align: left;     /* reads nicer on mobile */
+    }
+    /* Keep metrics legible but compact */
+    .totals-table th:nth-child(3), /* W */
+    .totals-table td:nth-child(3),
+    .totals-table th:nth-child(4), /* L */
+    .totals-table td:nth-child(4),
+    .totals-table th:nth-child(5), /* P */
+    .totals-table td:nth-child(5),
+    .totals-table th:nth-child(6), /* G */
+    .totals-table td:nth-child(6) {
+      width: 9%;
+    }
+    .totals-table th:nth-child(7), /* Win % */
+    .totals-table td:nth-child(7) {
+      width: 18%;
+    }
+  </style>
 </head>
 <body>
   <div class="wrap">
@@ -50,6 +128,16 @@
           <div class="section">
             <h2>Totals (Over / Under) by Team</h2>
             <table class="table compact totals-table">
+              <!-- Column widths for Totals (Team | Side | W | L | P | G | Win %) -->
+              <colgroup>
+                <col style="width:28%" />
+                <col style="width:18%" />
+                <col style="width:9%" />
+                <col style="width:9%" />
+                <col style="width:9%" />
+                <col style="width:9%" />
+                <col style="width:18%" />
+              </colgroup>
               <thead>
                 <tr><th>Team</th><th>Side</th><th>W</th><th>L</th><th>P</th><th>G</th><th>Win %</th></tr>
               </thead>
@@ -77,6 +165,16 @@
           <div class="section">
             <h2>Totals (Over / Under) by Team</h2>
             <table class="table compact totals-table">
+              <!-- Column widths for Totals (Team | Side | W | L | P | G | Win %) -->
+              <colgroup>
+                <col style="width:28%" />
+                <col style="width:18%" />
+                <col style="width:9%" />
+                <col style="width:9%" />
+                <col style="width:9%" />
+                <col style="width:9%" />
+                <col style="width:18%" />
+              </colgroup>
               <thead>
                 <tr><th>Team</th><th>Side</th><th>W</th><th>L</th><th>P</th><th>G</th><th>Win %</th></tr>
               </thead>

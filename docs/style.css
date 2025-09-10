@@ -1,255 +1,138 @@
-/* ==========================================================================
-   Base / Reset
-   ========================================================================== */
-:root {
-  --bg: #0b0b0c;
-  --fg: #f2f3f5;
-  --muted: #b7bcc7;
-  --card: #15161a;
-  --card-border: #23252b;
-  --accent: #00c2ff;
+:root { --bg:#000; --fg:#fff; --muted:#bbb; --accent:#1f6feb; --neon:#39ff14; }
+html,body{background:#000;color:#fff;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; padding-top: 70px; padding-bottom: 70px; box-sizing: border-box;}
 
-  --gap: 10px;
-  --round: 12px;
+.wrap { max-width:1000px; margin:0 auto; padding:10px; }
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-}
-
-* { box-sizing: border-box; }
-html, body { height: 100%; }
-html { background: var(--bg); color: var(--fg); }
-body {
-  margin: 0;
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+header.main-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 12px 0 0;
+    gap: 10px;
+    padding-bottom: 8px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #000;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
-/* Links */
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+header.main-header img { width:60px; height:auto; }
 
-/* Wrap keeps content centered with padding for the bottom bar */
-.wrap {
-  max-width: 1100px;
-  margin: 0 auto 64px auto;
-  padding: 12px;
-}
+header.main-header .titles { flex:1; text-align:center; }
 
-/* ==========================================================================
-   Header (shared across pages)
-   ========================================================================== */
-.main-header {
-  display: grid;
-  grid-template-columns: 72px 1fr 72px;
-  align-items: center;
-  gap: var(--gap);
-  margin-bottom: 8px;
-}
-.main-header img {
-  width: 100%;
-  height: 72px;
-  object-fit: cover;
-  border-radius: var(--round);
-  border: 1px solid var(--card-border);
-}
-.main-header .titles {
-  text-align: center;
-}
-.main-header .titles h1 {
-  margin: 0;
-  font-size: clamp(18px, 5.2vw, 28px);
-  letter-spacing: 0.2px;
-}
-.main-header .titles .sub {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: clamp(12px, 3.4vw, 14px);
+header.main-header .titles h1,
+header.main-header .titles .sub {
+    margin:0;
+    font-size:1.2rem;
+    font-weight:500;
 }
 
-/* ==========================================================================
-   Bottom Nav Bar
-   ========================================================================== */
-.bar {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  background: rgba(10, 10, 12, 0.88);
-  border-top: 1px solid var(--card-border);
-  backdrop-filter: blur(6px);
-  z-index: 50;
-}
-.bar nav {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 10px 12px;
-  display: grid;
-  grid-auto-flow: column;
-  justify-content: space-between;
-  gap: 12px;
-}
-.bar nav a {
-  color: var(--fg);
-  font-size: clamp(13px, 3.4vw, 15px);
+.neon-separator {
+    height:3px;
+    background:var(--neon);
+    margin:0 0 12px;
+    border-radius:2px;
+    box-shadow:0 0 8px var(--neon);
+    pointer-events:none;
+    z-index:0;
 }
 
-/* ==========================================================================
-   Cards + Two-up Grid
-   ========================================================================== */
-main.two-up {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--gap);
-  align-items: start;
+.bar{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:#1a1a1a;
+    border-top:1px solid #333;
+    padding:8px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    z-index: 1000;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+}
+.bar nav{
+    display:flex;
+    gap:14px;
+    justify-content:center;
+    margin:0 auto;
+}
+.bar a{
+    color:#fff;
+    text-decoration:none;
+    font-size:.9rem;
+}
+.bar a:hover{
+    color:var(--accent);
+}
+.bar .row{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    align-items:center;
+}
+.btn{background:#111;color:#fff;border:1px solid #444;border-radius:10px;padding:8px 14px;font-weight:600}
+.btn.primary{background:#0b5cff;border-color:#0b5cff}
+
+#games{display:flex;flex-direction:column;gap:14px;margin:12px 0}
+
+.matchgrid {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+.matchtext {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    line-height:1.2;
+}
+.team-logo { width:50px; height:auto; }
+
+.pickbtn {
+    pointer-events:auto !important;
+    position:relative;
+    z-index:1;
+    cursor:pointer;
+    touch-action:manipulation;
+    width:100%;
+    min-height:44px;
+    padding: 12px 10px;
+    border: none;
+    border-radius: 8px;
+    background-color: #333;
+    color: #eee;
+    font-weight: 500;
+    transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
+    font-size: 1em;
+}
+.pickbtn:hover {
+    background-color: #444;
 }
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: var(--round);
-  overflow: hidden;
-}
-.card .card-inner { padding: 10px; }
-.card .card-inner > h1 {
-  margin: 0 0 8px 0;
-  font-size: clamp(16px, 4.6vw, 22px);
-  text-align: center;
-}
-.card h2 {
-  margin: 12px 0 6px 0;
-  font-size: clamp(14px, 3.8vw, 18px);
-  text-align: center; /* centered section titles (ATS by Team, Fade ATS, etc.) */
-}
-.section { margin-bottom: 10px; }
-
-/* ==========================================================================
-   Controls (Season / Team Filter)
-   ========================================================================== */
-.controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin: 10px 0;
-}
-.controls label {
-  font-size: clamp(12px, 3.4vw, 14px);
-  display: block;
-  margin-bottom: 4px;
-  color: var(--muted);
-}
-.controls select {
-  width: 100%;
-  padding: 6px;
-  border-radius: 8px;
-  border: 1px solid var(--card-border);
-  background: #0f1013;
-  color: var(--fg);
-  font-size: clamp(12px, 3.4vw, 14px);
+.pickbtn.active.mat {
+    background-color: #39ff14;
+    color: #000;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.7);
+    transform: translateY(-2px);
 }
 
-/* ==========================================================================
-   Tables (compact, fixed, nowrap)
-   ========================================================================== */
-.table.compact {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed; /* fixed layout makes columns consistent */
-  border: 1px solid var(--card-border);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.table.compact thead th {
-  background: #101216;
-  color: var(--muted);
-  border-bottom: 1px solid var(--card-border);
-  font-weight: 600;
-}
-.table.compact th,
-.table.compact td {
-  padding: 6px 6px;             /* compact spacing */
-  text-align: center;
-  font-size: clamp(9px, 2vw, 14px);
-  white-space: nowrap;           /* prevent wrapping (e.g., 5-10-1) */
-}
-.table.compact tr + tr td { border-top: 1px solid rgba(255,255,255,0.04); }
-
-/* First column tighter so W is closer */
-.table.compact th:first-child,
-.table.compact td:first-child {
-  text-align: left;
-  width: 28%;
-  padding-right: 4px;
+.pickbtn.active.nikki {
+    background-color: #ff39c3;
+    color: #000;
+    box-shadow: 0 0 10px rgba(255, 57, 195, 0.7);
+    transform: translateY(-2px);
 }
 
-/* Year rows (on Picks page) */
-.year-row td { font-weight: 700; }
-
-/* ==========================================================================
-   Fade ATS Header Shortening (Insights)
-   ========================================================================== */
-/* If your HTML sets <th>OPP</th>, nothing extra is required.
-   This block is here in case any page still uses 'Opponent' and you want to force width tightness. */
-.table.compact th[data-col="opponent"]::after { content: "OPP"; }
-.table.compact th[data-col="opponent"] { text-indent: -9999px; }
-
-/* ==========================================================================
-   Win% Heatmap (Insights & Metrics)
-   ========================================================================== */
-.winpct {
-  border-radius: 4px;
-  padding: 2px 4px;
-  display: inline-block; /* avoid shifting column widths */
+.neon-divider {
+    height:3px;
+    background:var(--neon);
+    margin:10px 0;
+    border-radius:2px;
+    box-shadow:0 0 8px var(--neon);
+    pointer-events:none;
 }
-.winpct.hot  { background: rgba(0, 255, 0, 0.15);  outline: 1px solid rgba(0, 255, 0, 0.28); }
-.winpct.mid  { background: rgba(255, 200, 0, 0.14); outline: 1px solid rgba(255, 200, 0, 0.25); }
-.winpct.cold { background: rgba(255, 60, 60, 0.14); outline: 1px solid rgba(255, 60, 60, 0.25); }
-
-/* ==========================================================================
-   Metrics Totals Table — widen 'Side' and add gap before W
-   (applies to tables with class `totals-table`)
-   ========================================================================== */
-.totals-table th:nth-child(2),
-.totals-table td:nth-child(2) {
-  width: 18%;
-  padding-right: 10px;  /* creates breathing room before W */
-  text-align: left;
-}
-.totals-table th:nth-child(3),
-.totals-table td:nth-child(3),
-.totals-table th:nth-child(4),
-.totals-table td:nth-child(4),
-.totals-table th:nth-child(5),
-.totals-table td:nth-child(5),
-.totals-table th:nth-child(6),
-.totals-table td:nth-child(6) {
-  width: 9%;
-}
-.totals-table th:nth-child(7),
-.totals-table td:nth-child(7) {
-  width: 18%;
-}
-
-/* ==========================================================================
-   Outlines for winners (weekly page compare)
-   ========================================================================== */
-.outline-win  { outline: 2px solid lime; }
-.outline-lose { outline: 2px solid hotpink; }
-.outline-tie  { outline: 2px solid orange; }
-
-/* ==========================================================================
-   Responsive tweaks
-   ========================================================================== */
-@media (max-width: 820px) {
-  .main-header {
-    grid-template-columns: 56px 1fr 56px;
-  }
-  .main-header img { height: 56px; }
-
-  main.two-up {
-    grid-template-columns: 1fr;   /* stack on mobile */
-  }
-  .wrap {
-    padding: 12px;
-    margin-bottom: 80px;          /* leave room for bottom bar */
-  }
-}
-
-/* End of style.css */
