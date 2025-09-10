@@ -1,324 +1,304 @@
 #!/usr/bin/env python3
 import os
 import sys
-from pathlib import Path
 import re
+from pathlib import Path
 import pandas as pd
 
+# --- Paths
 ROOT = Path(__file__).resolve().parents[1]
 FINAL_DIR = ROOT / "docs" / "data" / "final"
 METRICS_DIR = ROOT / "docs" / "data" / "metrics"
 
-# Configure pickers here (columns expected: <Picker>_spread, <Picker>_total)
+# --- Configure pickers (case-insensitive column matching)
 PICKERS = ["Mat", "Nikki"]
 
-# Column alias maps
+# Column alias candidates (case-insensitive)
 SPREAD_ALIASES = ["spread_home", "home_spread", "spread"]
 TOTAL_ALIASES  = ["total", "over_under", "ou", "total_points"]
 
-def _pick_first_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
-    for c in candidates:
-        if c in df.columns:
-            return c
+def err_exit(msg, code=78):
+    print(f"ERROR: {msg}", file=sys.stderr)
+    sys.exit(code)
+
+def infer_season() -> str:
+    # Prefer CLI arg, then SEASON env, else infer newest by mtime
+    if len(sys.argv) >= 2 and sys.argv[1].strip():
+        return sys.argv[1].strip()
+    env = os.getenv("SEASON", "").strip()
+    if env:
+        return env
+    cands = list(FINAL_DIR.glob("*_wk*_final.csv"))
+    if not cands:
+        err_exit("No final CSVs found for any season.")
+    newest = max(cands, key=lambda p: p.stat().st_mtime)
+    m = re.match(r"^(\d{4})_wk\d{2}_final\.csv$", newest.name)
+    if not m:
+        err_exit(f"Could not infer season from newest file: {newest.name}")
+    season = m.group(1)
+    print(f"Auto-detected season: {season}")
+    return season
+
+# --- Case-insensitive column helpers
+def lower_map(columns) -> dict:
+    """Map lowercase->original for DataFrame columns."""
+    return {c.lower(): c for c in columns}
+
+def pick_first_col(ci_map: dict, candidates: list[str]) -> str | None:
+    """Return the ORIGINAL column name for first candidate found (case-insensitive)."""
+    for cand in candidates:
+        k = cand.lower()
+        if k in ci_map:
+            return ci_map[k]
     return None
 
-def _norm_side(val: str | float | int) -> str | None:
+def find_picker_col(ci_map: dict, picker: str, bases: list[str]) -> str | None:
+    """
+    For a picker like 'Mat', try variants case-insensitively:
+      Mat_spread, mat_spread, MAT_SPREAD, Mat_spread_pick, Mat_ATS, etc.
+    """
+    # Build flexible candidates: <picker>_<base> plus common alternates
+    pfx = picker
+    # Try lower too for safety
+    pfx_low = picker.lower()
+    variants = []
+    for b in bases:
+        variants += [
+            f"{pfx}_{b}",
+            f"{pfx}_{b}_pick",
+            f"{pfx} {b}".replace("_", " "),  # e.g., "Mat Spread"
+            f"{pfx}_{b.upper()}",
+            f"{pfx_low}_{b}",
+            f"{pfx_low}_{b}_pick",
+            f"{pfx_low} {b}".replace("_", " "),
+            f"{pfx}_{'ATS' if b=='spread' else ('OU' if b in ('total','Totals','O_U') else b)}",
+            f"{pfx_low}_{'ATS' if b=='spread' else ('OU' if b in ('total','Totals','O_U') else b)}",
+        ]
+    # Also accept minimal shorthands
+    variants += [f"{pfx}_ATS", f"{pfx_low}_ATS", f"{pfx}_OU", f"{pfx_low}_OU"]
+    # Case-insensitive pick
+    tried = set()
+    for v in variants:
+        key = v.strip().lower()
+        if key and key not in tried:
+            tried.add(key)
+            if key in ci_map:
+                return ci_map[key]
+    return None
+
+# --- Value normalization (accepts h/a/o/u too)
+def norm_side(val: object) -> str | None:
     if pd.isna(val):
         return None
     s = str(val).strip().lower()
-    if s in ("home", "h"):
-        return "Home"
-    if s in ("away", "a"):
-        return "Away"
-    if s in ("over", "o"):
-        return "Over"
-    if s in ("under", "u"):
-        return "Under"
+    if s in ("home", "h"):   return "Home"
+    if s in ("away", "a"):   return "Away"
+    if s in ("over", "o"):   return "Over"
+    if s in ("under", "u"):  return "Under"
     return None
 
-def _to_float(x):
+def to_float(x):
     try:
         return float(x)
     except Exception:
         return None
 
-def load_season_files(season: str) -> list[Path]:
+def list_season_files(season: str) -> list[Path]:
     return sorted(FINAL_DIR.glob(f"{season}_wk*_final.csv"))
 
-def infer_season_from_args_env() -> str:
-    # Prefer CLI arg; next ENV SEASON; else fail with clear error
-    if len(sys.argv) >= 2 and str(sys.argv[1]).strip():
-        return str(sys.argv[1]).strip()
-    env = os.getenv("SEASON", "").strip()
-    if env:
-        return env
-    # Fallback: auto-detect newest by filename
-    candidates = sorted(FINAL_DIR.glob("*_wk*_final.csv"))
-    if not candidates:
-        print("ERROR: No final CSVs found for any season.", file=sys.stderr)
-        sys.exit(78)
-    newest = max(candidates, key=lambda p: p.stat().st_mtime)
-    m = re.match(r"^(\d{4})_wk\d{2}_final\.csv$", newest.name)
-    if not m:
-        print(f"ERROR: Could not infer season from newest file: {newest.name}", file=sys.stderr)
-        sys.exit(78)
-    season = m.group(1)
-    print(f"Auto-detected season: {season}")
-    return season
+def grade_ats(home_score, away_score, spread_home, pick_side) -> str | None:
+    hs = to_float(home_score); as_ = to_float(away_score); sp = to_float(spread_home)
+    if hs is None or as_ is None or sp is None or pick_side not in ("Home", "Away"):
+        return None
+    diff = (hs + sp) - as_
+    if abs(diff) < 1e-12:
+        return "P"
+    home_wins = diff > 0
+    return ("W" if home_wins else "L") if pick_side == "Home" else ("L" if home_wins else "W")
+
+def grade_total(home_score, away_score, total_line, pick_side) -> str | None:
+    hs = to_float(home_score); as_ = to_float(away_score); tl = to_float(total_line)
+    if hs is None or as_ is None or tl is None or pick_side not in ("Over", "Under"):
+        return None
+    s = hs + as_
+    if abs(s - tl) < 1e-12:
+        return "P"
+    is_over = s > tl
+    return "W" if (pick_side == "Over" and is_over) or (pick_side == "Under" and not is_over) else "L"
 
 def main():
-    season = infer_season_from_args_env()
-    files = load_season_files(season)
+    season = infer_season()
+    files = list_season_files(season)
     if not files:
-        print(f"ERROR: No final CSVs for season {season}", file=sys.stderr)
-        sys.exit(78)
-
-    print("=== Inputs ===")
-    for p in files:
-        print(f"- {p.relative_to(ROOT)}")
+        err_exit(f"No final CSVs for season {season}")
 
     METRICS_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Buckets
+    # Aggregation buckets
     team_ats = {}          # (team, picker) -> [W,L,P]
     team_fade = {}         # (opponent, picker) -> [W,L,P]
     home_away = {}         # (picker, side[Home/Away]) -> [W,L,P]
     totals = {}            # (picker, side[Over/Under]) -> [W,L,P]
     team_totals = {}       # (team, picker, side[Over/Under]) -> [W,L,P]
 
-    processed_rows = 0
-    skipped_rows = 0
-    skipped_records = []  # dicts with reason, game_id, file, (optional) week
-
-    def tally(d: dict, key, result: str):
+    def tally(d: dict, key, res: str):
         w, l, p = d.get(key, [0, 0, 0])
-        if result == "W":
-            w += 1
-        elif result == "L":
-            l += 1
-        else:
-            p += 1
+        if   res == "W": w += 1
+        elif res == "L": l += 1
+        else:            p += 1
         d[key] = [w, l, p]
 
-    def grade_ats(home_score, away_score, spread_home, pick_side) -> str | None:
-        # returns W/L/P for the side picked (Home/Away)
-        hs = _to_float(home_score)
-        as_ = _to_float(away_score)
-        sp = _to_float(spread_home)
-        if hs is None or as_ is None or sp is None or pick_side not in ("Home", "Away"):
-            return None
-        diff = (hs + sp) - as_
-        if abs(diff) < 1e-12:
-            return "P"
-        home_wins = diff > 0
-        if pick_side == "Home":
-            return "W" if home_wins else "L"
-        else:
-            return "L" if home_wins else "W"
+    processed, skipped = 0, 0
+    skipped_reasons = {}
 
-    def grade_total(home_score, away_score, total_line, pick_side) -> str | None:
-        hs = _to_float(home_score)
-        as_ = _to_float(away_score)
-        tl = _to_float(total_line)
-        if hs is None or as_ is None or tl is None or pick_side not in ("Over", "Under"):
-            return None
-        s = hs + as_
-        if abs(s - tl) < 1e-12:
-            return "P"
-        is_over = s > tl
-        if pick_side == "Over":
-            return "W" if is_over else "L"
-        else:
-            return "L" if is_over else "W"
+    def skip(reason: str):
+        nonlocal skipped
+        skipped += 1
+        skipped_reasons[reason] = skipped_reasons.get(reason, 0) + 1
 
-    # Process each file
-    for fpath in files:
-        df = pd.read_csv(fpath)
-        # Required core columns
-        required = ["game_id", "home_team", "away_team", "home_score", "away_score"]
-        missing_core = [c for c in required if c not in df.columns]
+    # Process each week's final file
+    for f in files:
+        df = pd.read_csv(f)
+        ci = lower_map(df.columns)
+
+        # Required core columns (case-insensitive)
+        need = ["game_id", "home_team", "away_team", "home_score", "away_score"]
+        missing_core = [c for c in need if c.lower() not in ci]
         if missing_core:
-            skipped_rows += len(df)
-            for _, r in df.iterrows():
-                skipped_records.append({
-                    "reason": f"missing core columns: {','.join(missing_core)}",
-                    "game_id": r.get("game_id", ""),
-                    "week": r.get("week", ""),
-                    "file": str(fpath.relative_to(ROOT))
-                })
+            skip(f"missing core: {','.join(missing_core)} (file {f.name})")
             continue
 
-        spread_col = _pick_first_col(df, SPREAD_ALIASES)
-        total_col  = _pick_first_col(df, TOTAL_ALIASES)
+        # Map to original names via ci-map
+        game_id_col   = ci["game_id"]
+        home_team_col = ci["home_team"]
+        away_team_col = ci["away_team"]
+        home_score_col= ci["home_score"]
+        away_score_col= ci["away_score"]
 
+        spread_col = pick_first_col(ci, SPREAD_ALIASES)
+        total_col  = pick_first_col(ci, TOTAL_ALIASES)
+
+        # Pre-locate picker columns (ATS & Totals) per picker
+        picker_ats_col = {}
+        picker_tot_col = {}
+        for picker in PICKERS:
+            ats = find_picker_col(ci, picker, ["spread", "ats"])
+            tot = find_picker_col(ci, picker, ["total", "totals", "ou", "o_u"])
+            picker_ats_col[picker] = ats
+            picker_tot_col[picker] = tot
+
+        # Row-wise grading
         for _, row in df.iterrows():
-            gid = row.get("game_id", "")
-            week = row.get("week", "")
-
-            # Normalize picks for each picker
-            # We accept several column name variants; build a small lookup per picker
-            picker_values = {}
-            for picker in PICKERS:
-                # ATS pick
-                ats_candidates = [
-                    f"{picker}_spread", f"{picker}_ats", f"{picker}_spread_pick",
-                    f"{picker}_Spread", f"{picker}_ATS"
-                ]
-                ats_val = None
-                for c in ats_candidates:
-                    if c in df.columns:
-                        ats_val = _norm_side(row.get(c))
-                        if ats_val in ("Home", "Away"):
-                            break
-                        ats_val = None
-                # Totals pick
-                tot_candidates = [
-                    f"{picker}_total", f"{picker}_Totals", f"{picker}_total_pick",
-                    f"{picker}_OU", f"{picker}_O_U"
-                ]
-                tot_val = None
-                for c in tot_candidates:
-                    if c in df.columns:
-                        tot_val = _norm_side(row.get(c))
-                        if tot_val in ("Over", "Under"):
-                            break
-                        tot_val = None
-
-                picker_values[picker] = (ats_val, tot_val)
-
-            hs, as_ = row.get("home_score"), row.get("away_score")
+            hs = row.get(home_score_col); as_ = row.get(away_score_col)
             if pd.isna(hs) or pd.isna(as_):
-                skipped_rows += 1
-                skipped_records.append({
-                    "reason": "missing score(s)",
-                    "game_id": gid, "week": week, "file": str(fpath.relative_to(ROOT))
-                })
+                skip("missing score(s)")
                 continue
 
-            # ATS grading if we have a spread column
-            if spread_col:
-                sp = row.get(spread_col)
+            # ATS grading
+            if spread_col is not None:
+                sp_val = row.get(spread_col)
                 for picker in PICKERS:
-                    ats_pick, _ = picker_values[picker]
-                    if ats_pick is None:
-                        # No ATS pick for this picker; not a row skip (could still do totals)
-                        pass
-                    else:
-                        res = grade_ats(hs, as_, sp, ats_pick)
-                        if res is None:
-                            skipped_rows += 1
-                            skipped_records.append({
-                                "reason": "ATS grade failed (bad spread or pick)",
-                                "game_id": gid, "week": week, "file": str(fpath.relative_to(ROOT))
-                            })
-                        else:
-                            processed_rows += 1
-                            # Team for ATS = the team corresponding to the picked side
-                            team = row.get("home_team") if ats_pick == "Home" else row.get("away_team")
-                            opp  = row.get("away_team") if ats_pick == "Home" else row.get("home_team")
-                            tally(team_ats, (team, picker), res)
-                            tally(team_fade, (opp, picker), "L" if res == "W" else ("W" if res == "L" else "P"))
-                            tally(home_away, (picker, ats_pick), res)
-
-            # Totals grading if we have a total column
-            if total_col:
-                tl = row.get(total_col)
-                for picker in PICKERS:
-                    _, tot_pick = picker_values[picker]
-                    if tot_pick is None:
+                    ats_col = picker_ats_col[picker]
+                    if ats_col is None:
                         continue
-                    res = grade_total(hs, as_, tl, tot_pick)
+                    pick = norm_side(row.get(ats_col))
+                    if pick not in ("Home", "Away"):
+                        # not graded for ATS, but keep going (totals might grade)
+                        continue
+                    res = grade_ats(hs, as_, sp_val, pick)
                     if res is None:
-                        skipped_rows += 1
-                        skipped_records.append({
-                            "reason": "Totals grade failed (bad total or pick)",
-                            "game_id": gid, "week": week, "file": str(fpath.relative_to(ROOT))
-                        })
+                        skip("ATS grade failed")
                     else:
-                        processed_rows += 1
-                        team = row.get("home_team")  # team bucket for totals is arbitrary; keep by home team for stability
-                        tally(totals, (picker, tot_pick), res)
-                        tally(team_totals, (team, picker, tot_pick), res)
+                        processed += 1
+                        team = row.get(home_team_col) if pick == "Home" else row.get(away_team_col)
+                        opp  = row.get(away_team_col) if pick == "Home" else row.get(home_team_col)
+                        tally(team_ats, (team, picker), res)
+                        # fade is the inverse W<->L, P stays P
+                        fade_res = "L" if res == "W" else ("W" if res == "L" else "P")
+                        tally(team_fade, (opp, picker), fade_res)
+                        tally(home_away, (picker, pick), res)
 
-    # --- Write outputs
-    def dump_triplets(rows, header, out_name):
-        out_path = METRICS_DIR / out_name
-        pd.DataFrame(rows, columns=header).to_csv(out_path, index=False)
-        return out_path
+            # Totals grading
+            if total_col is not None:
+                tl_val = row.get(total_col)
+                for picker in PICKERS:
+                    tot_col = picker_tot_col[picker]
+                    if tot_col is None:
+                        continue
+                    pick = norm_side(row.get(tot_col))
+                    if pick not in ("Over", "Under"):
+                        continue
+                    res = grade_total(hs, as_, tl_val, pick)
+                    if res is None:
+                        skip("Totals grade failed")
+                    else:
+                        processed += 1
+                        team = row.get(home_team_col)  # stable anchor; totals aren’t team-specific
+                        tally(totals, (picker, pick), res)
+                        tally(team_totals, (team, picker, pick), res)
+
+    # --- Emit outputs
+    METRICS_DIR.mkdir(parents=True, exist_ok=True)
+
+    def dump(rows, header, name):
+        path = METRICS_DIR / name
+        pd.DataFrame(rows, columns=header).to_csv(path, index=False)
+        return path
 
     # team_ats_by_picker.csv
     rows = []
-    for (team, picker), (w, l, p_) in sorted(team_ats.items()):
-        games = w + l + p_
-        win_pct = round(100.0 * (w / games), 1) if games else 0.0
-        rows.append([season, team, picker, w, l, p_, games, win_pct])
-    p1 = dump_triplets(rows,
-        ["season","team","picker","wins","losses","pushes","games","win_pct"],
-        "team_ats_by_picker.csv")
+    for (team, picker), (w, l, p) in sorted(team_ats.items()):
+        g = w + l + p
+        wp = round(100.0 * (w / g), 1) if g else 0.0
+        rows.append([season, team, picker, w, l, p, g, wp])
+    p1 = dump(rows, ["season","team","picker","wins","losses","pushes","games","win_pct"], "team_ats_by_picker.csv")
 
     # team_fade_ats_by_picker.csv
     rows = []
-    for (opp, picker), (w, l, p_) in sorted(team_fade.items()):
-        games = w + l + p_
-        win_pct = round(100.0 * (w / games), 1) if games else 0.0
-        rows.append([season, opp, picker, w, l, p_, games, win_pct])
-    p2 = dump_triplets(rows,
-        ["season","opponent","picker","wins","losses","pushes","games","win_pct"],
-        "team_fade_ats_by_picker.csv")
+    for (opp, picker), (w, l, p) in sorted(team_fade.items()):
+        g = w + l + p
+        wp = round(100.0 * (w / g), 1) if g else 0.0
+        rows.append([season, opp, picker, w, l, p, g, wp])
+    p2 = dump(rows, ["season","opponent","picker","wins","losses","pushes","games","win_pct"], "team_fade_ats_by_picker.csv")
 
     # home_away_ats_by_picker.csv
     rows = []
-    for (picker, side), (w, l, p_) in sorted(home_away.items()):
-        games = w + l + p_
-        win_pct = round(100.0 * (w / games), 1) if games else 0.0
-        rows.append([season, picker, side, w, l, p_, games, win_pct])
-    p3 = dump_triplets(rows,
-        ["season","picker","side","wins","losses","pushes","games","win_pct"],
-        "home_away_ats_by_picker.csv")
+    for (picker, side), (w, l, p) in sorted(home_away.items()):
+        g = w + l + p
+        wp = round(100.0 * (w / g), 1) if g else 0.0
+        rows.append([season, picker, side, w, l, p, g, wp])
+    p3 = dump(rows, ["season","picker","side","wins","losses","pushes","games","win_pct"], "home_away_ats_by_picker.csv")
 
     # totals_by_picker.csv
     rows = []
-    for (picker, side), (w, l, p_) in sorted(totals.items()):
-        games = w + l + p_
-        win_pct = round(100.0 * (w / games), 1) if games else 0.0
-        rows.append([season, picker, side, w, l, p_, games, win_pct])
-    p4 = dump_triplets(rows,
-        ["season","picker","side","wins","losses","pushes","games","win_pct"],
-        "totals_by_picker.csv")
+    for (picker, side), (w, l, p) in sorted(totals.items()):
+        g = w + l + p
+        wp = round(100.0 * (w / g), 1) if g else 0.0
+        rows.append([season, picker, side, w, l, p, g, wp])
+    p4 = dump(rows, ["season","picker","side","wins","losses","pushes","games","win_pct"], "totals_by_picker.csv")
 
     # team_totals_by_picker.csv
     rows = []
-    for (team, picker, side), (w, l, p_) in sorted(team_totals.items()):
-        games = w + l + p_
-        win_pct = round(100.0 * (w / games), 1) if games else 0.0
-        rows.append([season, team, picker, side, w, l, p_, games, win_pct])
-    p5 = dump_triplets(rows,
-        ["season","team","picker","side","wins","losses","pushes","games","win_pct"],
-        "team_totals_by_picker.csv")
-
-    # Debug: skipped details
-    dbg_path = METRICS_DIR / "_debug_skipped_rows.csv"
-    if skipped_records:
-        pd.DataFrame(skipped_records, columns=["reason","game_id","week","file"]).to_csv(dbg_path, index=False)
+    for (team, picker, side), (w, l, p) in sorted(team_totals.items()):
+        g = w + l + p
+        wp = round(100.0 * (w / g), 1) if g else 0.0
+        rows.append([season, team, picker, side, w, l, p, g, wp])
+    p5 = dump(rows, ["season","team","picker","side","wins","losses","pushes","games","win_pct"], "team_totals_by_picker.csv")
 
     # Console summary
-    print("=== Summary ===")
+    print("=== Metrics Summary ===")
     print(f"Season: {season}")
-    print(f"Processed graded rows: {processed_rows}")
-    print(f"Skipped rows:         {skipped_rows}")
-    if skipped_records:
-        # show top few reasons
-        by_reason = pd.Series([r["reason"] for r in skipped_records]).value_counts().to_dict()
-        print("Skip reasons:", by_reason)
-        print(f"Debug file: {dbg_path.relative_to(ROOT)}")
-
-    # Show outputs with row counts
+    print(f"Graded rows:   {processed}")
+    print(f"Skipped rows:  {skipped}")
+    if skipped_reasons:
+        print("Skip reasons:", skipped_reasons)
     for pth in (p1, p2, p3, p4, p5):
         try:
-            n = sum(1 for _ in open(pth, "r", encoding="utf-8")) - 1
+            n = max(0, sum(1 for _ in open(pth, "r", encoding="utf-8")) - 1)
         except Exception:
             n = "?"
-        print(f"Wrote {pth.relative_to(ROOT)} (rows: {n})")
+        print(f"{pth.relative_to(ROOT)} -> rows: {n}")
 
 if __name__ == "__main__":
+    season = infer_season()
     main()
