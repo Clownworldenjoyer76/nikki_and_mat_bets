@@ -2,32 +2,154 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Team Metrics — Nikki & Mat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Nikki & Mat — By Team</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Match site look (Picks/Insights) */
+    main.two-up {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+    .card .card-inner { padding: 10px; }
+    .card .card-inner > h1 {
+      margin: 0 0 8px 0;
+      font-size: clamp(16px, 4.6vw, 22px);
+      text-align: center;
+    }
+
+    /* Controls */
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .controls label {
+      font-size: clamp(12px, 3.4vw, 14px);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .controls select {
+      width: 100%;
+      padding: 6px;
+      font-size: clamp(12px, 3.4vw, 14px);
+    }
+
+    /* Compact tables */
+    .table.compact { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .table.compact th, .table.compact td {
+      padding: 6px 6px;
+      text-align: center;
+      font-size: clamp(9px, 2vw, 14px);
+      white-space: nowrap;
+    }
+    /* Tighter first column (team/OPP) */
+    .table.compact th:first-child, .table.compact td:first-child {
+      text-align: left;
+      width: 28%;
+      padding-right: 4px;
+    }
+
+    .card h2 {
+      margin: 12px 0 6px 0;
+      font-size: clamp(14px, 3.8vw, 18px);
+      text-align: center;
+    }
+    .section { margin-bottom: 10px; }
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <nav>
-      <a href="./index.html">🏈 Main Picks</a>
-      <a href="./picks.html">📊 Weekly Records</a>
-      <a href="./insights.html">📐 Insights</a>
-      <a href="./metrics.html">📏 Metrics</a>
-    </nav>
-  </header>
-
   <div class="wrap">
-    <header><h1>Team by Team Metrics</h1></header>
+    <header class="main-header">
+      <img src="assets/logos/IMG_0931.jpeg" alt="Left logo" />
+      <div class="titles">
+        <h1>Nikki and Mat’s NFL — By Team</h1>
+        <div class="sub" id="metricsSubtitle">Season Metrics</div>
+      </div>
+      <img src="assets/logos/IMG_0930.jpeg" alt="Right logo" />
+    </header>
+
+    <!-- Global controls -->
     <div class="controls">
-      <label for="teamSelect">Team:</label>
-      <select id="teamSelect">
-        <option value="">All Teams</option>
-      </select>
+      <div>
+        <label for="seasonSel">Season</label>
+        <select id="seasonSel"></select>
+      </div>
+      <div>
+        <label for="teamFilter">Team Filter (optional)</label>
+        <select id="teamFilter">
+          <option value="">All Teams</option>
+        </select>
+      </div>
     </div>
-    <table id="metricsTable">
-      <thead><tr><th>Team</th><th>Who</th><th>Spread W-L-P</th><th>O/U W-L</th></tr></thead>
-      <tbody></tbody>
-    </table>
+
+    <main class="two-up">
+      <!-- Nikki -->
+      <article class="card">
+        <div class="card-inner">
+          <h1>Nikki</h1>
+
+          <div class="section">
+            <h2>ATS by Team</h2>
+            <table class="table compact">
+              <thead>
+                <tr><th>Team</th><th>W</th><th>L</th><th>P</th><th>G</th><th>Win %</th></tr>
+              </thead>
+              <tbody id="nikki_teamAtsBody"></tbody>
+            </table>
+          </div>
+
+          <div class="section">
+            <h2>Totals (Over / Under) by Team</h2>
+            <table class="table compact">
+              <thead>
+                <tr><th>Team</th><th>Side</th><th>W</th><th>L</th><th>P</th><th>G</th><th>Win %</th></tr>
+              </thead>
+              <tbody id="nikki_teamTotalsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+
+      <!-- Mat -->
+      <article class="card">
+        <div class="card-inner">
+          <h1>Mat</h1>
+
+          <div class="section">
+            <h2>ATS by Team</h2>
+            <table class="table compact">
+              <thead>
+                <tr><th>Team</th><th>W</th><th>L</th><th>P</th><th>G</th><th>Win %</th></tr>
+              </thead>
+              <tbody id="mat_teamAtsBody"></tbody>
+            </table>
+          </div>
+
+          <div class="section">
+            <h2>Totals (Over / Under) by Team</h2>
+            <table class="table compact">
+              <thead>
+                <tr><th>Team</th><th>Side</th><th>W</th><th>L</th><th>P</th><th>G</th><th>Win %</th></tr>
+              </thead>
+              <tbody id="mat_teamTotalsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <div class="bar" id="bottombar">
+    <nav>
+      <a href="./index.html">🏈 Picks</a>
+      <a href="./picks.html">📊 Weekly</a>
+      <a href="./insights.html">📐 Insights</a>
+      <a href="./metrics.html">📏 By Team</a>
+    </nav>
   </div>
 
   <script src="./metrics.js" defer></script>
