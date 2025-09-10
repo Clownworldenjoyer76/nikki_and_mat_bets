@@ -1,4 +1,15 @@
 #!/usr/bin/env python3
+"""
+Builds season metrics from docs/data/final/{season}_wk*_final.csv and writes:
+  docs/data/metrics/team_ats_by_picker.csv
+  docs/data/metrics/team_fade_ats_by_picker.csv
+  docs/data/metrics/home_away_ats_by_picker.csv
+  docs/data/metrics/totals_by_picker.csv
+  docs/data/metrics/team_totals_by_picker.csv
+PLUS also writes the concatenated season file:
+  docs/data/metrics/{season}_metrics.csv
+"""
+
 import os
 import sys
 import re
@@ -57,16 +68,14 @@ def find_picker_col(ci_map: dict, picker: str, bases: list[str]) -> str | None:
     For a picker like 'Mat', try variants case-insensitively:
       Mat_spread, mat_spread, MAT_SPREAD, Mat_spread_pick, Mat_ATS, etc.
     """
-    # Build flexible candidates: <picker>_<base> plus common alternates
     pfx = picker
-    # Try lower too for safety
     pfx_low = picker.lower()
     variants = []
     for b in bases:
         variants += [
             f"{pfx}_{b}",
             f"{pfx}_{b}_pick",
-            f"{pfx} {b}".replace("_", " "),  # e.g., "Mat Spread"
+            f"{pfx} {b}".replace("_", " "),
             f"{pfx}_{b.upper()}",
             f"{pfx_low}_{b}",
             f"{pfx_low}_{b}_pick",
@@ -74,9 +83,7 @@ def find_picker_col(ci_map: dict, picker: str, bases: list[str]) -> str | None:
             f"{pfx}_{'ATS' if b=='spread' else ('OU' if b in ('total','Totals','O_U') else b)}",
             f"{pfx_low}_{'ATS' if b=='spread' else ('OU' if b in ('total','Totals','O_U') else b)}",
         ]
-    # Also accept minimal shorthands
     variants += [f"{pfx}_ATS", f"{pfx_low}_ATS", f"{pfx}_OU", f"{pfx_low}_OU"]
-    # Case-insensitive pick
     tried = set()
     for v in variants:
         key = v.strip().lower()
@@ -126,13 +133,28 @@ def grade_total(home_score, away_score, total_line, pick_side) -> str | None:
     is_over = s > tl
     return "W" if (pick_side == "Over" and is_over) or (pick_side == "Under" and not is_over) else "L"
 
-def main():
-    season = infer_season()
+def main(season: str):
     files = list_season_files(season)
     if not files:
         err_exit(f"No final CSVs for season {season}")
 
     METRICS_DIR.mkdir(parents=True, exist_ok=True)
+
+    # 0) Also build the concatenated season file (all finals stacked)
+    combined = []
+    for f in files:
+        try:
+            df = pd.read_csv(f)
+            df["__source_file"] = f.name
+            combined.append(df)
+        except Exception as e:
+            print(f"WARNING: could not read {f.name}: {e}", file=sys.stderr)
+    if combined:
+        all_rows = pd.concat(combined, ignore_index=True)
+        (METRICS_DIR / f"{season}_metrics.csv").parent.mkdir(parents=True, exist_ok=True)
+        all_rows.to_csv(METRICS_DIR / f"{season}_metrics.csv", index=False)
+    else:
+        print("WARNING: no readable finals to concatenate; skipping {season}_metrics.csv", file=sys.stderr)
 
     # Aggregation buckets
     team_ats = {}          # (team, picker) -> [W,L,P]
@@ -156,19 +178,17 @@ def main():
         skipped += 1
         skipped_reasons[reason] = skipped_reasons.get(reason, 0) + 1
 
-    # Process each week's final file
+    # 1) Grade each week's final
     for f in files:
         df = pd.read_csv(f)
         ci = lower_map(df.columns)
 
         # Required core columns (case-insensitive)
         need = ["game_id", "home_team", "away_team", "home_score", "away_score"]
-        missing_core = [c for c in need if c.lower() not in ci]
-        if missing_core:
-            skip(f"missing core: {','.join(missing_core)} (file {f.name})")
+        if any(c.lower() not in ci for c in need):
+            skip(f"missing core columns ({f.name})")
             continue
 
-        # Map to original names via ci-map
         game_id_col   = ci["game_id"]
         home_team_col = ci["home_team"]
         away_team_col = ci["away_team"]
@@ -203,7 +223,6 @@ def main():
                         continue
                     pick = norm_side(row.get(ats_col))
                     if pick not in ("Home", "Away"):
-                        # not graded for ATS, but keep going (totals might grade)
                         continue
                     res = grade_ats(hs, as_, sp_val, pick)
                     if res is None:
@@ -213,7 +232,6 @@ def main():
                         team = row.get(home_team_col) if pick == "Home" else row.get(away_team_col)
                         opp  = row.get(away_team_col) if pick == "Home" else row.get(home_team_col)
                         tally(team_ats, (team, picker), res)
-                        # fade is the inverse W<->L, P stays P
                         fade_res = "L" if res == "W" else ("W" if res == "L" else "P")
                         tally(team_fade, (opp, picker), fade_res)
                         tally(home_away, (picker, pick), res)
@@ -237,7 +255,7 @@ def main():
                         tally(totals, (picker, pick), res)
                         tally(team_totals, (team, picker, pick), res)
 
-    # --- Emit outputs
+    # --- Emit outputs (five breakdown CSVs)
     METRICS_DIR.mkdir(parents=True, exist_ok=True)
 
     def dump(rows, header, name):
@@ -291,8 +309,8 @@ def main():
     print(f"Graded rows:   {processed}")
     print(f"Skipped rows:  {skipped}")
     if skipped_reasons:
-        print("Skip reasons:", skipped_reasons)
-    for pth in (p1, p2, p3, p4, p5):
+        print("Skip reasons:", dict(sorted(skipped_reasons.items(), key=lambda x: -x[1])))
+    for pth in (p1, p2, p3, p4, p5, METRICS_DIR / f"{season}_metrics.csv"):
         try:
             n = max(0, sum(1 for _ in open(pth, "r", encoding="utf-8")) - 1)
         except Exception:
@@ -301,4 +319,4 @@ def main():
 
 if __name__ == "__main__":
     season = infer_season()
-    main()
+    main(season)
