@@ -1,46 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Insights</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nikki & Mat – Weekly Picks</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* minimal layout to guarantee the two side-by-side blocks */
+    .two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+    @media (max-width: 700px) { .two-up { gap: 8px; } }
+    .table.compact th, .table.compact td { white-space: nowrap; text-align: center; }
+    .table.compact td:first-child { text-align: left; }
+    .year-row td { font-weight: 600; }
+  </style>
 </head>
 <body>
-    <div class="wrap">
-        <header class="main-header">
-            <img src="assets/logos/IMG_0931.jpeg" alt="Left logo">
-            <div class="titles">
-                <h1>Nikki and Mat’s NFL Picks</h1>
-                <div class="sub" id="seasonWeek">Weekly Insights</div>
-            </div>
-            <img src="assets/logos/IMG_0930.jpeg" alt="Right logo">
-        </header>
+  <div class="wrap">
+    <header class="main-header">
+      <img src="assets/logos/IMG_0931.jpeg" alt="Left logo" />
+      <div class="titles">
+        <h1>Nikki and Mat’s NFL Picks</h1>
+        <div class="sub" id="seasonWeek">Weekly Insights</div>
+      </div>
+      <img src="assets/logos/IMG_0930.jpeg" alt="Right logo" />
+    </header>
 
-        <main id="insights">
-            <article class="card">
-                <div class="card-inner">
-                    <h1>Best Picks</h1>
-                    <p>The best picks so far this season.</p>
-                </div>
-            </article>
-            <article class="card">
-                <div class="card-inner">
-                    <h1>Worst Picks</h1>
-                    <p>The worst picks so far this season.</p>
-                </div>
-            </article>
-        </main>
-    </div>
+    <main id="insights" class="two-up">
+      <!-- Nikki block -->
+      <article class="card">
+        <div class="card-inner">
+          <h1>Nikki</h1>
+          <p class="muted">Season total + weekly results</p>
+          <div class="table-wrap">
+            <table id="nikkiTable" class="table compact">
+              <thead>
+                <tr>
+                  <th>Week</th>
+                  <th>ATS</th>
+                  <th>O/U</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- populated by picks.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </article>
 
-    <div class="bar" id="bottombar">
-        <nav>
-            <a href="./index.html">🏈 Picks</a>
-            <a href="./picks.html">📊 Weekly</a>
-            <a href="./insights.html">📐 Insights</a>
-            <a href="./metrics.html">📏 By Team</a>
-        </nav>
-    </div>
+      <!-- Mat block -->
+      <article class="card">
+        <div class="card-inner">
+          <h1>Mat</h1>
+          <p class="muted">Season total + weekly results</p>
+          <div class="table-wrap">
+            <table id="matTable" class="table compact">
+              <thead>
+                <tr>
+                  <th>Week</th>
+                  <th>ATS</th>
+                  <th>O/U</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- populated by picks.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+    </main>
+  </div>
 
+  <div class="bar" id="bottombar">
+    <nav>
+      <a href="./index.html">🏈 Picks</a>
+      <a href="./picks.html">📊 Weekly</a>
+      <a href="./insights.html">📐 Insights</a>
+      <a href="./metrics.html">📏 By Team</a>
+    </nav>
+  </div>
+
+  <script src="picks.js" defer></script>
 </body>
 </html>
