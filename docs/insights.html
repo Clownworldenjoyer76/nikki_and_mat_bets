@@ -6,7 +6,6 @@
   <title>Nikki & Mat — Insights</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* Match picks page look */
     main.two-up {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -19,7 +18,6 @@
       font-size: clamp(16px, 4.6vw, 22px);
       text-align: center;
     }
-
     .controls {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -39,25 +37,22 @@
 
     .table.compact { width: 100%; border-collapse: collapse; table-layout: fixed; }
     .table.compact th, .table.compact td {
-      padding: 6px 6px;
+      padding: 4px 4px; /* tighter spacing */
       text-align: center;
-      font-size: clamp(9px, 2vw, 14px);
-      white-space: nowrap; /* prevent “5-10-1” wrapping */
+      font-size: clamp(10px, 2.4vw, 15px); /* slightly larger */
+      white-space: nowrap;
     }
-    /* Tighten team/opponent column so W is closer */
+    /* Team/OPP column tighter */
     .table.compact th:first-child, .table.compact td:first-child {
       text-align: left;
-      width: 28%;
-      padding-right: 4px;
+      width: 22%; /* reduced from 28% */
+      padding-right: 2px;
     }
-
-    /* Center the section titles you listed */
     .card h2 {
       margin: 12px 0 6px 0;
       font-size: clamp(14px, 3.8vw, 18px);
-      text-align: center; /* centered per request */
+      text-align: center;
     }
-
     .section { margin-bottom: 10px; }
   </style>
 </head>
@@ -106,7 +101,7 @@
             <h2>Fade ATS (vs Team)</h2>
             <table class="table compact">
               <thead>
-                <tr><th>Opponent</th><th>W</th><th>L</th><th>P</th><th>G</th><th>Win %</th></tr>
+                <tr><th>OPP</th><th>W</th><th>L</th><th>P</th><th>G</th><th>Win %</th></tr>
               </thead>
               <tbody id="nikki_fadeAtsBody"></tbody>
             </table>
@@ -153,7 +148,7 @@
             <h2>Fade ATS (vs Team)</h2>
             <table class="table compact">
               <thead>
-                <tr><th>Opponent</th><th>W</th><th>L</th><th>P</th><th>G</th><th>Win %</th></tr>
+                <tr><th>OPP</th><th>W</th><th>L</th><th>P</th><th>G</th><th>Win %</th></tr>
               </thead>
               <tbody id="mat_fadeAtsBody"></tbody>
             </table>
