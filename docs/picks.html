@@ -6,56 +6,27 @@
   <title>Nikki & Mat – Weekly Picks</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Hard layout override: ALWAYS two columns; shrink fonts to fit on mobile -->
   <style>
-    /* Reduce header footprint so the two-up section has room on phones */
-    .main-header { align-items: center; gap: 8px; }
-    .main-header img { width: 54px; height: 54px; object-fit: cover; border-radius: 6px; }
-    .main-header .titles h1 {
-      margin: 0;
-      line-height: 1.05;
-      /* slightly smaller heading at mobile sizes */
-      font-size: clamp(18px, 5vw, 28px);
-    }
-    .main-header .titles .sub {
-      font-size: clamp(12px, 3.6vw, 16px);
-      opacity: .85;
-    }
-
-    /* TWO-UP: force side-by-side at all widths */
     main.two-up {
       display: grid;
-      grid-template-columns: 1fr 1fr !important; /* never collapse to 1 col */
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
       align-items: start;
     }
-
-    /* Tighten cards */
-    .card .card-inner { padding: 10px 10px; }
-
-    /* Block titles inside cards */
+    .card .card-inner { padding: 10px; }
     .card .card-inner > h1 {
-      margin: 0 0 4px 0;
+      margin: 0 0 8px 0;
       font-size: clamp(16px, 4.6vw, 22px);
-      line-height: 1.1;
+      text-align: center;   /* centered titles */
     }
-
-    .muted { margin: 0 0 8px 0; opacity: .72; font-size: clamp(11px, 3.2vw, 14px); }
-
-    /* Compact table for small screens */
     .table.compact { width: 100%; border-collapse: collapse; table-layout: fixed; }
     .table.compact th, .table.compact td {
       padding: 6px 6px;
       text-align: center;
-      white-space: nowrap;
-      font-size: clamp(10px, 2.9vw, 14px); /* scales down on phones */
+      font-size: clamp(10px, 2.9vw, 14px);
     }
     .table.compact td:first-child, .table.compact th:first-child { text-align: left; width: 48%; }
-    .table.compact th { font-weight: 600; }
     .year-row td { font-weight: 700; }
-
-    /* Optional: subtle row separators for readability on dark bg */
-    .table.compact tbody tr + tr td { border-top: 1px solid rgba(255,255,255,.08); }
   </style>
 </head>
 <body>
@@ -70,11 +41,10 @@
     </header>
 
     <main class="two-up">
-      <!-- Nikki block (LEFT) -->
+      <!-- Nikki block -->
       <article class="card">
         <div class="card-inner">
           <h1>Nikki</h1>
-          <p class="muted">Season total + weekly results</p>
           <div class="table-wrap">
             <table id="nikkiTable" class="table compact">
               <thead>
@@ -86,11 +56,10 @@
         </div>
       </article>
 
-      <!-- Mat block (RIGHT) -->
+      <!-- Mat block -->
       <article class="card">
         <div class="card-inner">
           <h1>Mat</h1>
-          <p class="muted">Season total + weekly results</p>
           <div class="table-wrap">
             <table id="matTable" class="table compact">
               <thead>
@@ -113,7 +82,6 @@
     </nav>
   </div>
 
-  <!-- JS already computes ATS / O/U per week from docs/data/picks/latest.csv -->
   <script src="picks.js" defer></script>
 </body>
 </html>
