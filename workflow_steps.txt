@@ -1,10 +1,21 @@
 🔗 Pipeline in order of use:
-	1.	Weekly Fetcher → gets odds (latest.csv).
-	2.	Save Picks From Issue → records everyone’s picks.
-	3.	Init Scores CSV → creates a blank scorecard for that week.
-	4.	You fill in the scores manually.
-	5.	Combine Picks & Scores → merges picks + results → final.csv.
-	6.	Build Insights Metrics → aggregates season splits for Insights page.
+
+1. Weekly Fetcher → gets odds (latest.csv).
+2. Save Picks From Issue → records everyone’s picks.
+
+3. Init Scores CSV → creates a blank scorecard for that week.
+
+4.	Run export xlsx manual action. This creates the weekly xlsx file for next step (at docs/data/scores)
+
+5. You fill in the scores manually.
+
+6. Re-upload ***WHAT NEXT??
+
+
+
+6.	Combine Picks & Scores → merges picks + results → final.csv.
+
+7. Build Insights Metrics → aggregates season splits for Insights page.
 
 1. Odds / Weekly Data Fetcher
 
