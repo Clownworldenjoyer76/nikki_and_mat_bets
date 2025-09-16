@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* two-up layout */
+    /* two-up stays side-by-side */
     main.two-up {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -19,46 +19,39 @@
     .card .card-inner > h1 {
       margin: 0 0 8px 0;
       font-size: clamp(16px, 4.6vw, 22px);
-      text-align: center;   /* centered titles */
+      text-align: center;
     }
 
-    /* make the table resilient on small screens */
-    .table-wrap { overflow-x: auto; }
+    .table-wrap { overflow-x: auto; } /* safety, but should not scroll now */
     .table.compact {
       width: 100%;
       border-collapse: collapse;
-      table-layout: auto;             /* was fixed — allows columns to size naturally */
+      table-layout: auto;             /* allow columns to size naturally */
     }
     .table.compact th,
     .table.compact td {
       padding: 6px 6px;
       text-align: center;
       font-size: clamp(9px, 2vw, 14px);
-      white-space: nowrap;            /* keep “13-18-1” on a single line */
-      overflow: visible;              /* never visually clip content */
+      white-space: nowrap;            /* keep “13-18-1” on one line */
     }
 
-    /* Week label column a bit wider */
+    /* Week column a touch narrower to free space for numbers */
     .table.compact td:first-child,
     .table.compact th:first-child {
       text-align: left;
-      width: 44%;
+      width: 42%;
     }
 
-    /* Ensure number columns have enough room for strings like “13-18-1” */
+    /* Guarantee enough width for ATS & O/U strings */
     .table.compact th:nth-child(2),
     .table.compact td:nth-child(2),
     .table.compact th:nth-child(3),
     .table.compact td:nth-child(3) {
-      min-width: 7.6ch;               /* fits up to 7 characters comfortably */
+      min-width: 7ch;                 /* fits e.g., “13-18-1” */
     }
 
     .year-row td { font-weight: 700; }
-
-    /* Optional: if the device is extremely narrow, let blocks stack */
-    @media (max-width: 520px) {
-      main.two-up { grid-template-columns: 1fr; }
-    }
   </style>
 </head>
 <body>
