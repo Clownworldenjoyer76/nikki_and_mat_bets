@@ -7,13 +7,15 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* two-up stays side-by-side */
+    /* stay two-up; allow tracks to shrink so nothing overflows */
     main.two-up {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr);
       gap: 10px;
       align-items: start;
     }
+    /* critical: let grid items shrink within tracks */
+    main.two-up > .card { min-width: 0; }
 
     .card .card-inner { padding: 10px; }
     .card .card-inner > h1 {
@@ -22,33 +24,33 @@
       text-align: center;
     }
 
-    .table-wrap { overflow-x: auto; } /* safety, but should not scroll now */
+    .table-wrap { overflow-x: auto; } /* safety */
     .table.compact {
       width: 100%;
       border-collapse: collapse;
-      table-layout: auto;             /* allow columns to size naturally */
+      table-layout: auto;             /* natural sizing */
     }
     .table.compact th,
     .table.compact td {
       padding: 6px 6px;
       text-align: center;
       font-size: clamp(9px, 2vw, 14px);
-      white-space: nowrap;            /* keep “13-18-1” on one line */
+      white-space: nowrap;
     }
 
-    /* Week column a touch narrower to free space for numbers */
+    /* give week label less space to free room for numbers */
     .table.compact td:first-child,
     .table.compact th:first-child {
       text-align: left;
       width: 42%;
     }
 
-    /* Guarantee enough width for ATS & O/U strings */
+    /* ensure ATS & O/U cells fit “13-18-1” comfortably */
     .table.compact th:nth-child(2),
     .table.compact td:nth-child(2),
     .table.compact th:nth-child(3),
     .table.compact td:nth-child(3) {
-      min-width: 7ch;                 /* fits e.g., “13-18-1” */
+      min-width: 7ch;
     }
 
     .year-row td { font-weight: 700; }
