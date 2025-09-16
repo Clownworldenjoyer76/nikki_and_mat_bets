@@ -7,27 +7,58 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
+    /* two-up layout */
     main.two-up {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       align-items: start;
     }
+
     .card .card-inner { padding: 10px; }
     .card .card-inner > h1 {
       margin: 0 0 8px 0;
       font-size: clamp(16px, 4.6vw, 22px);
       text-align: center;   /* centered titles */
     }
-    .table.compact { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    .table.compact th, .table.compact td {
+
+    /* make the table resilient on small screens */
+    .table-wrap { overflow-x: auto; }
+    .table.compact {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;             /* was fixed — allows columns to size naturally */
+    }
+    .table.compact th,
+    .table.compact td {
       padding: 6px 6px;
       text-align: center;
-      font-size: clamp(9px, 2vw, 14px);  /* allow smaller min size on mobile */
-      white-space: nowrap;                /* prevent wrapping like “5-10-1” */
+      font-size: clamp(9px, 2vw, 14px);
+      white-space: nowrap;            /* keep “13-18-1” on a single line */
+      overflow: visible;              /* never visually clip content */
     }
-    .table.compact td:first-child, .table.compact th:first-child { text-align: left; width: 48%; }
+
+    /* Week label column a bit wider */
+    .table.compact td:first-child,
+    .table.compact th:first-child {
+      text-align: left;
+      width: 44%;
+    }
+
+    /* Ensure number columns have enough room for strings like “13-18-1” */
+    .table.compact th:nth-child(2),
+    .table.compact td:nth-child(2),
+    .table.compact th:nth-child(3),
+    .table.compact td:nth-child(3) {
+      min-width: 7.6ch;               /* fits up to 7 characters comfortably */
+    }
+
     .year-row td { font-weight: 700; }
+
+    /* Optional: if the device is extremely narrow, let blocks stack */
+    @media (max-width: 520px) {
+      main.two-up { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
