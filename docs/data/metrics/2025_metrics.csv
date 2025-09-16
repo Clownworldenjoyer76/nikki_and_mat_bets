@@ -27,7 +27,7 @@ season,week,game_id,commence_time_utc,home_team,away_team,spread_home,total,mat_
 2025,2,82f9fd7001598d5cf9c1bdd57c66cae4,2025-09-14T17:01:00+00:00,Pittsburgh Steelers,Seattle Seahawks,-3.0,40.0,home,over,home,over,17.0,31.0,2025_wk02_final.csv
 2025,2,7e2ad5ef04493526707e0868f7b70c47,2025-09-14T20:05:00+00:00,Arizona Cardinals,Carolina Panthers,-6.5,44.5,home,over,away,under,27.0,22.0,2025_wk02_final.csv
 2025,2,e217b38ef8bc6e98d3512cb42b90782e,2025-09-14T20:06:00+00:00,Indianapolis Colts,Denver Broncos,2.5,42.5,away,under,home,over,29.0,28.0,2025_wk02_final.csv
-2025,2,bbec8d71145954cff67915c9b006bb6e,2025-09-14T20:25:00+00:00,Kansas City Chiefs,Philadelphia Eagles,1.0,47.0,home,over,away,under,,,2025_wk02_final.csv
-2025,2,37d09ce5d357536d0e58dd4ba0ab4106,2025-09-15T00:20:00+00:00,Minnesota Vikings,Atlanta Falcons,-4.75,45.5,home,under,away,over,,,2025_wk02_final.csv
-2025,2,7d9a04f411031528d9c1d2df7b9a0453,2025-09-15T23:01:00+00:00,Houston Texans,Tampa Bay Buccaneers,-2.5,42.0,away,over,away,over,,,2025_wk02_final.csv
-2025,2,bebae12f59f19bd877df7ac3cab05263,2025-09-16T02:00:00+00:00,Las Vegas Raiders,Los Angeles Chargers,3.5,47.0,away,under,away,under,,,2025_wk02_final.csv
+2025,2,bbec8d71145954cff67915c9b006bb6e,2025-09-14T20:25:00+00:00,Kansas City Chiefs,Philadelphia Eagles,1.0,47.0,home,over,away,under,17.0,20.0,2025_wk02_final.csv
+2025,2,37d09ce5d357536d0e58dd4ba0ab4106,2025-09-15T00:20:00+00:00,Minnesota Vikings,Atlanta Falcons,-4.75,45.5,home,under,away,over,6.0,22.0,2025_wk02_final.csv
+2025,2,7d9a04f411031528d9c1d2df7b9a0453,2025-09-15T23:01:00+00:00,Houston Texans,Tampa Bay Buccaneers,-2.5,42.0,away,over,away,over,19.0,20.0,2025_wk02_final.csv
+2025,2,bebae12f59f19bd877df7ac3cab05263,2025-09-16T02:00:00+00:00,Las Vegas Raiders,Los Angeles Chargers,3.5,47.0,away,under,away,under,9.0,20.0,2025_wk02_final.csv
