@@ -11,7 +11,7 @@
     main.two-up {
       display: grid;
       grid-template-columns: minmax(0,1fr) minmax(0,1fr);
-      gap: 10px;
+      gap: 6px;                      /* was 10px */
       align-items: start;
     }
     /* critical: let grid items shrink within tracks */
@@ -32,25 +32,25 @@
     }
     .table.compact th,
     .table.compact td {
-      padding: 6px 6px;
+      padding: 4px 4px;               /* was 6px */
       text-align: center;
       font-size: clamp(9px, 2vw, 14px);
       white-space: nowrap;
     }
 
-    /* give week label less space to free room for numbers */
+    /* make Week column a touch narrower to free space for numbers */
     .table.compact td:first-child,
     .table.compact th:first-child {
       text-align: left;
-      width: 42%;
+      width: 40%;                     /* was 42% */
     }
 
-    /* ensure ATS & O/U cells fit “13-18-1” comfortably */
+    /* ensure ATS & O/U cells fit “13-18-1” without pushing layout */
     .table.compact th:nth-child(2),
     .table.compact td:nth-child(2),
     .table.compact th:nth-child(3),
     .table.compact td:nth-child(3) {
-      min-width: 7ch;
+      min-width: 6.6ch;               /* was 7ch */
     }
 
     .year-row td { font-weight: 700; }
