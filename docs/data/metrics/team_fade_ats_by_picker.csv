@@ -1,45 +1,52 @@
 season,opponent,picker,wins,losses,pushes,games,win_pct
+2025,Arizona Cardinals,Mat,1,0,0,1,100.0
 2025,Arizona Cardinals,Nikki,1,1,0,2,50.0
 2025,Atlanta Falcons,Mat,1,0,0,1,100.0
+2025,Atlanta Falcons,Nikki,0,1,0,1,0.0
 2025,Baltimore Ravens,Nikki,1,0,0,1,100.0
-2025,Buffalo Bills,Mat,1,0,0,1,100.0
+2025,Buffalo Bills,Mat,1,1,0,2,50.0
 2025,Buffalo Bills,Nikki,2,0,0,2,100.0
-2025,Carolina Panthers,Mat,1,0,0,1,100.0
+2025,Carolina Panthers,Mat,2,0,0,2,100.0
 2025,Carolina Panthers,Nikki,0,1,0,1,0.0
-2025,Chicago Bears,Mat,0,2,0,2,0.0
-2025,Cincinnati Bengals,Nikki,1,1,0,2,50.0
-2025,Cleveland Browns,Mat,1,1,0,2,50.0
+2025,Chicago Bears,Mat,1,2,0,3,33.3
+2025,Chicago Bears,Nikki,1,0,0,1,100.0
+2025,Cincinnati Bengals,Mat,0,1,0,1,0.0
+2025,Cincinnati Bengals,Nikki,1,2,0,3,33.3
+2025,Cleveland Browns,Mat,2,1,0,3,66.7
 2025,Dallas Cowboys,Nikki,0,1,0,1,0.0
-2025,Denver Broncos,Nikki,0,1,0,1,0.0
+2025,Denver Broncos,Nikki,0,2,0,2,0.0
 2025,Detroit Lions,Mat,0,1,0,1,0.0
 2025,Detroit Lions,Nikki,1,0,0,1,100.0
 2025,Green Bay Packers,Mat,1,0,0,1,100.0
-2025,Green Bay Packers,Nikki,2,0,0,2,100.0
+2025,Green Bay Packers,Nikki,2,1,0,3,66.7
 2025,Houston Texans,Mat,0,2,0,2,0.0
-2025,Houston Texans,Nikki,0,1,0,1,0.0
+2025,Houston Texans,Nikki,0,2,0,2,0.0
 2025,Indianapolis Colts,Mat,2,0,0,2,100.0
-2025,Jacksonville Jaguars,Mat,1,1,0,2,50.0
-2025,Kansas City Chiefs,Nikki,0,2,0,2,0.0
-2025,Las Vegas Raiders,Mat,0,1,0,1,0.0
-2025,Las Vegas Raiders,Nikki,1,1,0,2,50.0
-2025,Los Angeles Chargers,Mat,1,0,0,1,100.0
-2025,Los Angeles Rams,Nikki,1,0,0,1,100.0
-2025,Miami Dolphins,Nikki,0,1,0,1,0.0
+2025,Indianapolis Colts,Nikki,1,0,0,1,100.0
+2025,Jacksonville Jaguars,Mat,2,1,0,3,66.7
+2025,Kansas City Chiefs,Mat,1,0,0,1,100.0
+2025,Kansas City Chiefs,Nikki,1,2,0,3,33.3
+2025,Las Vegas Raiders,Mat,0,2,0,2,0.0
+2025,Las Vegas Raiders,Nikki,1,2,0,3,33.3
+2025,Los Angeles Chargers,Mat,2,0,0,2,100.0
+2025,Los Angeles Rams,Nikki,1,1,0,2,50.0
+2025,Miami Dolphins,Nikki,1,1,0,2,50.0
 2025,Minnesota Vikings,Nikki,1,1,0,2,50.0
-2025,New England Patriots,Mat,1,1,0,2,50.0
-2025,New England Patriots,Nikki,1,0,0,1,100.0
-2025,New Orleans Saints,Mat,0,2,0,2,0.0
+2025,New England Patriots,Mat,1,2,0,3,33.3
+2025,New England Patriots,Nikki,1,1,0,2,50.0
+2025,New Orleans Saints,Mat,0,3,0,3,0.0
+2025,New Orleans Saints,Nikki,0,1,0,1,0.0
 2025,New York Giants,Mat,1,1,0,2,50.0
-2025,New York Jets,Mat,0,1,0,1,0.0
-2025,New York Jets,Nikki,1,0,0,1,100.0
-2025,Philadelphia Eagles,Mat,1,1,0,2,50.0
+2025,New York Jets,Mat,1,1,0,2,50.0
+2025,New York Jets,Nikki,2,0,0,2,100.0
+2025,Philadelphia Eagles,Mat,2,1,0,3,66.7
 2025,Philadelphia Eagles,Nikki,0,1,0,1,0.0
 2025,Pittsburgh Steelers,Mat,0,1,0,1,0.0
-2025,San Francisco 49ers,Nikki,2,0,0,2,100.0
+2025,San Francisco 49ers,Nikki,2,1,0,3,66.7
 2025,Seattle Seahawks,Mat,1,1,0,2,50.0
 2025,Seattle Seahawks,Nikki,1,0,0,1,100.0
 2025,Tampa Bay Buccaneers,Mat,1,0,0,1,100.0
 2025,Tampa Bay Buccaneers,Nikki,1,0,0,1,100.0
-2025,Tennessee Titans,Mat,0,1,1,2,0.0
+2025,Tennessee Titans,Mat,0,2,1,3,0.0
 2025,Tennessee Titans,Nikki,0,1,1,2,0.0
 2025,Washington Commanders,Nikki,1,0,0,1,100.0
