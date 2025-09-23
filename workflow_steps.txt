@@ -9,15 +9,17 @@
 
 5. You fill in the scores manually.
 
-6. Re-upload ***WHAT NEXT??
+6. Re-upload 
+
+7. Run import xlsx manual
 
 
 
-6.	Combine Picks & Scores → merges picks + results → final.csv.
+8. Combine Picks & Scores → merges picks + results → final.csv.
 
-7. Build Insights Metrics → aggregates season splits for Insights page.
+9.  Build Insights Metrics → aggregates season splits for Insights page.
 
-1. Odds / Weekly Data Fetcher
+10. Odds / Weekly Data Fetcher
 
 (from earlier setup)
 	•	When it runs: Automatically on Tuesday at 6 AM EST, or manually.
