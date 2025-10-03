@@ -9,7 +9,8 @@
 
 5. You fill in the scores manually.
 
-6. Re-upload 
+6. Re-upload xlsx to:
+docs/data/scores
 
 7. Run import xlsx manual
 
