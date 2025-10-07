@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       season:
-        description: "Season year (e.g., 2025). Leave blank to auto-detect from final CSVs."
+        description: "Season year (e.g., 2025). Leave blank to auto-detect in the script."
         required: false
         default: ""
 
@@ -26,74 +26,76 @@ jobs:
       - name: Pre-run snapshot
         shell: bash
         run: |
-          set -e
-          echo "=== Existing final files (newest first) ==="
-          ls -lt docs/data/final 2>/dev/null || true
-          echo "=== Existing metrics BEFORE ==="
-          ls -l docs/data/metrics 2>/dev/null || true
-          if ls docs/data/metrics/*.csv >/dev/null 2>&1; then
-            echo "=== Hashes BEFORE ==="
-            sha256sum docs/data/metrics/*.csv | sort
+          set -Eeuo pipefail
+          echo "=== Existing finals (newest first) ==="
+          if [ -d docs/data/final ]; then
+            ls -lt docs/data/final || true
+          else
+            echo "docs/data/final does not exist"
           fi
+          echo "=== Existing metrics BEFORE ==="
+          if [ -d docs/data/metrics ]; then
+            ls -l docs/data/metrics || true
+            if compgen -G "docs/data/metrics/*.csv" > /dev/null; then
+              echo "=== Hashes BEFORE ==="
+              sha256sum docs/data/metrics/*.csv | sort
+            fi
+          else
+            echo "docs/data/metrics does not exist (yet)"
+          fi
+
+      - name: Install deps
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install pandas
 
       - name: Run aggregator
         shell: bash
+        env:
+          SEASON: ${{ inputs.season }}
         run: |
-          set -e
-
-          IN_SEASON="${{ inputs.season }}"
-          if [ -z "$IN_SEASON" ]; then
-            latest=$(ls -t docs/data/final/*_wk*_final.csv 2>/dev/null | head -n1 || true)
-            if [ -n "$latest" ]; then
-              base=$(basename "$latest")
-              IN_SEASON="${base%%_*}"
-              echo "Auto-detected season: $IN_SEASON"
-            else
-              echo "ERROR: No final CSVs found to auto-detect season."
-              exit 78
-            fi
+          set -Eeuo pipefail
+          if [ -n "${SEASON:-}" ]; then
+            echo "Season provided to script via SEASON env: ${SEASON}"
           else
-            echo "Season provided: $IN_SEASON"
+            echo "No season provided; script will auto-detect."
           fi
-
-          echo "=== Final files for season ${IN_SEASON} ==="
-          ls -1 docs/data/final/${IN_SEASON}_wk*_final.csv 2>/dev/null || true
-          matches=$(ls docs/data/final/${IN_SEASON}_wk*_final.csv 2>/dev/null | wc -l | xargs)
-          if [ "$matches" = "0" ]; then
-            echo "ERROR: No final CSVs for season ${IN_SEASON}"
-            exit 78
-          fi
-
-          python -m pip install --upgrade pip pandas
-
-          # Run your metrics builder
-          python scripts/aggregate_metrics.py "${IN_SEASON}"
+          echo "=== Running: scripts/aggregate_metrics.py ==="
+          python scripts/aggregate_metrics.py ${SEASON:+$SEASON}
 
       - name: Post-run snapshot
         if: always()
         shell: bash
         run: |
+          set -Eeuo pipefail
           echo "=== Metrics AFTER ==="
-          ls -l docs/data/metrics 2>/dev/null || true
-          if ls docs/data/metrics/*.csv >/dev/null 2>&1; then
-            echo "=== Hashes AFTER ==="
-            sha256sum docs/data/metrics/*.csv | sort
+          if [ -d docs/data/metrics ]; then
+            ls -l docs/data/metrics || true
+            if compgen -G "docs/data/metrics/*.csv" > /dev/null; then
+              echo "=== Hashes AFTER ==="
+              sha256sum docs/data/metrics/*.csv | sort
+            fi
+          else
+            echo "docs/data/metrics directory missing after run"
           fi
 
       - name: Commit metrics
         if: always()
         shell: bash
         run: |
-          set -e
+          set -Eeuo pipefail
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
-          # Show which files actually changed before committing
+          # Preview changes
+          echo "=== Diff (name-only) ==="
           git add -N docs/data/metrics/*.csv 2>/dev/null || true
-          echo "=== Changed files (git diff --name-only) ==="
           git diff --name-only -- docs/data/metrics || true
           echo "=== Diffstat ==="
           git diff --stat -- docs/data/metrics || true
 
+          # Commit if there are staged changes
           git add docs/data/metrics/*.csv 2>/dev/null || true
           git commit -m "Metrics updated" && git push || echo "No metric changes"
