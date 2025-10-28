@@ -1,0 +1,14 @@
+season,week,game_id,commence_time_utc,home_team,away_team,spread_home,total,mat_spread,mat_total,nikki_spread,nikki_total,home_score,away_score
+2025,8,6439b16f4a038f1c351dc3f1aef27471,2025-10-24T00:15:00+00:00,Los Angeles Chargers,Minnesota Vikings,-3.0,44.5,away,over,away,under,37.0,10.0
+2025,8,ac02b1b59aa0623845378a02bc530c68,2025-10-26T17:00:00+00:00,Atlanta Falcons,Miami Dolphins,-7.5,44.5,home,under,away,over,10.0,34.0
+2025,8,a061e80d1f50eab193b34d19f8e59f62,2025-10-26T17:00:00+00:00,Baltimore Ravens,Chicago Bears,-6.5,49.0,away,under,home,over,30.0,16.0
+2025,8,53d4369464c66630f03a5d128cd39b08,2025-10-26T17:00:00+00:00,Carolina Panthers,Buffalo Bills,7.0,46.5,home,under,away,over,9.0,40.0
+2025,8,9c1f73e48ca9750f6e7d5d64874057c2,2025-10-26T17:00:00+00:00,Cincinnati Bengals,New York Jets,-6.5,44.5,home,over,home,under,38.0,39.0
+2025,8,3536a3e857050d2dd6e2019ceb668f67,2025-10-26T17:00:00+00:00,New England Patriots,Cleveland Browns,-7.0,40.5,away,under,home,over,32.0,13.0
+2025,8,abc4104a9ac597ce37d703613256fd6c,2025-10-26T17:00:00+00:00,Houston Texans,San Francisco 49ers,-1.5,41.5,away,over,away,over,26.0,15.0
+2025,8,a8ebe01e05675c109b53a97f653f8653,2025-10-26T17:00:00+00:00,Philadelphia Eagles,New York Giants,-7.5,44.0,home,over,away,over,38.0,20.0
+2025,8,a8dd9bb0681692540d067bd0e9e66989,2025-10-26T20:05:00+00:00,New Orleans Saints,Tampa Bay Buccaneers,4.0,47.0,away,over,home,over,3.0,23.0
+2025,8,40c2ebd9ddd5ce8ff5b1ada730bb1785,2025-10-26T20:25:00+00:00,Denver Broncos,Dallas Cowboys,-3.5,51.0,away,over,away,under,44.0,24.0
+2025,8,88187a33b007c088d75c6cd14c83086c,2025-10-26T20:25:00+00:00,Indianapolis Colts,Tennessee Titans,-14.5,47.5,home,under,home,over,38.0,14.0
+2025,8,fb900eef07307ebf5c1930341ecd852a,2025-10-27T00:20:00+00:00,Pittsburgh Steelers,Green Bay Packers,3.0,45.5,away,under,home,over,25.0,35.0
+2025,8,7e3361e84d5223a8d210a887b249f247,2025-10-28T00:15:00+00:00,Kansas City Chiefs,Washington Commanders,-12.5,48.0,away,under,away,under,28.0,7.0
