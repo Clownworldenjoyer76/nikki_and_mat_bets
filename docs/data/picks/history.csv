@@ -120,3 +120,17 @@ season,week,game_id,commence_time_utc,home_team,away_team,spread_home,total,mat_
 2025,8,88187a33b007c088d75c6cd14c83086c,2025-10-26T20:25:00+00:00,Indianapolis Colts,Tennessee Titans,-14.5,47.5,home,under,home,over
 2025,8,fb900eef07307ebf5c1930341ecd852a,2025-10-27T00:20:00+00:00,Pittsburgh Steelers,Green Bay Packers,3.0,45.5,away,under,home,over
 2025,8,7e3361e84d5223a8d210a887b249f247,2025-10-28T00:15:00+00:00,Kansas City Chiefs,Washington Commanders,-12.5,48.0,away,under,away,under
+2025,9,677dbbb6ad96fc5f5b36bb20b43139dd,2025-10-31T00:15:00+00:00,Miami Dolphins,Baltimore Ravens,7.5,51.0,away,under,home,under
+2025,9,6dd3b8a705ed0db85d59fa19b9062cc8,2025-11-02T18:00:00+00:00,New England Patriots,Atlanta Falcons,-5.5,45.0,home,over,away,over
+2025,9,6031b513e188fc19a2311499566c9258,2025-11-02T18:00:00+00:00,Green Bay Packers,Carolina Panthers,-13.0,44.0,away,under,away,under
+2025,9,016f76d8237e8d4eb62b9c2ef68381bb,2025-11-02T18:00:00+00:00,Cincinnati Bengals,Chicago Bears,3.0,51.5,home,over,home,over
+2025,9,72e2ce6652bbb3901f60b38bec05bf5f,2025-11-02T18:00:00+00:00,Houston Texans,Denver Broncos,-1.5,39.5,away,under,home,over
+2025,9,cf95657d78ab3e515203df1d19c3b0c2,2025-11-02T18:00:00+00:00,Detroit Lions,Minnesota Vikings,-8.5,48.5,home,under,home,over
+2025,9,2340a6e0794d5688996dcf8aaf634742,2025-11-02T18:00:00+00:00,Pittsburgh Steelers,Indianapolis Colts,3.0,50.5,away,over,away,over
+2025,9,b60025aea576e2e89ef7bc7303f847ec,2025-11-02T18:00:00+00:00,Tennessee Titans,Los Angeles Chargers,9.5,43.5,away,under,home,under
+2025,9,a788e7cebff4b5fe10034710090e4529,2025-11-02T18:00:00+00:00,New York Giants,San Francisco 49ers,2.5,48.5,away,under,away,under
+2025,9,d0bf341e7959d69b55f1a8ff09065234,2025-11-02T21:05:00+00:00,Las Vegas Raiders,Jacksonville Jaguars,3.0,44.5,home,over,home,under
+2025,9,b08df670a95f1809707b335dc75081c6,2025-11-02T21:05:00+00:00,Los Angeles Rams,New Orleans Saints,-14.0,44.0,away,over,home,over
+2025,9,61531628516decd1ee8116da5f6f9056,2025-11-02T21:25:00+00:00,Buffalo Bills,Kansas City Chiefs,2.0,52.5,away,under,away,over
+2025,9,c2fd8a23091a954fb21ff6d3537db826,2025-11-03T01:20:00+00:00,Washington Commanders,Seattle Seahawks,3.0,48.0,away,over,away,under
+2025,9,f3dfb574e0a542375a480534525ee6cf,2025-11-04T01:15:00+00:00,Dallas Cowboys,Arizona Cardinals,-2.5,53.5,home,over,home,over
