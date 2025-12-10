@@ -193,3 +193,17 @@ season,week,game_id,commence_time_utc,home_team,away_team,spread_home,total,mat_
 2025,13,76ac5a8d2c8679ae6ea8861114791bd8,2025-11-30T21:25:00+00:00,Los Angeles Chargers,Las Vegas Raiders,-9.5,40.5,home,under,away,over,31.0,14.0,2025_wk13_final.csv
 2025,13,9c040de8f1dfc3ddee20e0d65c9402de,2025-12-01T01:20:00+00:00,Washington Commanders,Denver Broncos,5.5,43.5,away,under,home,over,26.0,27.0,2025_wk13_final.csv
 2025,13,3e65786eddd4c7aee9e7f2504f6fdedc,2025-12-02T01:15:00+00:00,New England Patriots,New York Giants,-7.5,46.0,away,over,away,over,33.0,15.0,2025_wk13_final.csv
+2025,14,81db991c5b34169eeeff8d734d8836d9,2025-12-05T01:15:00+00:00,Detroit Lions,Dallas Cowboys,-3.0,54.5,away,over,away,over,44.0,30.0,2025_wk14_final.csv
+2025,14,f0bdd27bbed46dfc3d0657500c95a96c,2025-12-07T18:00:00+00:00,Atlanta Falcons,Seattle Seahawks,7.0,44.5,home,over,home,over,9.0,37.0,2025_wk14_final.csv
+2025,14,4fead7bd0592ec121cc3baf72e3e21e0,2025-12-07T18:00:00+00:00,Baltimore Ravens,Pittsburgh Steelers,-6.0,42.5,away,under,home,under,22.0,27.0,2025_wk14_final.csv
+2025,14,c67c327076a98a3a1c4a5eb32e5a80c2,2025-12-07T18:00:00+00:00,Buffalo Bills,Cincinnati Bengals,-5.5,53.5,home,over,away,over,39.0,34.0,2025_wk14_final.csv
+2025,14,f95be6b9bd8ce1208f766cbaae8a4822,2025-12-07T18:00:00+00:00,Cleveland Browns,Tennessee Titans,-4.0,34.0,home,under,home,over,29.0,31.0,2025_wk14_final.csv
+2025,14,4e289ac7d9b5663fd5a06881f2b1424d,2025-12-07T18:00:00+00:00,Jacksonville Jaguars,Indianapolis Colts,1.5,47.5,home,under,home,under,36.0,19.0,2025_wk14_final.csv
+2025,14,c86a0783216d21040c87fce3aadd3336,2025-12-07T18:00:00+00:00,New York Jets,Miami Dolphins,3.0,41.5,away,over,away,over,10.0,34.0,2025_wk14_final.csv
+2025,14,58b16c4033587f5662ff365bce2dbb92,2025-12-07T18:00:00+00:00,Minnesota Vikings,Washington Commanders,-2.0,42.0,away,under,away,over,31.0,0.0,2025_wk14_final.csv
+2025,14,15555b4c7283dc6553e011dd6c8aea8d,2025-12-07T18:00:00+00:00,Tampa Bay Buccaneers,New Orleans Saints,-8.5,42.5,home,over,away,over,20.0,24.0,2025_wk14_final.csv
+2025,14,d5fd126cbfea2ccd79962a17f0ef4463,2025-12-07T21:05:00+00:00,Las Vegas Raiders,Denver Broncos,7.5,40.5,home,under,home,over,17.0,24.0,2025_wk14_final.csv
+2025,14,12bbffdcd65d53436b56c68a811ca610,2025-12-07T21:25:00+00:00,Arizona Cardinals,Los Angeles Rams,8.0,47.5,away,over,home,under,17.0,45.0,2025_wk14_final.csv
+2025,14,5b1211b476d0afa2b57133c9603583b6,2025-12-07T21:25:00+00:00,Green Bay Packers,Chicago Bears,-6.5,44.5,away,over,away,over,28.0,21.0,2025_wk14_final.csv
+2025,14,4727a6cfcd3d604dbfcb898c5a4d40a6,2025-12-08T01:20:00+00:00,Kansas City Chiefs,Houston Texans,-3.0,42.0,away,under,away,over,10.0,20.0,2025_wk14_final.csv
+2025,14,5d7b12c34454df4ff2c59a15ca58e63f,2025-12-09T01:15:00+00:00,Los Angeles Chargers,Philadelphia Eagles,3.0,40.5,away,under,home,over,22.0,19.0,2025_wk14_final.csv
