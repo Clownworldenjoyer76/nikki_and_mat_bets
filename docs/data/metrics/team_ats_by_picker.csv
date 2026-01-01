@@ -1,65 +1,65 @@
 season,team,picker,wins,losses,pushes,games,win_pct
 2025,Arizona Cardinals,Mat,1,4,0,5,20.0
-2025,Arizona Cardinals,Nikki,1,3,0,4,25.0
+2025,Arizona Cardinals,Nikki,1,4,0,5,20.0
 2025,Atlanta Falcons,Mat,2,6,0,8,25.0
-2025,Atlanta Falcons,Nikki,4,2,0,6,66.7
+2025,Atlanta Falcons,Nikki,5,2,0,7,71.4
 2025,Baltimore Ravens,Mat,3,3,0,6,50.0
-2025,Baltimore Ravens,Nikki,2,5,0,7,28.6
-2025,Buffalo Bills,Mat,3,3,0,6,50.0
+2025,Baltimore Ravens,Nikki,3,5,0,8,37.5
+2025,Buffalo Bills,Mat,3,4,0,7,42.9
 2025,Buffalo Bills,Nikki,1,1,0,2,50.0
 2025,Carolina Panthers,Mat,3,6,0,9,33.3
-2025,Carolina Panthers,Nikki,6,4,0,10,60.0
-2025,Chicago Bears,Mat,3,3,0,6,50.0
-2025,Chicago Bears,Nikki,3,3,0,6,50.0
-2025,Cincinnati Bengals,Mat,3,5,0,8,37.5
+2025,Carolina Panthers,Nikki,6,5,0,11,54.5
+2025,Chicago Bears,Mat,3,4,0,7,42.9
+2025,Chicago Bears,Nikki,3,4,0,7,42.9
+2025,Cincinnati Bengals,Mat,4,5,0,9,44.4
 2025,Cincinnati Bengals,Nikki,5,4,1,10,50.0
 2025,Cleveland Browns,Mat,2,9,0,11,18.2
-2025,Cleveland Browns,Nikki,5,7,0,12,41.7
+2025,Cleveland Browns,Nikki,6,7,0,13,46.2
 2025,Dallas Cowboys,Mat,5,7,0,12,41.7
 2025,Dallas Cowboys,Nikki,5,7,0,12,41.7
-2025,Denver Broncos,Mat,2,4,1,7,28.6
+2025,Denver Broncos,Mat,2,5,1,8,25.0
 2025,Denver Broncos,Nikki,3,1,1,5,60.0
 2025,Detroit Lions,Mat,3,3,0,6,50.0
-2025,Detroit Lions,Nikki,2,5,0,7,28.6
-2025,Green Bay Packers,Mat,3,2,0,5,60.0
+2025,Detroit Lions,Nikki,2,6,0,8,25.0
+2025,Green Bay Packers,Mat,3,3,0,6,50.0
 2025,Green Bay Packers,Nikki,1,0,0,1,100.0
-2025,Houston Texans,Mat,1,3,0,4,25.0
-2025,Houston Texans,Nikki,2,2,0,4,50.0
+2025,Houston Texans,Mat,2,3,0,5,40.0
+2025,Houston Texans,Nikki,3,2,0,5,60.0
 2025,Indianapolis Colts,Mat,4,5,0,9,44.4
-2025,Indianapolis Colts,Nikki,5,5,0,10,50.0
-2025,Jacksonville Jaguars,Mat,4,2,1,7,57.1
+2025,Indianapolis Colts,Nikki,6,5,0,11,54.5
+2025,Jacksonville Jaguars,Mat,4,3,1,8,50.0
 2025,Jacksonville Jaguars,Nikki,6,3,1,10,60.0
 2025,Kansas City Chiefs,Mat,0,5,0,5,0.0
-2025,Kansas City Chiefs,Nikki,1,2,0,3,33.3
+2025,Kansas City Chiefs,Nikki,2,2,0,4,50.0
 2025,Las Vegas Raiders,Mat,5,4,0,9,55.6
 2025,Las Vegas Raiders,Nikki,4,5,0,9,44.4
 2025,Los Angeles Chargers,Mat,4,4,0,8,50.0
 2025,Los Angeles Chargers,Nikki,5,1,0,6,83.3
-2025,Los Angeles Rams,Mat,6,4,0,10,60.0
+2025,Los Angeles Rams,Mat,6,5,0,11,54.5
 2025,Los Angeles Rams,Nikki,4,3,0,7,57.1
 2025,Miami Dolphins,Mat,5,4,0,9,55.6
 2025,Miami Dolphins,Nikki,6,5,0,11,54.5
-2025,Minnesota Vikings,Mat,2,5,1,8,25.0
+2025,Minnesota Vikings,Mat,3,5,1,9,33.3
 2025,Minnesota Vikings,Nikki,1,4,0,5,20.0
-2025,New England Patriots,Mat,4,1,1,6,66.7
-2025,New England Patriots,Nikki,4,2,1,7,57.1
-2025,New Orleans Saints,Mat,2,2,0,4,50.0
-2025,New Orleans Saints,Nikki,4,6,0,10,40.0
-2025,New York Giants,Mat,3,3,1,7,42.9
-2025,New York Giants,Nikki,6,5,2,13,46.2
+2025,New England Patriots,Mat,5,1,1,7,71.4
+2025,New England Patriots,Nikki,5,2,1,8,62.5
+2025,New Orleans Saints,Mat,3,2,0,5,60.0
+2025,New Orleans Saints,Nikki,5,6,0,11,45.5
+2025,New York Giants,Mat,4,3,1,8,50.0
+2025,New York Giants,Nikki,7,5,2,14,50.0
 2025,New York Jets,Mat,2,1,1,4,50.0
 2025,New York Jets,Nikki,3,2,0,5,60.0
 2025,Philadelphia Eagles,Mat,4,2,0,6,66.7
-2025,Philadelphia Eagles,Nikki,4,0,0,4,100.0
-2025,Pittsburgh Steelers,Mat,4,3,0,7,57.1
+2025,Philadelphia Eagles,Nikki,5,0,0,5,100.0
+2025,Pittsburgh Steelers,Mat,4,4,0,8,50.0
 2025,Pittsburgh Steelers,Nikki,1,4,0,5,20.0
 2025,San Francisco 49ers,Mat,4,3,1,8,50.0
 2025,San Francisco 49ers,Nikki,2,2,0,4,50.0
-2025,Seattle Seahawks,Mat,7,2,0,9,77.8
+2025,Seattle Seahawks,Mat,8,2,0,10,80.0
 2025,Seattle Seahawks,Nikki,7,2,0,9,77.8
-2025,Tampa Bay Buccaneers,Mat,3,7,0,10,30.0
-2025,Tampa Bay Buccaneers,Nikki,3,4,0,7,42.9
+2025,Tampa Bay Buccaneers,Mat,3,8,0,11,27.3
+2025,Tampa Bay Buccaneers,Nikki,3,5,0,8,37.5
 2025,Tennessee Titans,Mat,2,1,0,3,66.7
 2025,Tennessee Titans,Nikki,3,4,1,8,37.5
-2025,Washington Commanders,Mat,2,3,0,5,40.0
-2025,Washington Commanders,Nikki,3,5,0,8,37.5
+2025,Washington Commanders,Mat,2,3,1,6,33.3
+2025,Washington Commanders,Nikki,3,5,1,9,33.3
