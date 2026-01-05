@@ -38,15 +38,6 @@ function parseCSV(text) {
   });
 }
 
-// ===== WEEK LABELS =====
-function weekLabel(wk) {
-  if (wk === 19) return "WC";
-  if (wk === 20) return "DIV";
-  if (wk === 21) return "CONF";
-  if (wk === 22) return "SB";
-  return `Week ${wk}`;
-}
-
 // ===== GRADING =====
 function gradeByWeek(rows, picker) {
   const byWeek = new Map();
@@ -74,37 +65,28 @@ function recordStr(r) {
 function fillTable(tbody, byWeek) {
   tbody.innerHTML = "";
 
-  for (let wk = 1; wk <= 22; wk++) {
+  // Weeks 1–18 (unchanged behavior)
+  for (let wk = 1; wk <= 18; wk++) {
     const rec = byWeek.get(wk);
     const tr = document.createElement("tr");
 
-    const tdWk = document.createElement("td");
-    tdWk.textContent = weekLabel(wk);
-
-    const tdATS = document.createElement("td");
-    const tdOU  = document.createElement("td");
-
-    if (rec) {
-      tdATS.textContent = recordStr(rec.ats);
-      tdOU.textContent  = recordStr(rec.ou);
-    } else {
-      tdATS.textContent = "—";
-      tdOU.textContent  = "—";
-    }
-
-    tr.appendChild(tdWk);
-    tr.appendChild(tdATS);
-    tr.appendChild(tdOU);
+    tr.innerHTML = `
+      <td>Week ${wk}</td>
+      <td>${rec ? recordStr(rec.ats) : "—"}</td>
+      <td>${rec ? recordStr(rec.ou) : "—"}</td>
+    `;
     tbody.appendChild(tr);
   }
+
+  // Added rows only
+  ["WC", "DIV", "CONF", "SB"].forEach(label => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${label}</td><td>—</td><td>—</td>`;
+    tbody.appendChild(tr);
+  });
 }
 
 // ===== UI =====
-function setSubtitle(seasonLabel) {
-  const el = document.getElementById("subtitle");
-  if (el) el.textContent = seasonLabel;
-}
-
 function highlightWinners() {
   // unchanged
 }
@@ -114,18 +96,15 @@ async function main() {
   const csv = await fetchText(METRICS_CSV);
   const rows = parseCSV(csv);
 
-  const seasonLabel = "2025";
-
-  const Nikki = gradeByWeek(rows, "Nikki");
-  const Mat   = gradeByWeek(rows, "Mat");
+  const nikki = gradeByWeek(rows, "nikki");
+  const mat   = gradeByWeek(rows, "mat");
 
   const nikBody = document.querySelector("#nikkiTable tbody");
   const matBody = document.querySelector("#matTable tbody");
   if (!nikBody || !matBody) return;
 
-  fillTable(nikBody, Nikki);
-  fillTable(matBody, Mat);
-  setSubtitle(seasonLabel);
+  fillTable(nikBody, nikki);
+  fillTable(matBody, mat);
 
   highlightWinners();
 }
