@@ -11,59 +11,32 @@ def die(msg, code=78):
     print(f"ERROR: {msg}", file=sys.stderr)
     sys.exit(code)
 
-def xlsx_to_csv(xlsx_path: Path, csv_path: Path):
-    wb = load_workbook(filename=xlsx_path, read_only=True, data_only=True)
-    ws = wb.active
+if len(sys.argv) != 4:
+    die("Usage: xlsx_to_csv.py <folder> <week> <season>")
 
-    rows = []
-    for row in ws.iter_rows(values_only=True):
-        rows.append([("" if v is None else str(v)) for v in row])
+folder = sys.argv[1].strip().lower()
+week = int(sys.argv[2])
+season = int(sys.argv[3])
 
-    if not rows:
-        die(f"{xlsx_path} appears to be empty")
+if folder not in {"scores","picks","final"}:
+    die("Folder must be scores|picks|final")
+if not (1 <= week <= 23):
+    die("Week must be 1..23")
 
-    headers = rows[0]
-    data = rows[1:]
+xlsx = DATA_DIR / folder / f"{season}_wk{week:02d}_{folder}.xlsx"
+if not xlsx.exists():
+    die(f"Missing XLSX file: {xlsx}")
 
-    csv_path.parent.mkdir(parents=True, exist_ok=True)
-    with csv_path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(headers)
-        writer.writerows(data)
+csvp = xlsx.with_suffix(".csv")
+wb = load_workbook(filename=xlsx, read_only=True, data_only=True)
+ws = wb.active
 
-def main():
-    if len(sys.argv) != 4:
-        die("Usage: xlsx_to_csv.py <folder: scores|picks|final> <week-number 1..23> <season>")
+rows = []
+for row in ws.iter_rows(values_only=True):
+    rows.append([("" if v is None else str(v)) for v in row])
 
-    folder = sys.argv[1].strip().lower()
-    try:
-        week = int(sys.argv[2])
-        season = int(sys.argv[3])
-    except:
-        die("Week and season must be integers")
+with csvp.open("w", newline="", encoding="utf-8") as f:
+    w = csv.writer(f)
+    w.writerows(rows)
 
-    if folder not in {"scores", "picks", "final"}:
-        die(f"Folder must be one of: scores|picks|final (got '{folder}')")
-
-    if not (1 <= week <= 23):
-        die("Week must be 1..23")
-
-    wk_tag = f"wk{week:02d}"
-    suffix = folder
-
-    base = DATA_DIR / folder
-    xlsx_path = base / f"{season}_{wk_tag}_{suffix}.xlsx"
-
-    if not xlsx_path.exists():
-        die(f"Missing XLSX file: {xlsx_path}")
-
-    csv_path = xlsx_path.with_suffix(".csv")
-
-    xlsx_to_csv(xlsx_path, csv_path)
-
-    print(f"Converted XLSX -> CSV")
-    print(f"  XLSX: {xlsx_path.relative_to(ROOT)}")
-    print(f"  CSV : {csv_path.relative_to(ROOT)}")
-
-if __name__ == "__main__":
-    main()
+print(csvp)
