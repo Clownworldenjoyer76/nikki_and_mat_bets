@@ -4,7 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       week:
-        description: "NFL week number (1-18)"
+        description: "NFL week number (1–23)"
+        required: true
+        type: string
+      season:
+        description: "NFL season year (e.g., 2025)"
         required: true
         type: string
 
@@ -23,10 +27,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Combine picks and scores for the given week
+      - name: Combine picks and scores
         run: |
           python -m pip install --upgrade pip
-          python scripts/combine_picks_and_scores.py "${{ inputs.week }}"
+          python scripts/combine_picks_and_scores.py "${{ inputs.week }}" "${{ inputs.season }}"
 
       - name: Commit final CSV
         run: |
@@ -36,6 +40,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Final CSV for week ${{ inputs.week }}"
+            git commit -m "Final CSV for season ${{ inputs.season }} week ${{ inputs.week }}"
             git push
           fi
