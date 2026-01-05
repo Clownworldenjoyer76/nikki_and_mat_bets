@@ -10,12 +10,32 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: write
+
 jobs:
   combine:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python scripts/combine_picks_and_scores.py "${{ inputs.week }}" "${{ inputs.season }}"
+
+      - name: Combine picks and scores
+        run: |
+          python scripts/combine_picks_and_scores.py "${{ inputs.week }}" "${{ inputs.season }}"
+
+      - name: Commit final CSV
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/data/final/*.csv
+          if git diff --cached --quiet; then
+            echo "No final CSV changes to commit."
+          else
+            git commit -m "Final CSV for week ${{ inputs.week }} season ${{ inputs.season }}"
+            git push
+          fi
