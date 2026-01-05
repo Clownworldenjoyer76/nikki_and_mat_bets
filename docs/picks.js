@@ -116,15 +116,15 @@ async function main() {
 
   const seasonLabel = "2025";
 
-  const nikki = gradeByWeek(rows, "nikki");
-  const mat   = gradeByWeek(rows, "mat");
+  const Nikki = gradeByWeek(rows, "Nikki");
+  const Mat   = gradeByWeek(rows, "Mat");
 
   const nikBody = document.querySelector("#nikkiTable tbody");
   const matBody = document.querySelector("#matTable tbody");
   if (!nikBody || !matBody) return;
 
-  fillTable(nikBody, nikki);
-  fillTable(matBody, mat);
+  fillTable(nikBody, Nikki);
+  fillTable(matBody, Mat);
   setSubtitle(seasonLabel);
 
   highlightWinners();
