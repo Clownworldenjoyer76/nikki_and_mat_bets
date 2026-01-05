@@ -4,36 +4,27 @@
   <meta charset="UTF-8">
   <title>Score Entry</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 15px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
-    input {
-      width: 60px;
-      text-align: center;
-    }
-    button {
-      margin-top: 15px;
-      padding: 10px 16px;
-      font-size: 14px;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    input[type="number"] { width: 70px; }
+    button { margin-top: 12px; padding: 8px 14px; }
+    #controls { margin-bottom: 20px; }
   </style>
 </head>
 <body>
 
-<h2 id="pageTitle">Score Entry</h2>
+<h2>Score Entry</h2>
 
-<table>
+<div id="controls">
+  Season:
+  <input id="seasonInput" type="number" placeholder="2025">
+  Week:
+  <input id="weekInput" type="number" placeholder="18">
+  <button id="loadBtn">Load Games</button>
+</div>
+
+<table id="scoresTable" style="display:none;">
   <thead>
     <tr>
       <th>Game</th>
@@ -44,7 +35,7 @@
   <tbody id="scoresBody"></tbody>
 </table>
 
-<button id="saveBtn">Save Scores</button>
+<button id="saveBtn" style="display:none;">Save Scores</button>
 
 <script src="score_entry.js"></script>
 </body>
