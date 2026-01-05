@@ -1,21 +1,17 @@
-// ================= CONFIG =================
-const OWNER  = "YOUR_GITHUB_USERNAME";
-const REPO   = "YOUR_REPO_NAME";
+// ============ CONFIG ============
+const OWNER  = "clownworldenjoyer76";
+const REPO   = "nikki_and_mat_bets";
 const BRANCH = "main";
 
-// ================= HELPERS =================
-function getParam(name) {
-  return new URLSearchParams(window.location.search).get(name);
-}
-
+// ============ CSV HELPERS ============
 function parseCSV(text) {
   const lines = text.trim().split("\n");
   const headers = lines[0].split(",");
   return lines.slice(1).map(line => {
-    const values = line.split(",");
-    const row = {};
-    headers.forEach((h, i) => row[h] = values[i] || "");
-    return row;
+    const vals = line.split(",");
+    const o = {};
+    headers.forEach((h, i) => o[h] = vals[i] || "");
+    return o;
   });
 }
 
@@ -25,75 +21,65 @@ function toCSV(rows) {
   return [headers.join(","), ...body].join("\n");
 }
 
-// ================= LOAD CONTEXT =================
-const season = getParam("season");
-const week   = getParam("week");
+// ============ STATE ============
+let season, week, rows = [], filePath, fileSha = null;
 
-if (!season || !week) {
-  alert("Missing season or week in URL");
-  throw new Error("Missing parameters");
-}
+// ============ LOAD ============
+document.getElementById("loadBtn").onclick = async () => {
+  season = document.getElementById("seasonInput").value;
+  week   = document.getElementById("weekInput").value;
 
-const paddedWeek = String(week).padStart(2, "0");
-const filePath = `docs/data/scores/${season}_wk${paddedWeek}_scores.csv`;
+  if (!season || !week) {
+    alert("Season and week are required");
+    return;
+  }
 
-document.getElementById("pageTitle").textContent =
-  `Season ${season} — Week ${week} Score Entry`;
+  const wk = String(week).padStart(2, "0");
+  filePath = `docs/data/scores/${season}_wk${wk}_scores.csv`;
 
-let rows = [];
-let fileSha = null;
-
-// ================= LOAD CSV =================
-async function loadScores() {
   const rawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${filePath}`;
   const res = await fetch(rawUrl);
   if (!res.ok) {
-    alert("Unable to load scores CSV");
-    throw new Error("Fetch failed");
+    alert("Scores file not found");
+    return;
   }
 
-  const text = await res.text();
-  rows = parseCSV(text);
+  rows = parseCSV(await res.text());
 
   const tbody = document.getElementById("scoresBody");
   tbody.innerHTML = "";
 
-  rows.forEach((r, idx) => {
+  rows.forEach((r, i) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${r.away_team} @ ${r.home_team}</td>
-      <td><input data-i="${idx}" data-f="away_score" value="${r.away_score}"></td>
-      <td><input data-i="${idx}" data-f="home_score" value="${r.home_score}"></td>
+      <td><input type="number" data-i="${i}" data-f="away_score" value="${r.away_score}"></td>
+      <td><input type="number" data-i="${i}" data-f="home_score" value="${r.home_score}"></td>
     `;
     tbody.appendChild(tr);
   });
-}
 
-// ================= SAVE CSV =================
-document.getElementById("saveBtn").addEventListener("click", async () => {
-  document.querySelectorAll("input").forEach(input => {
-    const i = input.dataset.i;
-    const f = input.dataset.f;
-    rows[i][f] = input.value;
+  document.getElementById("scoresTable").style.display = "";
+  document.getElementById("saveBtn").style.display = "";
+};
+
+// ============ SAVE ============
+document.getElementById("saveBtn").onclick = async () => {
+  document.querySelectorAll("input[data-i]").forEach(inp => {
+    rows[inp.dataset.i][inp.dataset.f] = inp.value;
   });
 
   const csv = toCSV(rows);
-  const encoded = btoa(unescape(encodeURIComponent(csv)));
+  const content = btoa(unescape(encodeURIComponent(csv)));
+  const token = prompt("GitHub token (contents:write)");
 
-  const token = prompt("Enter GitHub token (contents:write)");
-
-  if (!token) {
-    alert("Token required");
-    return;
-  }
+  if (!token) return;
 
   const metaRes = await fetch(
     `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`,
     { headers: { Authorization: `token ${token}` } }
   );
-
-  const meta = await metaRes.json();
-  fileSha = meta.sha;
+  fileSha = (await metaRes.json()).sha;
 
   await fetch(
     `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`,
@@ -104,16 +90,13 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        message: `Update scores for ${season} wk${week}`,
-        content: encoded,
+        message: `Update scores: ${season} wk${week}`,
+        content,
         sha: fileSha,
         branch: BRANCH
       })
     }
   );
 
-  alert("Scores saved successfully");
-});
-
-// ================= INIT =================
-loadScores();
+  alert("Scores saved");
+};
