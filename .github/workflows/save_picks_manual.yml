@@ -1,58 +1,52 @@
-name: Save Picks (Manual)
+name: Save Picks From Issue (Manual)
 
 on:
   workflow_dispatch:
     inputs:
-      issue_number:
-        description: "Issue number that contains the picks JSON"
+      season:
+        description: "Season year (e.g. 2025)"
         required: true
-        type: string
+      issue_number:
+        description: "GitHub Issue number containing picks"
+        required: true
 
 permissions:
   contents: write
   issues: read
 
 jobs:
-  save:
+  run:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Fetch issue body
         env:
-          GH_REPO: ${{ github.repository }}
-          ISSUE_NUMBER: ${{ inputs.issue_number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
         run: |
-          set -euo pipefail
-          sudo apt-get update -y
-          sudo apt-get install -y jq
-          curl -sSf -H "Authorization: Bearer $GH_TOKEN" \
-               -H "Accept: application/vnd.github+json" \
-               "https://api.github.com/repos/$GH_REPO/issues/$ISSUE_NUMBER" \
+          curl -s \
+            -H "Authorization: token $GH_TOKEN" \
+            https://api.github.com/repos/${{ github.repository }}/issues/$ISSUE_NUMBER \
             | jq -r '.body' > issue_body.txt
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Parse and write CSVs
+      - name: Parse and save picks
         env:
-          BODY_FILE: issue_body.txt
+          SEASON: ${{ inputs.season }}
         run: |
-          python -m pip install --upgrade pip
           python scripts/parse_and_save_picks.py
 
-      - name: Commit results
+      - name: Commit picks
         run: |
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/data/picks/*
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "Save picks from Issue #${{ inputs.issue_number }}"
-            git push
-          fi
+          git add docs/data/picks/*.csv
+          git commit -m "Save picks for season ${{ inputs.season }} (issue #${{ inputs.issue_number }})" || echo "No changes"
+          git push
