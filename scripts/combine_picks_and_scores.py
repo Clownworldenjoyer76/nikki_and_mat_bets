@@ -4,7 +4,7 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]  # repo root
+ROOT = Path(__file__).resolve().parents[1]
 PICKS_DIR = ROOT / "docs" / "data" / "picks"
 SCORES_DIR = ROOT / "docs" / "data" / "scores"
 FINAL_DIR = ROOT / "docs" / "data" / "final"
@@ -13,10 +13,14 @@ def die(msg: str, code: int = 78):
     print(f"ERROR: {msg}", file=sys.stderr)
     sys.exit(code)
 
-def find_week_files(week_str: str):
+def extract_season_from_filename(name: str):
+    m = re.match(r"(?P<season>\d{4})_wk\d{2}_(picks|scores)\.csv$", name)
+    return int(m.group("season")) if m else None
+
+def find_week_files(week_str: str, season_override: int | None):
     wk = int(week_str)
-    if not (1 <= wk <= 18):
-        die(f"Week must be 1..18, got: {week_str}")
+    if not (1 <= wk <= 23):
+        die(f"Week must be 1..23, got: {week_str}")
 
     wk_tag = f"wk{wk:02d}"
 
@@ -31,30 +35,24 @@ def find_week_files(week_str: str):
     pick_path = max(pick_matches)
     score_path = max(score_matches)
 
-    season_from_picks = extract_season_from_filename(pick_path.name) or guess_season_from_csv(pick_path)
-    season_from_scores = extract_season_from_filename(score_path.name) or guess_season_from_csv(score_path)
+    season_from_picks = extract_season_from_filename(pick_path.name)
+    season_from_scores = extract_season_from_filename(score_path.name)
 
-    if season_from_scores and season_from_scores != season_from_picks:
-        print(f"WARNING: Season mismatch ({season_from_picks} vs {season_from_scores}); using {season_from_picks}", file=sys.stderr)
+    if season_override:
+        season = season_override
+    elif season_from_picks:
+        season = season_from_picks
+    else:
+        die(f"Season must be provided explicitly or encoded in filename: {pick_path.name}")
 
-    return season_from_picks, wk_tag, pick_path, score_path
+    if season_from_scores and season_from_scores != season:
+        print(
+            f"WARNING: Scores season ({season_from_scores}) does not match "
+            f"declared season ({season}); using declared season",
+            file=sys.stderr
+        )
 
-def extract_season_from_filename(name: str):
-    m = re.match(r"(?P<season>\d{4})_wk\d{2}_(picks|scores)\.csv$", name)
-    return int(m.group("season")) if m else None
-
-def guess_season_from_csv(path: Path):
-    try:
-        with path.open(newline="", encoding="utf-8") as f:
-            rdr = csv.DictReader(f)
-            for row in rdr:
-                v = row.get("season")
-                if v:
-                    return int(v)
-                break
-    except Exception:
-        pass
-    return None
+    return season, wk_tag, pick_path, score_path
 
 def read_csv(path: Path):
     with path.open(newline="", encoding="utf-8") as f:
@@ -72,10 +70,12 @@ def write_csv(path: Path, headers, rows):
 
 def main():
     if len(sys.argv) < 2:
-        die("Usage: combine_picks_and_scores.py <week-number> (e.g., 1)")
+        die("Usage: combine_picks_and_scores.py <week-number> [season]")
 
     week_str = sys.argv[1]
-    season, wk_tag, picks_path, scores_path = find_week_files(week_str)
+    season_override = int(sys.argv[2]) if len(sys.argv) >= 3 else None
+
+    season, wk_tag, picks_path, scores_path = find_week_files(week_str, season_override)
 
     picks_hdr, picks_rows = read_csv(picks_path)
     scores_hdr, scores_rows = read_csv(scores_path)
@@ -99,28 +99,23 @@ def main():
         die(f"'game_id' missing in picks CSV: {picks_path}")
 
     combined_rows = []
-    missing_scores = []
     for prow in picks_rows:
         gid = prow.get("game_id", "")
         srow = scores_by_gid.get(gid)
         if not srow:
-            missing_scores.append(gid)
             continue
         out = dict(prow)
+        out["season"] = season
+        out["week"] = int(week_str)
         out["home_score"] = srow.get("home_score", "")
         out["away_score"] = srow.get("away_score", "")
         combined_rows.append(out)
 
-    if missing_scores:
-        print(f"WARNING: {len(missing_scores)} games in picks had no matching score rows: {', '.join(missing_scores)}", file=sys.stderr)
-
     out_name = f"{season}_{wk_tag}_final.csv"
     out_path = FINAL_DIR / out_name
-    write_csv(out_path, combined_hdr, combined_rows)
+    write_csv(out_path, combined_hdr + ["season", "week"], combined_rows)
 
     print(f"Final CSV written: {out_path.relative_to(ROOT)}")
-    print(f"  Picks:  {picks_path.relative_to(ROOT)}")
-    print(f"  Scores: {scores_path.relative_to(ROOT)}")
     print(f"  Rows:   {len(combined_rows)}")
 
 if __name__ == "__main__":
