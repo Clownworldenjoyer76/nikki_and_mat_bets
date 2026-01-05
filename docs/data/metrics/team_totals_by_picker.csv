@@ -1,124 +1,33 @@
 season,team,picker,side,wins,losses,pushes,games,win_pct
-2025,Arizona Cardinals,Mat,Over,3,1,0,4,75.0
-2025,Arizona Cardinals,Mat,Under,1,2,0,3,33.3
-2025,Arizona Cardinals,Nikki,Under,2,5,0,7,28.6
-2025,Atlanta Falcons,Mat,Over,3,1,0,4,75.0
-2025,Atlanta Falcons,Mat,Under,1,1,0,2,50.0
-2025,Atlanta Falcons,Nikki,Over,3,2,0,5,60.0
-2025,Atlanta Falcons,Nikki,Under,0,1,0,1,0.0
-2025,Baltimore Ravens,Mat,Over,3,1,0,4,75.0
-2025,Baltimore Ravens,Mat,Under,3,1,0,4,75.0
-2025,Baltimore Ravens,Nikki,Over,2,3,0,5,40.0
-2025,Baltimore Ravens,Nikki,Under,1,2,0,3,33.3
-2025,Buffalo Bills,Mat,Over,2,1,0,3,66.7
-2025,Buffalo Bills,Mat,Under,2,3,0,5,40.0
-2025,Buffalo Bills,Nikki,Over,4,3,0,7,57.1
-2025,Buffalo Bills,Nikki,Under,0,1,0,1,0.0
-2025,Carolina Panthers,Mat,Over,3,3,0,6,50.0
-2025,Carolina Panthers,Mat,Under,1,1,0,2,50.0
-2025,Carolina Panthers,Nikki,Over,4,4,0,8,50.0
-2025,Chicago Bears,Mat,Over,1,4,0,5,20.0
-2025,Chicago Bears,Mat,Under,1,0,1,2,50.0
-2025,Chicago Bears,Nikki,Over,1,4,0,5,20.0
-2025,Chicago Bears,Nikki,Under,1,0,1,2,50.0
-2025,Cincinnati Bengals,Mat,Over,4,3,0,7,57.1
-2025,Cincinnati Bengals,Mat,Under,0,1,0,1,0.0
-2025,Cincinnati Bengals,Nikki,Over,2,2,0,4,50.0
-2025,Cincinnati Bengals,Nikki,Under,1,3,0,4,25.0
-2025,Cleveland Browns,Mat,Over,0,4,1,5,0.0
-2025,Cleveland Browns,Mat,Under,1,3,0,4,25.0
-2025,Cleveland Browns,Nikki,Over,1,3,1,5,20.0
-2025,Cleveland Browns,Nikki,Under,2,2,0,4,50.0
-2025,Dallas Cowboys,Mat,Over,2,1,0,3,66.7
-2025,Dallas Cowboys,Mat,Under,1,3,0,4,25.0
-2025,Dallas Cowboys,Nikki,Over,5,2,0,7,71.4
-2025,Denver Broncos,Mat,Over,2,1,0,3,66.7
-2025,Denver Broncos,Mat,Under,2,2,0,4,50.0
-2025,Denver Broncos,Nikki,Over,3,2,0,5,60.0
-2025,Denver Broncos,Nikki,Under,1,1,0,2,50.0
-2025,Detroit Lions,Mat,Over,2,0,0,2,100.0
-2025,Detroit Lions,Mat,Under,1,4,0,5,20.0
-2025,Detroit Lions,Nikki,Over,4,1,0,5,80.0
-2025,Detroit Lions,Nikki,Under,0,2,0,2,0.0
-2025,Green Bay Packers,Mat,Over,3,3,0,6,50.0
-2025,Green Bay Packers,Mat,Under,2,0,0,2,100.0
-2025,Green Bay Packers,Nikki,Over,3,4,0,7,42.9
-2025,Green Bay Packers,Nikki,Under,1,0,0,1,100.0
-2025,Houston Texans,Mat,Over,0,3,0,3,0.0
-2025,Houston Texans,Mat,Under,2,3,0,5,40.0
-2025,Houston Texans,Nikki,Over,2,4,0,6,33.3
-2025,Houston Texans,Nikki,Under,1,1,0,2,50.0
-2025,Indianapolis Colts,Mat,Over,3,2,0,5,60.0
-2025,Indianapolis Colts,Mat,Under,2,2,0,4,50.0
-2025,Indianapolis Colts,Nikki,Over,4,1,0,5,80.0
-2025,Indianapolis Colts,Nikki,Under,3,1,0,4,75.0
-2025,Jacksonville Jaguars,Mat,Over,0,2,0,2,0.0
-2025,Jacksonville Jaguars,Mat,Under,3,3,0,6,50.0
-2025,Jacksonville Jaguars,Nikki,Over,2,3,0,5,40.0
-2025,Jacksonville Jaguars,Nikki,Under,2,1,0,3,66.7
-2025,Kansas City Chiefs,Mat,Over,1,3,0,4,25.0
-2025,Kansas City Chiefs,Mat,Under,4,0,0,4,100.0
-2025,Kansas City Chiefs,Nikki,Over,1,4,0,5,20.0
-2025,Kansas City Chiefs,Nikki,Under,3,0,0,3,100.0
-2025,Las Vegas Raiders,Mat,Over,1,1,0,2,50.0
-2025,Las Vegas Raiders,Mat,Under,3,3,0,6,50.0
-2025,Las Vegas Raiders,Nikki,Over,3,3,0,6,50.0
-2025,Las Vegas Raiders,Nikki,Under,1,1,0,2,50.0
-2025,Los Angeles Chargers,Mat,Over,1,1,0,2,50.0
-2025,Los Angeles Chargers,Mat,Under,3,3,0,6,50.0
-2025,Los Angeles Chargers,Nikki,Over,2,3,0,5,40.0
-2025,Los Angeles Chargers,Nikki,Under,1,2,0,3,33.3
-2025,Los Angeles Rams,Mat,Over,1,3,1,5,20.0
-2025,Los Angeles Rams,Mat,Under,1,1,0,2,50.0
-2025,Los Angeles Rams,Nikki,Over,0,2,1,3,0.0
-2025,Los Angeles Rams,Nikki,Under,2,2,0,4,50.0
-2025,Miami Dolphins,Mat,Over,1,2,0,3,33.3
-2025,Miami Dolphins,Mat,Under,3,2,0,5,60.0
-2025,Miami Dolphins,Nikki,Over,1,3,0,4,25.0
-2025,Miami Dolphins,Nikki,Under,2,2,0,4,50.0
-2025,Minnesota Vikings,Mat,Over,2,2,0,4,50.0
-2025,Minnesota Vikings,Mat,Under,3,0,0,3,100.0
-2025,Minnesota Vikings,Nikki,Over,2,5,0,7,28.6
-2025,New England Patriots,Mat,Over,3,1,0,4,75.0
-2025,New England Patriots,Mat,Under,2,2,0,4,50.0
-2025,New England Patriots,Nikki,Over,4,2,0,6,66.7
-2025,New England Patriots,Nikki,Under,1,1,0,2,50.0
-2025,New Orleans Saints,Mat,Over,1,6,0,7,14.3
-2025,New Orleans Saints,Mat,Under,1,0,0,1,100.0
-2025,New Orleans Saints,Nikki,Over,1,7,0,8,12.5
-2025,New York Giants,Mat,Over,1,0,0,1,100.0
-2025,New York Giants,Mat,Under,3,3,0,6,50.0
-2025,New York Giants,Nikki,Over,2,3,0,5,40.0
-2025,New York Giants,Nikki,Under,0,2,0,2,0.0
-2025,New York Jets,Mat,Over,4,1,0,5,80.0
-2025,New York Jets,Mat,Under,2,2,0,4,50.0
-2025,New York Jets,Nikki,Over,4,1,0,5,80.0
-2025,New York Jets,Nikki,Under,2,2,0,4,50.0
-2025,Philadelphia Eagles,Mat,Over,1,3,0,4,25.0
-2025,Philadelphia Eagles,Mat,Under,2,1,0,3,66.7
-2025,Philadelphia Eagles,Nikki,Over,1,5,0,6,16.7
-2025,Philadelphia Eagles,Nikki,Under,0,1,0,1,0.0
-2025,Pittsburgh Steelers,Mat,Over,2,3,0,5,40.0
-2025,Pittsburgh Steelers,Mat,Under,1,2,0,3,33.3
-2025,Pittsburgh Steelers,Nikki,Over,4,3,0,7,57.1
-2025,Pittsburgh Steelers,Nikki,Under,1,0,0,1,100.0
-2025,San Francisco 49ers,Mat,Over,0,1,0,1,0.0
-2025,San Francisco 49ers,Mat,Under,1,3,1,5,20.0
-2025,San Francisco 49ers,Nikki,Over,1,1,0,2,50.0
-2025,San Francisco 49ers,Nikki,Under,1,2,1,4,25.0
-2025,Seattle Seahawks,Mat,Over,3,3,0,6,50.0
-2025,Seattle Seahawks,Mat,Under,0,1,0,1,0.0
-2025,Seattle Seahawks,Nikki,Over,4,2,0,6,66.7
-2025,Seattle Seahawks,Nikki,Under,1,0,0,1,100.0
-2025,Tampa Bay Buccaneers,Mat,Over,3,0,0,3,100.0
-2025,Tampa Bay Buccaneers,Mat,Under,1,2,0,3,33.3
-2025,Tampa Bay Buccaneers,Nikki,Over,4,1,0,5,80.0
-2025,Tampa Bay Buccaneers,Nikki,Under,0,1,0,1,0.0
-2025,Tennessee Titans,Mat,Over,3,2,0,5,60.0
-2025,Tennessee Titans,Mat,Under,1,3,0,4,25.0
-2025,Tennessee Titans,Nikki,Over,4,3,0,7,57.1
-2025,Tennessee Titans,Nikki,Under,0,2,0,2,0.0
-2025,Washington Commanders,Mat,Over,4,1,0,5,80.0
-2025,Washington Commanders,Mat,Under,0,2,0,2,0.0
-2025,Washington Commanders,Nikki,Over,4,1,0,5,80.0
-2025,Washington Commanders,Nikki,Under,0,2,0,2,0.0
+2026,Atlanta Falcons,Mat,Over,0,1,0,1,0.0
+2026,Atlanta Falcons,Nikki,Over,0,1,0,1,0.0
+2026,Buffalo Bills,Mat,Over,1,0,0,1,100.0
+2026,Buffalo Bills,Nikki,Under,0,1,0,1,0.0
+2026,Chicago Bears,Mat,Over,0,1,0,1,0.0
+2026,Chicago Bears,Nikki,Over,0,1,0,1,0.0
+2026,Cincinnati Bengals,Mat,Under,1,0,0,1,100.0
+2026,Cincinnati Bengals,Nikki,Over,0,1,0,1,0.0
+2026,Denver Broncos,Mat,Under,1,0,0,1,100.0
+2026,Denver Broncos,Nikki,Over,0,1,0,1,0.0
+2026,Houston Texans,Mat,Over,1,0,0,1,100.0
+2026,Houston Texans,Nikki,Over,1,0,0,1,100.0
+2026,Jacksonville Jaguars,Mat,Under,0,1,0,1,0.0
+2026,Jacksonville Jaguars,Nikki,Under,0,1,0,1,0.0
+2026,Las Vegas Raiders,Mat,Under,1,0,0,1,100.0
+2026,Las Vegas Raiders,Nikki,Over,0,1,0,1,0.0
+2026,Los Angeles Rams,Mat,Over,1,0,0,1,100.0
+2026,Los Angeles Rams,Nikki,Over,1,0,0,1,100.0
+2026,Minnesota Vikings,Mat,Over,0,1,0,1,0.0
+2026,Minnesota Vikings,Nikki,Over,0,1,0,1,0.0
+2026,New England Patriots,Mat,Over,1,0,0,1,100.0
+2026,New England Patriots,Nikki,Over,1,0,0,1,100.0
+2026,New York Giants,Mat,Over,0,1,0,1,0.0
+2026,New York Giants,Nikki,Under,1,0,0,1,100.0
+2026,Philadelphia Eagles,Mat,Over,1,0,0,1,100.0
+2026,Philadelphia Eagles,Nikki,Over,1,0,0,1,100.0
+2026,Pittsburgh Steelers,Mat,Over,1,0,0,1,100.0
+2026,Pittsburgh Steelers,Nikki,Over,1,0,0,1,100.0
+2026,San Francisco 49ers,Mat,Under,1,0,0,1,100.0
+2026,San Francisco 49ers,Nikki,Over,0,1,0,1,0.0
+2026,Tampa Bay Buccaneers,Mat,Over,0,1,0,1,0.0
+2026,Tampa Bay Buccaneers,Nikki,Over,0,1,0,1,0.0
