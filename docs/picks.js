@@ -71,7 +71,7 @@ function recordStr(r) {
 }
 
 // ===== TABLE FILL =====
-function fillTable(tbody, seasonLabel, byWeek) {
+function fillTable(tbody, byWeek) {
   tbody.innerHTML = "";
 
   for (let wk = 1; wk <= 22; wk++) {
@@ -123,8 +123,8 @@ async function main() {
   const matBody = document.querySelector("#matTable tbody");
   if (!nikBody || !matBody) return;
 
-  fillTable(nikBody, seasonLabel, nikki);
-  fillTable(matBody, seasonLabel, mat);
+  fillTable(nikBody, nikki);
+  fillTable(matBody, mat);
   setSubtitle(seasonLabel);
 
   highlightWinners();
