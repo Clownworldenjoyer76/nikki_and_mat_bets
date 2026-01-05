@@ -14,14 +14,9 @@ function smartSplit(line) {
   let inQ = false;
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
-    if (ch === '"') {
-      inQ = !inQ;
-    } else if (ch === "," && !inQ) {
-      out.push(cur);
-      cur = "";
-    } else {
-      cur += ch;
-    }
+    if (ch === '"') inQ = !inQ;
+    else if (ch === "," && !inQ) { out.push(cur); cur = ""; }
+    else cur += ch;
   }
   out.push(cur);
   return out.map(s => s.replace(/^"|"$/g, ""));
@@ -65,11 +60,10 @@ function recordStr(r) {
 function fillTable(tbody, byWeek) {
   tbody.innerHTML = "";
 
-  // Weeks 1–18 (unchanged behavior)
+  // Weeks 1–18 (UNCHANGED)
   for (let wk = 1; wk <= 18; wk++) {
     const rec = byWeek.get(wk);
     const tr = document.createElement("tr");
-
     tr.innerHTML = `
       <td>Week ${wk}</td>
       <td>${rec ? recordStr(rec.ats) : "—"}</td>
@@ -78,17 +72,24 @@ function fillTable(tbody, byWeek) {
     tbody.appendChild(tr);
   }
 
-  // Added rows only
-  ["WC", "DIV", "CONF", "SB"].forEach(label => {
+  // Weeks 19–22 (APPENDED, DATA-AWARE)
+  const playoffWeeks = [
+    { wk: 19, label: "WC" },
+    { wk: 20, label: "DIV" },
+    { wk: 21, label: "CONF" },
+    { wk: 22, label: "SB" }
+  ];
+
+  playoffWeeks.forEach(p => {
+    const rec = byWeek.get(p.wk);
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${label}</td><td>—</td><td>—</td>`;
+    tr.innerHTML = `
+      <td>${p.label}</td>
+      <td>${rec ? recordStr(rec.ats) : "—"}</td>
+      <td>${rec ? recordStr(rec.ou) : "—"}</td>
+    `;
     tbody.appendChild(tr);
   });
-}
-
-// ===== UI =====
-function highlightWinners() {
-  // unchanged
 }
 
 // ===== MAIN =====
@@ -105,8 +106,6 @@ async function main() {
 
   fillTable(nikBody, nikki);
   fillTable(matBody, mat);
-
-  highlightWinners();
 }
 
 main();
