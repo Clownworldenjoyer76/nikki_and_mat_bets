@@ -14,9 +14,14 @@ function smartSplit(line) {
   let inQ = false;
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
-    if (ch === '"') inQ = !inQ;
-    else if (ch === "," && !inQ) { out.push(cur); cur = ""; }
-    else cur += ch;
+    if (ch === '"') {
+      inQ = !inQ;
+    } else if (ch === "," && !inQ) {
+      out.push(cur);
+      cur = "";
+    } else {
+      cur += ch;
+    }
   }
   out.push(cur);
   return out.map(s => s.replace(/^"|"$/g, ""));
@@ -31,6 +36,15 @@ function parseCSV(text) {
     headers.forEach((h, i) => (o[h] = vals[i]));
     return o;
   });
+}
+
+// ===== WEEK LABELS =====
+function weekLabel(wk) {
+  if (wk === 19) return "WC";
+  if (wk === 20) return "DIV";
+  if (wk === 21) return "CONF";
+  if (wk === 22) return "SB";
+  return `Week ${wk}`;
 }
 
 // ===== GRADING =====
@@ -57,45 +71,50 @@ function recordStr(r) {
 }
 
 // ===== TABLE FILL =====
-function fillTable(tbody, byWeek) {
+function fillTable(tbody, seasonLabel, byWeek) {
   tbody.innerHTML = "";
 
-  // Weeks 1–18 (UNCHANGED)
-  for (let wk = 1; wk <= 18; wk++) {
+  for (let wk = 1; wk <= 22; wk++) {
     const rec = byWeek.get(wk);
     const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>Week ${wk}</td>
-      <td>${rec ? recordStr(rec.ats) : "—"}</td>
-      <td>${rec ? recordStr(rec.ou) : "—"}</td>
-    `;
+
+    const tdWk = document.createElement("td");
+    tdWk.textContent = weekLabel(wk);
+
+    const tdATS = document.createElement("td");
+    const tdOU  = document.createElement("td");
+
+    if (rec) {
+      tdATS.textContent = recordStr(rec.ats);
+      tdOU.textContent  = recordStr(rec.ou);
+    } else {
+      tdATS.textContent = "—";
+      tdOU.textContent  = "—";
+    }
+
+    tr.appendChild(tdWk);
+    tr.appendChild(tdATS);
+    tr.appendChild(tdOU);
     tbody.appendChild(tr);
   }
+}
 
-  // Weeks 19–22 (APPENDED, DATA-AWARE)
-  const playoffWeeks = [
-    { wk: 19, label: "WC" },
-    { wk: 20, label: "DIV" },
-    { wk: 21, label: "CONF" },
-    { wk: 22, label: "SB" }
-  ];
+// ===== UI =====
+function setSubtitle(seasonLabel) {
+  const el = document.getElementById("subtitle");
+  if (el) el.textContent = seasonLabel;
+}
 
-  playoffWeeks.forEach(p => {
-    const rec = byWeek.get(p.wk);
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${p.label}</td>
-      <td>${rec ? recordStr(rec.ats) : "—"}</td>
-      <td>${rec ? recordStr(rec.ou) : "—"}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+function highlightWinners() {
+  // unchanged
 }
 
 // ===== MAIN =====
 async function main() {
   const csv = await fetchText(METRICS_CSV);
   const rows = parseCSV(csv);
+
+  const seasonLabel = "2025";
 
   const nikki = gradeByWeek(rows, "nikki");
   const mat   = gradeByWeek(rows, "mat");
@@ -104,8 +123,11 @@ async function main() {
   const matBody = document.querySelector("#matTable tbody");
   if (!nikBody || !matBody) return;
 
-  fillTable(nikBody, nikki);
-  fillTable(matBody, mat);
+  fillTable(nikBody, seasonLabel, nikki);
+  fillTable(matBody, seasonLabel, mat);
+  setSubtitle(seasonLabel);
+
+  highlightWinners();
 }
 
 main();
