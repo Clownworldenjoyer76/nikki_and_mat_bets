@@ -6,6 +6,10 @@ const CSV_CANDIDATES = [
   "data/weekly/latest.csv"
 ];
 
+const OWNER = "clownworldenjoyer76";
+const REPO  = "nikki_and_mat_bets";
+const BRANCH = "main";
+
 // ---------- UTILS ----------
 function normalizeTeamName(name){
   if(name === "Washington Commanders") return "Washington Redskins";
@@ -34,10 +38,15 @@ function onlyConsensus(rows, hdr){
     (iBook !== -1 && String(r[iBook]).trim().toUpperCase() === "CONSENSUS")
   );
 }
-function keyOf(r,h){ return `${r[h.indexOf("away_team")]}@${r[h.indexOf("home_team")]}_${r[h.indexOf("commence_time_utc")]}`; }
+function keyOf(r,h){
+  return `${r[h.indexOf("away_team")]}@${r[h.indexOf("home_team")]}_${r[h.indexOf("commence_time_utc")]}`;
+}
 function fmtDate(iso){
   const d = new Date(iso);
-  return d.toLocaleString("en-US", { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", hour12:true });
+  return d.toLocaleString("en-US", {
+    weekday:"long", month:"long", day:"numeric",
+    hour:"numeric", minute:"2-digit", hour12:true
+  });
 }
 function nflWeekLabel(csvWeek){
   const base = 36;
@@ -55,6 +64,12 @@ function logoPath(team){
   const parts = cleaned.split(" ");
   const nickname = parts[parts.length - 1].toLowerCase();
   return `assets/logos/${nickname}.png`;
+}
+function apiContentsUrl(path){
+  return `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`;
+}
+function b64EncodeUtf8(str){
+  return btoa(unescape(encodeURIComponent(str)));
 }
 
 // ---------- STORAGE ----------
@@ -83,35 +98,32 @@ function makePickButton(label, type, side, curPick, color, key, user){
   b.textContent = label;
   b.dataset.type = type;
   b.dataset.side = side;
-  if( (type === "spread" && curPick.spread === side) ||
-      (type === "total"  && curPick.total  === side) ){
+  if(
+    (type === "spread" && curPick.spread === side) ||
+    (type === "total"  && curPick.total  === side)
+  ){
     b.classList.add("active", color);
   }
   b.onclick = async ()=>{
-    try {
-      const all = loadPicks();
-      const mine = all[user] || {};
-      const current = ensurePickShape(mine[key]);
+    const all = loadPicks();
+    const mine = all[user] || {};
+    const current = ensurePickShape(mine[key]);
 
-      if(type === "spread"){
-        current.spread = (current.spread === side) ? null : side;
-      }else if(type === "total"){
-        current.total  = (current.total  === side) ? null : side;
-      }
-
-      if(current.spread === null && current.total === null){
-        delete mine[key];
-      }else{
-        mine[key] = current;
-      }
-
-      all[user] = mine;
-      savePicks(all);
-
-      await render();
-    } catch (e) {
-      alert("Error: " + e.message);
+    if(type === "spread"){
+      current.spread = (current.spread === side) ? null : side;
+    }else{
+      current.total  = (current.total  === side) ? null : side;
     }
+
+    if(current.spread === null && current.total === null){
+      delete mine[key];
+    }else{
+      mine[key] = current;
+    }
+
+    all[user] = mine;
+    savePicks(all);
+    await render();
   };
   return b;
 }
@@ -133,16 +145,16 @@ function card(h, r, picksAll){
   el.className = "card";
   el.innerHTML = `
     <div class="matchgrid">
-      <img class="team-logo" src="${logoPath(away)}" alt="${away} logo">
+      <img class="team-logo" src="${logoPath(away)}">
       <div class="matchtext">
         <div class="team">${away}</div>
         <div class="at">@</div>
         <div class="team">${home}</div>
       </div>
-      <img class="team-logo right" src="${logoPath(home)}" alt="${home} logo">
+      <img class="team-logo right" src="${logoPath(home)}">
     </div>
-    <div class="when" style="text-align:center; margin-top:6px;">${when}</div>
-    <div class="line" style="text-align:center; margin-top:6px;">
+    <div class="when" style="text-align:center;margin-top:6px;">${when}</div>
+    <div class="line" style="text-align:center;margin-top:6px;">
       <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
       <span class="pill" style="margin-left:8px;">Total: <b>${totalDisp}</b></span>
     </div>
@@ -172,12 +184,12 @@ function card(h, r, picksAll){
     const picksUser = picksAll[user] || {};
     const curPick = ensurePickShape(picksUser[key]);
 
-    const btnAway  = makePickButton(`${away} ${spreadAway}`,      "spread", "away",  curPick, color, key, user);
-    const btnOver  = makePickButton(`Over ${totalDisp}`,          "total",  "over",  curPick, color, key, user);
-    const btnHome  = makePickButton(`${home} ${spreadHomeDisp}`,  "spread", "home",  curPick, color, key, user);
-    const btnUnder = makePickButton(`Under ${totalDisp}`,         "total",  "under", curPick, color, key, user);
-
-    [btnAway, btnOver, btnHome, btnUnder].forEach(b=> grid.appendChild(b));
+    [
+      makePickButton(`${away} ${spreadAway}`, "spread","away",curPick,color,key,user),
+      makePickButton(`Over ${totalDisp}`,     "total","over",curPick,color,key,user),
+      makePickButton(`${home} ${spreadHomeDisp}`,"spread","home",curPick,color,key,user),
+      makePickButton(`Under ${totalDisp}`,    "total","under",curPick,color,key,user)
+    ].forEach(b=>grid.appendChild(b));
 
     section.appendChild(grid);
     el.appendChild(section);
@@ -189,60 +201,106 @@ function card(h, r, picksAll){
 function neonDivider(){
   const div = document.createElement("div");
   div.className = "neon-divider";
-  div.setAttribute("style",
-    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;pointer-events:none;");
+  div.style.cssText =
+    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;";
   return div;
 }
 
 async function render(){
-  const { txt, used } = await fetchFirstAvailable(CSV_CANDIDATES);
-
+  const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
   const { hdr, rows } = parseCSV(txt);
-  const consensus = onlyConsensus(rows, hdr);
-  const source = consensus.length ? consensus : rows;
-  if(!source.length) throw new Error("No rows found in latest.csv");
+  const source = onlyConsensus(rows, hdr).length ? onlyConsensus(rows, hdr) : rows;
+  if(!source.length) throw new Error("No rows");
 
   const iWeek = hdr.indexOf("week");
-  const wkVal = iWeek !== -1 ? source[0][iWeek] : "";
-  const week = wkVal ? nflWeekLabel(wkVal) : "";
-  const season = iWeek !== -1 ? source[0][hdr.indexOf("season")] : "";
+  const week = nflWeekLabel(source[0][iWeek]);
+  const season = source[0][hdr.indexOf("season")];
 
-  document.getElementById("seasonWeek").textContent = week ? `NFL Week ${week}` : "NFL Schedule";
+  document.getElementById("seasonWeek").textContent = `NFL Week ${week}`;
   window._season = season;
   window._week = String(week).padStart(2,"0");
 
   const picksAll = loadPicks();
   const gamesDiv = document.getElementById("games");
   gamesDiv.innerHTML = "";
-  source.forEach((r, i)=>{
-    const c = card(hdr,r,picksAll);
-    gamesDiv.appendChild(c);
-    if(i < source.length - 1){
-      gamesDiv.appendChild(neonDivider());
-    }
+  source.forEach((r,i)=>{
+    gamesDiv.appendChild(card(hdr,r,picksAll));
+    if(i < source.length-1) gamesDiv.appendChild(neonDivider());
   });
 }
+
+// ---------- SAVE PICKS DIRECTLY ----------
+document.getElementById("issueBtn").onclick = async ()=>{
+  const season = window._season;
+  const week   = window._week;
+  if(!season || !week){
+    alert("Season/week not set.");
+    return;
+  }
+
+  const picksAll = loadPicks();
+  const rows = [];
+
+  Object.entries(picksAll).forEach(([picker, games])=>{
+    Object.entries(games).forEach(([game_id, p])=>{
+      if(p.spread){
+        rows.push({ season, week, game_id, picker, pick_type:"ATS", pick:p.spread });
+      }
+      if(p.total){
+        rows.push({ season, week, game_id, picker, pick_type:"OU", pick:p.total });
+      }
+    });
+  });
+
+  if(!rows.length){
+    alert("No picks selected.");
+    return;
+  }
+
+  const headers = ["season","week","game_id","picker","pick_type","pick"];
+  const csv =
+    headers.join(",") + "\n" +
+    rows.map(r=>headers.map(h=>r[h]).join(",")).join("\n");
+
+  const token = prompt("GitHub token (contents:write)");
+  if(!token) return;
+
+  const path = `docs/data/picks/${season}_wk${week}_picks.csv`;
+
+  let sha = null;
+  const meta = await fetch(apiContentsUrl(path), {
+    headers:{ Authorization:`token ${token}` }
+  });
+  if(meta.ok){
+    sha = (await meta.json()).sha;
+  }
+
+  const res = await fetch(apiContentsUrl(path), {
+    method:"PUT",
+    headers:{
+      Authorization:`token ${token}`,
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      message:`Save picks ${season} wk${week}`,
+      content:b64EncodeUtf8(csv),
+      sha,
+      branch:BRANCH
+    })
+  });
+
+  if(!res.ok){
+    alert("Save failed.");
+    return;
+  }
+
+  alert("Picks saved to CSV.");
+};
 
 document.getElementById("clearBtn").onclick = ()=>{
   localStorage.removeItem(LS_MAT);
   localStorage.removeItem(LS_NIK);
   render();
 };
-document.getElementById("issueBtn").onclick = ()=>{
-  try {
-    const season = window._season || new Date().getFullYear();
-    const week = window._week || "01";
-    const picks = localStorage.getItem("picks_mat") || "{}" ;
-    const picks2 = localStorage.getItem("picks_nikki") || "{}";
-    const title = encodeURIComponent(`Nikki and Mat’s NFL Picks — ${season} WK${week}`);
-    const body  = encodeURIComponent(`Paste (do not edit) between the fences:\n\n\`\`\`json\n{ "mat": ${picks}, "nikki": ${picks2} }\n\`\`\`\n`);
-    window.open(`https://github.com/Clownworldenjoyer76/nikki_and_mat_bets/issues/new?title=${title}&body=${body}`, "_blank");
-  } catch (e) {
-    alert("Error: " + e.message);
-  }
-};
 
-render().catch(err=>{
-  console.error(err);
-  alert("Failed to load schedule CSV.");
-});
+render().catch(()=>alert("Failed to load schedule CSV."));
