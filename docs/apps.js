@@ -48,11 +48,6 @@ function fmtDate(iso){
     hour:"numeric", minute:"2-digit", hour12:true
   });
 }
-function nflWeekLabel(csvWeek){
-  const base = 36;
-  const w = ((parseInt(csvWeek,10) - base) % 18 + 18) % 18 + 1;
-  return w;
-}
 function fmtSigned(n){
   if(n === "" || n === null || n === undefined) return "";
   const v = Number(n);
@@ -206,6 +201,7 @@ function neonDivider(){
   return div;
 }
 
+// ---------- RENDER ----------
 async function render(){
   const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
   const { hdr, rows } = parseCSV(txt);
@@ -213,12 +209,23 @@ async function render(){
   if(!source.length) throw new Error("No rows");
 
   const iWeek = hdr.indexOf("week");
-  const week = nflWeekLabel(source[0][iWeek]);
-  const season = source[0][hdr.indexOf("season")];
+  const csvWeek = parseInt(source[0][iWeek], 10);
+  const csvSeason = parseInt(source[0][hdr.indexOf("season")], 10);
 
-  document.getElementById("seasonWeek").textContent = `NFL Week ${week}`;
-  window._season = season;
-  window._week = String(week).padStart(2,"0");
+  // ---------- POSTSEASON FIX ----------
+  let nflSeason = csvSeason;
+  let nflWeek;
+
+  if (csvWeek >= 1 && csvWeek <= 4 && new Date(source[0][hdr.indexOf("commence_time_utc")]).getFullYear() > csvSeason) {
+    nflSeason = csvSeason - 1;
+    nflWeek = 18 + csvWeek;
+  } else {
+    nflWeek = csvWeek;
+  }
+
+  document.getElementById("seasonWeek").textContent = `NFL Week ${nflWeek}`;
+  window._season = nflSeason;
+  window._week = String(nflWeek).padStart(2,"0");
 
   const picksAll = loadPicks();
   const gamesDiv = document.getElementById("games");
@@ -229,7 +236,7 @@ async function render(){
   });
 }
 
-// ---------- SAVE PICKS DIRECTLY (REPLACES ISSUE FLOW) ----------
+// ---------- SAVE PICKS DIRECT ----------
 document.getElementById("issueBtn").onclick = async ()=>{
   const season = window._season;
   const week   = window._week;
