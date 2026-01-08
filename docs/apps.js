@@ -229,7 +229,7 @@ async function render(){
   });
 }
 
-// ---------- SAVE PICKS DIRECTLY ----------
+// ---------- SAVE PICKS DIRECTLY (REPLACES ISSUE FLOW) ----------
 document.getElementById("issueBtn").onclick = async ()=>{
   const season = window._season;
   const week   = window._week;
