@@ -106,7 +106,8 @@ async function loadGames() {
     return;
   }
 
-  filePath = `docs/data/scores/${season}_wk${wk}_scores.csv`;
+  // IMPORTANT: Pages root is /docs, so public path must NOT include "docs/"
+  filePath = `data/scores/${season}_wk${wk}_scores.csv`;
 
   const res = await fetch(pagesCsvUrl(filePath), { cache: "no-store" });
   if (!res.ok) {
@@ -115,8 +116,7 @@ async function loadGames() {
   }
 
   const text = await res.text();
-  const lines = text.replace(/\r\n/g, "\n").trim().split("\n");
-  headers = lines[0].split(",").map(h => h.trim());
+  headers = text.replace(/\r\n/g, "\n").trim().split("\n")[0].split(",").map(h => h.trim());
   rows = parseCSV(text);
 
   tbody.innerHTML = "";
