@@ -6,8 +6,8 @@ const CSV_CANDIDATES = [
   "data/weekly/latest.csv"
 ];
 
-const OWNER  = "clownworldenjoyer76";
-const REPO   = "nikki_and_mat_bets";
+const OWNER = "clownworldenjoyer76";
+const REPO  = "nikki_and_mat_bets";
 const BRANCH = "main";
 
 // ---------- UTILS ----------
@@ -15,26 +15,21 @@ function normalizeTeamName(name){
   if(name === "Washington Commanders") return "Washington Redskins";
   return name;
 }
-
 async function fetchFirstAvailable(urls){
   for(const p of urls){
     const url = p + (p.includes("?") ? "&" : "?") + "v=" + Date.now();
     try{
       const r = await fetch(url, { cache: "no-store" });
       if(r.ok) return { txt: await r.text(), used: p };
-    }catch{}
+    }catch(_e){}
   }
   throw new Error("Schedule CSV not found");
 }
-
 function parseCSV(txt){
-  const rows = txt.trim().split(/\r?\n/).map(l =>
-    l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/)
-  );
+  const rows = txt.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/));
   const hdr = rows.shift() || [];
   return { hdr, rows };
 }
-
 function onlyConsensus(rows, hdr){
   const iBook = hdr.indexOf("book");
   const iCons = hdr.indexOf("is_consensus");
@@ -43,84 +38,84 @@ function onlyConsensus(rows, hdr){
     (iBook !== -1 && String(r[iBook]).trim().toUpperCase() === "CONSENSUS")
   );
 }
-
 function keyOf(r,h){
   return `${r[h.indexOf("away_team")]}@${r[h.indexOf("home_team")]}_${r[h.indexOf("commence_time_utc")]}`;
 }
-
 function fmtDate(iso){
   const d = new Date(iso);
-  return d.toLocaleString("en-US", {
-    weekday:"long", month:"long", day:"numeric",
-    hour:"numeric", minute:"2-digit", hour12:true
-  });
+  return d.toLocaleString("en-US", { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", hour12:true });
 }
-
+function nflWeekLabel(csvWeek){
+  const base = 36;
+  return ((parseInt(csvWeek,10) - base) % 18 + 18) % 18 + 1;
+}
 function fmtSigned(n){
-  if(n === "" || n == null) return "";
+  if(n === "" || n === null || n === undefined) return "";
   const v = Number(n);
   if(Number.isNaN(v)) return String(n);
-  return v > 0 ? `+${v}` : `${v}`;
+  return v>0?`+${v}`:`${v}`;
 }
-
 function logoPath(team){
-  const cleaned = team.replace(/[^A-Za-z0-9 ]/g," ").replace(/\s+/g," ").trim();
-  const nickname = cleaned.split(" ").pop().toLowerCase();
+  const cleaned = team.replace(/[^A-Za-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  const parts = cleaned.split(" ");
+  const nickname = parts[parts.length - 1].toLowerCase();
   return `assets/logos/${nickname}.png`;
 }
-
 function apiContentsUrl(path){
   return `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`;
 }
-
-function b64(str){
+function b64EncodeUtf8(str){
   return btoa(unescape(encodeURIComponent(str)));
 }
 
 // ---------- STORAGE ----------
 const LS_MAT = "picks_mat";
 const LS_NIK = "picks_nikki";
-
 function loadPicks(){
   return {
     mat: JSON.parse(localStorage.getItem(LS_MAT) || "{}"),
     nikki: JSON.parse(localStorage.getItem(LS_NIK) || "{}"),
   };
 }
-
 function savePicks(all){
   localStorage.setItem(LS_MAT, JSON.stringify(all.mat || {}));
   localStorage.setItem(LS_NIK, JSON.stringify(all.nikki || {}));
 }
-
-function ensurePickShape(o){
-  if(!o || typeof o !== "object") return { spread:null, total:null };
-  return { spread:o.spread ?? null, total:o.total ?? null };
+function ensurePickShape(obj){
+  if(!obj || typeof obj !== "object") return { spread: null, total: null };
+  return { spread: obj.spread ?? null, total: obj.total ?? null };
 }
 
-// ---------- UI ----------
-function makePickButton(label,type,side,curPick,color,key,user){
+// ---------- RENDER HELPERS ----------
+function makePickButton(label, type, side, curPick, color, key, user){
   const b = document.createElement("button");
   b.className = "pickbtn";
+  b.type = "button";
   b.textContent = label;
-
+  b.dataset.type = type;
+  b.dataset.side = side;
   if(
-    (type==="spread" && curPick.spread===side) ||
-    (type==="total"  && curPick.total===side)
+    (type === "spread" && curPick.spread === side) ||
+    (type === "total"  && curPick.total  === side)
   ){
-    b.classList.add("active",color);
+    b.classList.add("active", color);
   }
-
   b.onclick = async ()=>{
     const all = loadPicks();
     const mine = all[user] || {};
-    const cur  = ensurePickShape(mine[key]);
+    const current = ensurePickShape(mine[key]);
 
-    if(type==="spread") cur.spread = cur.spread===side ? null : side;
-    else cur.total = cur.total===side ? null : side;
+    if(type === "spread"){
+      current.spread = (current.spread === side) ? null : side;
+    }else{
+      current.total  = (current.total  === side) ? null : side;
+    }
 
-    if(cur.spread==null && cur.total==null) delete mine[key];
-    else mine[key] = cur;
+    if(current.spread === null && current.total === null){
+      delete mine[key];
+    }else{
+      mine[key] = current;
+    }
 
     all[user] = mine;
     savePicks(all);
@@ -129,81 +124,106 @@ function makePickButton(label,type,side,curPick,color,key,user){
   return b;
 }
 
-function card(h,r,picksAll){
+// ---------- CARD (UNCHANGED MARKUP) ----------
+function card(h, r, picksAll){
   const when = fmtDate(r[h.indexOf("commence_time_utc")]);
   const home = normalizeTeamName(r[h.indexOf("home_team")]);
   const away = normalizeTeamName(r[h.indexOf("away_team")]);
 
-  const spreadHome = r[h.indexOf("spread_home")] || "";
-  const total = r[h.indexOf("total")] || "";
-  const spreadAway = spreadHome==="" ? "" : fmtSigned(-Number(spreadHome));
+  const spreadHome  = r[h.indexOf("spread_home")] || "";
+  const total       = r[h.indexOf("total")] || "";
+  const spreadAway  = spreadHome === "" ? "" : fmtSigned(-Number(spreadHome));
+  const spreadHomeDisp = fmtSigned(spreadHome);
+  const totalDisp   = total;
 
-  const key = keyOf(r,h);
+  const key  = keyOf(r,h);
 
   const el = document.createElement("article");
   el.className = "card";
   el.innerHTML = `
     <div class="matchgrid">
-      <img class="team-logo" src="${logoPath(away)}">
+      <img class="team-logo" src="${logoPath(away)}" alt="${away} logo">
       <div class="matchtext">
         <div class="team">${away}</div>
         <div class="at">@</div>
         <div class="team">${home}</div>
       </div>
-      <img class="team-logo right" src="${logoPath(home)}">
+      <img class="team-logo right" src="${logoPath(home)}" alt="${home} logo">
     </div>
-    <div class="when">${when}</div>
-    <div class="line">
-      <span class="pill">Home spread: <b>${fmtSigned(spreadHome)}</b></span>
-      <span class="pill">Total: <b>${total}</b></span>
+    <div class="when" style="text-align:center; margin-top:6px;">${when}</div>
+    <div class="line" style="text-align:center; margin-top:6px;">
+      <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
+      <span class="pill" style="margin-left:8px;">Total: <b>${totalDisp}</b></span>
     </div>
   `;
 
   ["mat","nikki"].forEach(user=>{
-    const sec = document.createElement("div");
-    const name = document.createElement("div");
-    name.className = "name "+user;
-    name.textContent = user==="mat"?"Mat":"Nikki";
-    sec.appendChild(name);
+    const section = document.createElement("div");
+    section.style.marginTop = "10px";
+
+    const nameDiv = document.createElement("div");
+    nameDiv.className = "name " + user;
+    nameDiv.textContent = user==="mat" ? "Mat" : "Nikki";
+    nameDiv.style.textAlign = "center";
+    nameDiv.style.fontWeight = "600";
+    nameDiv.style.margin = "6px 0";
+    section.appendChild(nameDiv);
 
     const grid = document.createElement("div");
     grid.className = "pick-grid";
+    grid.style.display = "grid";
+    grid.style.gridTemplateColumns = "1fr 1fr";
+    grid.style.columnGap = "8px";
+    grid.style.rowGap = "8px";
+    grid.style.marginTop = "6px";
 
-    const cur = ensurePickShape((picksAll[user]||{})[key]);
-    const color = user==="mat"?"mat":"nikki";
+    const color = user==="mat" ? "mat" : "nikki";
+    const picksUser = picksAll[user] || {};
+    const curPick = ensurePickShape(picksUser[key]);
 
     [
-      makePickButton(`${away} ${spreadAway}`,"spread","away",cur,color,key,user),
-      makePickButton(`Over ${total}`,"total","over",cur,color,key,user),
-      makePickButton(`${home} ${fmtSigned(spreadHome)}`,"spread","home",cur,color,key,user),
-      makePickButton(`Under ${total}`,"total","under",cur,color,key,user)
+      makePickButton(`${away} ${spreadAway}`, "spread","away",curPick,color,key,user),
+      makePickButton(`Over ${totalDisp}`, "total","over",curPick,color,key,user),
+      makePickButton(`${home} ${spreadHomeDisp}`, "spread","home",curPick,color,key,user),
+      makePickButton(`Under ${totalDisp}`, "total","under",curPick,color,key,user)
     ].forEach(b=>grid.appendChild(b));
 
-    sec.appendChild(grid);
-    el.appendChild(sec);
+    section.appendChild(grid);
+    el.appendChild(section);
   });
 
   return el;
+}
+
+function neonDivider(){
+  const div = document.createElement("div");
+  div.className = "neon-divider";
+  div.setAttribute(
+    "style",
+    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;pointer-events:none;"
+  );
+  return div;
 }
 
 // ---------- RENDER ----------
 async function render(){
   const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
   const { hdr, rows } = parseCSV(txt);
-  const src = onlyConsensus(rows,hdr).length ? onlyConsensus(rows,hdr) : rows;
+  const source = onlyConsensus(rows, hdr).length ? onlyConsensus(rows, hdr) : rows;
 
   const iWeek   = hdr.indexOf("week");
   const iSeason = hdr.indexOf("season");
   const iTime   = hdr.indexOf("commence_time_utc");
 
-  const csvWeek   = parseInt(src[0][iWeek],10);
-  const csvSeason = parseInt(src[0][iSeason],10);
-  const gameYear  = new Date(src[0][iTime]).getFullYear();
+  const csvWeek   = parseInt(source[0][iWeek],10);
+  const csvSeason = parseInt(source[0][iSeason],10);
+  const gameYear  = new Date(source[0][iTime]).getFullYear();
 
   let nflWeek = csvWeek;
   let nflSeason = csvSeason;
 
-  if(csvWeek>=1 && csvWeek<=4 && gameYear>csvSeason){
+  // ✅ FIX: postseason remap
+  if(csvWeek >= 1 && csvWeek <= 4 && gameYear > csvSeason){
     nflWeek = 18 + csvWeek;
     nflSeason = csvSeason - 1;
   }
@@ -214,20 +234,18 @@ async function render(){
   document.getElementById("seasonWeek").textContent = `NFL Week ${nflWeek}`;
 
   const picksAll = loadPicks();
-  const games = document.getElementById("games");
-  games.innerHTML = "";
+  const gamesDiv = document.getElementById("games");
+  gamesDiv.innerHTML = "";
 
-  src.forEach((r,i)=>{
-    games.appendChild(card(hdr,r,picksAll));
-    if(i<src.length-1){
-      const d = document.createElement("div");
-      d.className="neon-divider";
-      games.appendChild(d);
+  source.forEach((r,i)=>{
+    gamesDiv.appendChild(card(hdr,r,picksAll));
+    if(i < source.length - 1){
+      gamesDiv.appendChild(neonDivider());
     }
   });
 }
 
-// ---------- SAVE PICKS (CORRECT + VERIFIED) ----------
+// ---------- SAVE PICKS (VERIFIED) ----------
 document.getElementById("issueBtn").onclick = async ()=>{
   const season = window._season;
   const week   = window._week;
@@ -253,7 +271,8 @@ document.getElementById("issueBtn").onclick = async ()=>{
   }
 
   const headers = ["season","week","game_id","picker","pick_type","pick"];
-  const csv = headers.join(",")+"\n"+rows.map(r=>headers.map(h=>r[h]).join(",")).join("\n");
+  const csv = headers.join(",") + "\n" +
+    rows.map(r=>headers.map(h=>r[h]).join(",")).join("\n");
 
   const token = prompt("GitHub token (contents:write)");
   if(!token) return;
@@ -265,8 +284,7 @@ document.getElementById("issueBtn").onclick = async ()=>{
     headers:{ Authorization:`token ${token}` }
   });
   if(meta.ok){
-    const j = await meta.json();
-    sha = j.sha;
+    sha = (await meta.json()).sha;
   }
 
   const res = await fetch(apiContentsUrl(path), {
@@ -277,16 +295,15 @@ document.getElementById("issueBtn").onclick = async ()=>{
     },
     body:JSON.stringify({
       message:`Save picks ${season} wk${week}`,
-      content:b64(csv),
+      content:b64EncodeUtf8(csv),
       sha,
       branch:BRANCH
     })
   });
 
   const out = await res.json();
-
   if(!out.content || out.content.path !== path){
-    alert("Save FAILED. GitHub did not create the file.");
+    alert("SAVE FAILED — file not written");
     console.error(out);
     return;
   }
@@ -294,14 +311,10 @@ document.getElementById("issueBtn").onclick = async ()=>{
   alert(`Saved: ${out.content.path}`);
 };
 
-// ---------- CLEAR ----------
 document.getElementById("clearBtn").onclick = ()=>{
   localStorage.removeItem(LS_MAT);
   localStorage.removeItem(LS_NIK);
   render();
 };
 
-render().catch(e=>{
-  console.error(e);
-  alert("Failed to load schedule CSV");
-});
+render().catch(()=>alert("Failed to load schedule CSV"));
