@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 
 import os
+import re
 import csv
+import sys
+from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from dateutil import tz
 import requests
 
-API_KEY = os.environ["ODDS_API_KEY"]
+API_KEY = os.environ.get("ODDS_API_KEY")
+if not API_KEY:
+    print("ERROR: ODDS_API_KEY env var is required", file=sys.stderr)
+    sys.exit(1)
+
 SPORT = "americanfootball_nfl"
 BASE = "https://api.the-odds-api.com/v4"
 REGION = "us"
@@ -15,8 +22,8 @@ ODDS_FMT = "american"
 
 NY = tz.gettz("America/New_York")
 
-OUTDIR = "docs/data/weekly"
-LATEST_PATH = f"{OUTDIR}/latest.csv"
+OUTDIR = Path("docs/data/weekly")
+LATEST_PATH = OUTDIR / "latest.csv"
 
 HEADERS = [
     "season",
@@ -33,6 +40,14 @@ HEADERS = [
     "is_consensus",
 ]
 
+FNAME_RE = re.compile(r"^(?P<season>\d{4})_wk(?P<wk>\d{2})_odds\.csv$")
+
+
+def die(msg: str, code: int = 1):
+    print(f"ERROR: {msg}", file=sys.stderr)
+    sys.exit(code)
+
+
 def median(vals):
     x = sorted(v for v in vals if v is not None)
     if not x:
@@ -40,22 +55,43 @@ def median(vals):
     n = len(x)
     return x[n // 2] if n % 2 else (x[n // 2 - 1] + x[n // 2]) / 2
 
-def week_window_ny(now_ny):
-    start = now_ny.replace(hour=0, minute=0, second=0, microsecond=0)
-    end = start + timedelta(days=6, hours=23, minutes=59)
-    return start.astimezone(timezone.utc), end.astimezone(timezone.utc)
+
+def latest_existing_season_week(outdir: Path):
+    if not outdir.exists():
+        return None
+
+    best = None  # tuple (season:int, week:int)
+    for p in outdir.glob("*_wk*_odds.csv"):
+        m = FNAME_RE.match(p.name)
+        if not m:
+            continue
+        s = int(m.group("season"))
+        w = int(m.group("wk"))
+        if best is None or (s, w) > best:
+            best = (s, w)
+    return best
+
+
+def choose_label_season_week():
+    # Prefer explicit env vars if provided
+    s_env = os.environ.get("NFL_SEASON", "").strip()
+    w_env = os.environ.get("NFL_WEEK", "").strip()
+
+    if s_env and w_env:
+        if not (s_env.isdigit() and w_env.isdigit()):
+            die("NFL_SEASON and NFL_WEEK must be numeric if provided")
+        return int(s_env), int(w_env)
+
+    # Otherwise, reuse the latest existing week file in docs/data/weekly
+    best = latest_existing_season_week(OUTDIR)
+    if best:
+        return best
+
+    die("No existing *_wk##_odds.csv found in docs/data/weekly and NFL_SEASON/NFL_WEEK not provided")
+
 
 def main():
-    now_ny = datetime.now(tz=NY)
-
-    # IMPORTANT:
-    # We intentionally do NOT try to compute NFL week here.
-    # Whatever week/season you want should already be reflected
-    # in the events being pulled (postseason included).
-    season = now_ny.year
-    week = now_ny.isocalendar().week
-
-    start_utc, end_utc = week_window_ny(now_ny)
+    season, week = choose_label_season_week()
 
     params = {
         "apiKey": API_KEY,
@@ -68,6 +104,22 @@ def main():
     resp = requests.get(f"{BASE}/sports/{SPORT}/odds", params=params, timeout=30)
     resp.raise_for_status()
     events = resp.json()
+
+    if not events:
+        die("No events returned from odds API")
+
+    # Define the "current week window" based on the earliest event returned (not 'now')
+    ct_ny_list = []
+    for ev in events:
+        ct = datetime.fromisoformat(ev["commence_time"].replace("Z", "+00:00"))
+        ct_ny_list.append(ct.astimezone(NY))
+
+    earliest_ny = min(ct_ny_list)
+    start_ny = earliest_ny.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_ny = start_ny + timedelta(days=6, hours=23, minutes=59)
+
+    start_utc = start_ny.astimezone(timezone.utc)
+    end_utc = end_ny.astimezone(timezone.utc)
 
     rows = []
 
@@ -84,17 +136,18 @@ def main():
         sh_vals, sa_vals, tot_vals = [], [], []
 
         for bk in ev.get("bookmakers", []):
-            book = bk["title"]
+            book = bk.get("title", "")
             sh = sa = tot = None
 
             for m in bk.get("markets", []):
-                if m["key"] == "spreads":
+                if m.get("key") == "spreads":
                     for o in m.get("outcomes", []):
-                        if o["name"] == home and "point" in o:
+                        nm = o.get("name")
+                        if nm == home and "point" in o:
                             sh = float(o["point"])
-                        elif o["name"] == away and "point" in o:
+                        elif nm == away and "point" in o:
                             sa = float(o["point"])
-                elif m["key"] == "totals":
+                elif m.get("key") == "totals":
                     for o in m.get("outcomes", []):
                         if "point" in o:
                             tot = float(o["point"])
@@ -138,16 +191,26 @@ def main():
                 1,
             ])
 
-    os.makedirs(OUTDIR, exist_ok=True)
+    OUTDIR.mkdir(parents=True, exist_ok=True)
 
-    # 🔑 KEY CHANGE:
-    # latest.csv is ALWAYS overwritten and contains ONLY this pull
-    with open(LATEST_PATH, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(HEADERS)
-        writer.writerows(rows)
+    week_tag = f"{week:02d}"
+    week_file = OUTDIR / f"{season}_wk{week_tag}_odds.csv"
 
+    # Write the per-week file
+    with week_file.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(HEADERS)
+        w.writerows(rows)
+
+    # Overwrite latest.csv with THIS week's file content
+    with LATEST_PATH.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(HEADERS)
+        w.writerows(rows)
+
+    print(f"Wrote {week_file} ({len(rows)} rows)")
     print(f"Wrote {LATEST_PATH} ({len(rows)} rows)")
+
 
 if __name__ == "__main__":
     main()
