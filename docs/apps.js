@@ -1,3 +1,5 @@
+// docs/apps.js
+
 // ---------- CONFIG ----------
 const PRIMARY_CSV = "docs/data/weekly/latest.csv";
 const CSV_CANDIDATES = [
@@ -38,15 +40,15 @@ function onlyConsensus(rows, hdr){
     (iBook !== -1 && String(r[iBook]).trim().toUpperCase() === "CONSENSUS")
   );
 }
-function keyOf(r,h){ return `${r[h.indexOf("away_team")]}@${r[h.indexOf("home_team")]}_${r[h.indexOf("commence_time_utc")]}`; }
+function keyOf(r,h){
+  return `${r[h.indexOf("away_team")]}@${r[h.indexOf("home_team")]}_${r[h.indexOf("commence_time_utc")]}`;
+}
 function fmtDate(iso){
   const d = new Date(iso);
-  return d.toLocaleString("en-US", { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", hour12:true });
-}
-function nflWeekLabel(csvWeek){
-  const base = 36;
-  const w = ((parseInt(csvWeek,10) - base) % 18 + 18) % 18 + 1;
-  return w;
+  return d.toLocaleString("en-US", {
+    weekday:"long", month:"long", day:"numeric",
+    hour:"numeric", minute:"2-digit", hour12:true
+  });
 }
 function fmtSigned(n){
   if(n === "" || n === null || n === undefined) return "";
@@ -94,10 +96,10 @@ function makePickButton(label, type, side, curPick, color, key, user){
   b.className = "pickbtn";
   b.type = "button";
   b.textContent = label;
-  b.dataset.type = type;
-  b.dataset.side = side;
-  if( (type === "spread" && curPick.spread === side) ||
-      (type === "total"  && curPick.total  === side) ){
+  if(
+    (type === "spread" && curPick.spread === side) ||
+    (type === "total"  && curPick.total  === side)
+  ){
     b.classList.add("active", color);
   }
   b.onclick = async ()=>{
@@ -108,7 +110,7 @@ function makePickButton(label, type, side, curPick, color, key, user){
     if(type === "spread"){
       current.spread = (current.spread === side) ? null : side;
     }else{
-      current.total  = (current.total  === side) ? null : side;
+      current.total = (current.total === side) ? null : side;
     }
 
     if(current.spread === null && current.total === null){
@@ -133,9 +135,8 @@ function card(h, r, picksAll){
   const total       = r[h.indexOf("total")] || "";
   const spreadAway  = spreadHome === "" ? "" : fmtSigned(-Number(spreadHome));
   const spreadHomeDisp = fmtSigned(spreadHome);
-  const totalDisp   = total;
 
-  const key  = keyOf(r,h);
+  const key = keyOf(r,h);
 
   const el = document.createElement("article");
   el.className = "card";
@@ -152,7 +153,7 @@ function card(h, r, picksAll){
     <div class="when" style="text-align:center; margin-top:6px;">${when}</div>
     <div class="line" style="text-align:center; margin-top:6px;">
       <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
-      <span class="pill" style="margin-left:8px;">Total: <b>${totalDisp}</b></span>
+      <span class="pill" style="margin-left:8px;">Total: <b>${total}</b></span>
     </div>
   `;
 
@@ -182,9 +183,9 @@ function card(h, r, picksAll){
 
     grid.append(
       makePickButton(`${away} ${spreadAway}`, "spread", "away", curPick, color, key, user),
-      makePickButton(`Over ${totalDisp}`, "total", "over", curPick, color, key, user),
+      makePickButton(`Over ${total}`, "total", "over", curPick, color, key, user),
       makePickButton(`${home} ${spreadHomeDisp}`, "spread", "home", curPick, color, key, user),
-      makePickButton(`Under ${totalDisp}`, "total", "under", curPick, color, key, user)
+      makePickButton(`Under ${total}`, "total", "under", curPick, color, key, user)
     );
 
     section.appendChild(grid);
@@ -197,8 +198,10 @@ function card(h, r, picksAll){
 function neonDivider(){
   const div = document.createElement("div");
   div.className = "neon-divider";
-  div.setAttribute("style",
-    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;");
+  div.setAttribute(
+    "style",
+    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;"
+  );
   return div;
 }
 
@@ -211,21 +214,9 @@ async function render(){
 
   const iWeek = hdr.indexOf("week");
   const iSeason = hdr.indexOf("season");
-  const iTime = hdr.indexOf("commence_time_utc");
 
-  const csvWeek = parseInt(games[0][iWeek],10);
-  const csvSeason = parseInt(games[0][iSeason],10);
-  const gameDate = new Date(games[0][iTime]);
-
-  let nflWeek, nflSeason;
-
-  if(gameDate.getMonth() === 0 && csvWeek >= 1 && csvWeek <= 4){
-    nflWeek = 18 + csvWeek;
-    nflSeason = csvSeason - 1;
-  }else{
-    nflWeek = nflWeekLabel(csvWeek);
-    nflSeason = csvSeason;
-  }
+  const nflWeek = parseInt(games[0][iWeek], 10);
+  const nflSeason = parseInt(games[0][iSeason], 10);
 
   document.getElementById("seasonWeek").textContent = `NFL Week ${nflWeek}`;
   window._season = String(nflSeason);
@@ -256,14 +247,18 @@ document.getElementById("issueBtn").onclick = async ()=>{
   });
 
   const headers = ["season","week","game_id","picker","pick_type","pick"];
-  const csv = headers.join(",") + "\n" + rows.map(r=>headers.map(h=>r[h]).join(",")).join("\n");
+  const csv = headers.join(",") + "\n" +
+    rows.map(r=>headers.map(h=>r[h]).join(",")).join("\n");
 
   const token = prompt("GitHub token (contents:write)");
   if(!token) return;
 
   const path = `docs/data/picks/${season}_wk${week}_picks.csv`;
   let sha = null;
-  const meta = await fetch(apiContentsUrl(path), { headers:{Authorization:`token ${token}`}});
+
+  const meta = await fetch(apiContentsUrl(path), {
+    headers:{ Authorization:`token ${token}` }
+  });
   if(meta.ok) sha = (await meta.json()).sha;
 
   const res = await fetch(apiContentsUrl(path), {
@@ -281,7 +276,9 @@ document.getElementById("issueBtn").onclick = async ()=>{
   });
 
   const out = await res.json();
-  if(!out.content || out.content.path !== path) throw new Error("Save failed");
+  if(!out.content || out.content.path !== path){
+    throw new Error("Save failed");
+  }
   alert(`Picks saved: ${out.content.path}`);
 };
 
