@@ -1,0 +1,2 @@
+If you ever change to a different NFL season, update only this line:
+	•	const NFL_WEEK1_ANCHOR_UTC = Date.UTC(YYYY, MM, DD, 0, 0, 0); (Week 1 kickoff Thursday in UTC)
