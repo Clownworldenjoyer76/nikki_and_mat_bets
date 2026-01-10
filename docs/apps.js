@@ -10,6 +10,12 @@ const OWNER = "clownworldenjoyer76";
 const REPO  = "nikki_and_mat_bets";
 const BRANCH = "main";
 
+// Force NFL season labeling and NFL week calculation (do not use calendar year/week)
+const FIXED_NFL_SEASON = "2025";
+// Week 1 kickoff for the 2025 NFL season was Thursday, Sept 4, 2025.
+// We use this as the anchor to compute NFL week numbers (regular season weeks 1-18; postseason continues 19+).
+const NFL_WEEK1_ANCHOR_UTC = Date.UTC(2025, 8, 4, 0, 0, 0); // months are 0-indexed
+
 // ---------- UTILS ----------
 function normalizeTeamName(name){
   if(name === "Washington Commanders") return "Washington Redskins";
@@ -72,6 +78,16 @@ function b64EncodeUtf8(str){
 }
 function pad2(n){
   return String(n).padStart(2,"0");
+}
+
+// Compute NFL week number from a game commence_time_utc ISO string.
+// This avoids ISO/calendar week numbering (e.g., "week 2" in January) and instead follows NFL weeks.
+function nflWeekFromCommenceISO(iso){
+  const d = new Date(iso);
+  if(Number.isNaN(d.getTime())) return null;
+  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+  const w = Math.floor((d.getTime() - NFL_WEEK1_ANCHOR_UTC) / msPerWeek) + 1;
+  return (Number.isFinite(w) && w > 0) ? w : null;
 }
 
 // ---------- STORAGE ----------
@@ -221,18 +237,21 @@ async function render(){
   const consensus = onlyConsensus(rows, hdr);
   const sourceAll = consensus.length ? consensus : rows;
 
-  // *** MINIMAL FIX: select latest NFL week ***
-  const weeks = sourceAll.map(r => parseInt(r[iWeek], 10)).filter(Number.isFinite);
-  const maxWeek = Math.max(...weeks);
+  // Select latest NFL week based on commence_time_utc, not the CSV's "week" column (which may be calendar week).
+  const iCommence = hdr.indexOf("commence_time_utc");
+  if(iCommence === -1) throw new Error('Missing "commence_time_utc" column in latest.csv');
 
-  const games = sourceAll.filter(r => parseInt(r[iWeek], 10) === maxWeek);
+  const nflWeeks = sourceAll.map(r => nflWeekFromCommenceISO(r[iCommence])).filter(Number.isFinite);
+  const maxWeek = Math.max(...nflWeeks);
+  if(!Number.isFinite(maxWeek)) throw new Error("Unable to determine NFL week from commence_time_utc");
+
+  const games = sourceAll.filter(r => nflWeekFromCommenceISO(r[iCommence]) === maxWeek);
   if(!games.length) throw new Error("No games for latest week");
 
-  const csvSeason = games[0][iSeason];
-  const csvWeek   = games[0][iWeek];
+  const csvWeek   = maxWeek;
 
-  document.getElementById("seasonWeek").textContent = `NFL Week ${csvWeek}`;
-  window._season = String(csvSeason);
+  document.getElementById("seasonWeek").textContent = `NFL ${FIXED_NFL_SEASON} — Week ${csvWeek}`;
+  window._season = String(FIXED_NFL_SEASON);
   window._week   = pad2(csvWeek);
 
   const picksAll = loadPicks();
