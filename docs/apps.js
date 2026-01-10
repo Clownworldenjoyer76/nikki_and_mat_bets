@@ -101,30 +101,25 @@ function makePickButton(label, type, side, curPick, color, key, user){
     b.classList.add("active", color);
   }
   b.onclick = async ()=>{
-    try {
-      const all = loadPicks();
-      const mine = all[user] || {};
-      const current = ensurePickShape(mine[key]);
+    const all = loadPicks();
+    const mine = all[user] || {};
+    const current = ensurePickShape(mine[key]);
 
-      if(type === "spread"){
-        current.spread = (current.spread === side) ? null : side;
-      }else if(type === "total"){
-        current.total  = (current.total  === side) ? null : side;
-      }
-
-      if(current.spread === null && current.total === null){
-        delete mine[key];
-      }else{
-        mine[key] = current;
-      }
-
-      all[user] = mine;
-      savePicks(all);
-
-      await render();
-    } catch (e) {
-      alert("Error: " + e.message);
+    if(type === "spread"){
+      current.spread = (current.spread === side) ? null : side;
+    }else{
+      current.total  = (current.total  === side) ? null : side;
     }
+
+    if(current.spread === null && current.total === null){
+      delete mine[key];
+    }else{
+      mine[key] = current;
+    }
+
+    all[user] = mine;
+    savePicks(all);
+    await render();
   };
   return b;
 }
@@ -146,13 +141,13 @@ function card(h, r, picksAll){
   el.className = "card";
   el.innerHTML = `
     <div class="matchgrid">
-      <img class="team-logo" src="${logoPath(away)}" alt="${away} logo">
+      <img class="team-logo" src="${logoPath(away)}">
       <div class="matchtext">
         <div class="team">${away}</div>
         <div class="at">@</div>
         <div class="team">${home}</div>
       </div>
-      <img class="team-logo right" src="${logoPath(home)}" alt="${home} logo">
+      <img class="team-logo right" src="${logoPath(home)}">
     </div>
     <div class="when" style="text-align:center; margin-top:6px;">${when}</div>
     <div class="line" style="text-align:center; margin-top:6px;">
@@ -185,12 +180,12 @@ function card(h, r, picksAll){
     const picksUser = picksAll[user] || {};
     const curPick = ensurePickShape(picksUser[key]);
 
-    const btnAway  = makePickButton(`${away} ${spreadAway}`,      "spread", "away",  curPick, color, key, user);
-    const btnOver  = makePickButton(`Over ${totalDisp}`,          "total",  "over",  curPick, color, key, user);
-    const btnHome  = makePickButton(`${home} ${spreadHomeDisp}`,  "spread", "home",  curPick, color, key, user);
-    const btnUnder = makePickButton(`Under ${totalDisp}`,         "total",  "under", curPick, color, key, user);
-
-    [btnAway, btnOver, btnHome, btnUnder].forEach(b=> grid.appendChild(b));
+    grid.append(
+      makePickButton(`${away} ${spreadAway}`, "spread", "away", curPick, color, key, user),
+      makePickButton(`Over ${totalDisp}`, "total", "over", curPick, color, key, user),
+      makePickButton(`${home} ${spreadHomeDisp}`, "spread", "home", curPick, color, key, user),
+      makePickButton(`Under ${totalDisp}`, "total", "under", curPick, color, key, user)
+    );
 
     section.appendChild(grid);
     el.appendChild(section);
@@ -203,45 +198,36 @@ function neonDivider(){
   const div = document.createElement("div");
   div.className = "neon-divider";
   div.setAttribute("style",
-    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;pointer-events:none;");
+    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;");
   return div;
 }
 
 // ---------- RENDER ----------
 async function render(){
   const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
-
   const { hdr, rows } = parseCSV(txt);
-  const consensus = onlyConsensus(rows, hdr);
-  const source = consensus.length ? consensus : rows;
-  if(!source.length) throw new Error("No rows found in latest.csv");
+  const source = onlyConsensus(rows, hdr);
+  const games = source.length ? source : rows;
 
-  const iWeek   = hdr.indexOf("week");
+  const iWeek = hdr.indexOf("week");
   const iSeason = hdr.indexOf("season");
-  const iTime   = hdr.indexOf("commence_time_utc");
-  if(iWeek === -1 || iSeason === -1 || iTime === -1){
-    throw new Error("latest.csv missing required headers: week, season, commence_time_utc");
+  const iTime = hdr.indexOf("commence_time_utc");
+
+  const csvWeek = parseInt(games[0][iWeek],10);
+  const csvSeason = parseInt(games[0][iSeason],10);
+  const gameDate = new Date(games[0][iTime]);
+
+  let nflWeek, nflSeason;
+
+  if(gameDate.getMonth() === 0 && csvWeek >= 1 && csvWeek <= 4){
+    nflWeek = 18 + csvWeek;
+    nflSeason = csvSeason - 1;
+  }else{
+    nflWeek = nflWeekLabel(csvWeek);
+    nflSeason = csvSeason;
   }
 
-  const csvWeek = parseInt(source[0][iWeek], 10);
-  const csvSeasonNum = parseInt(source[0][iSeason], 10);
-  const gameYear = new Date(source[0][iTime]).getFullYear();
-
-  // --- Correct NFL week/season (postseason weeks 19–22 belong to prior season) ---
-  let nflWeek;
-  let nflSeason;
-
-  // If API reports playoff weeks as 1..4 in the next calendar year (e.g. season=2026, dates in 2026),
-  // map to prior season week 19..22.
-  if(Number.isFinite(csvWeek) && csvWeek >= 1 && csvWeek <= 4 && Number.isFinite(csvSeasonNum) && gameYear > csvSeasonNum){
-    nflWeek = 18 + csvWeek;        // 19..22
-    nflSeason = csvSeasonNum - 1;  // prior season
-  } else {
-    nflWeek = nflWeekLabel(csvWeek);     // existing behavior for weeks 1–18
-    nflSeason = csvSeasonNum;
-  }
-
-  document.getElementById("seasonWeek").textContent = nflWeek ? `NFL Week ${nflWeek}` : "NFL Schedule";
+  document.getElementById("seasonWeek").textContent = `NFL Week ${nflWeek}`;
   window._season = String(nflSeason);
   window._week = pad2(nflWeek);
 
@@ -249,97 +235,54 @@ async function render(){
   const gamesDiv = document.getElementById("games");
   gamesDiv.innerHTML = "";
 
-  source.forEach((r, i)=>{
-    const c = card(hdr,r,picksAll);
-    gamesDiv.appendChild(c);
-    if(i < source.length - 1){
-      gamesDiv.appendChild(neonDivider());
-    }
+  games.forEach((r,i)=>{
+    gamesDiv.appendChild(card(hdr,r,picksAll));
+    if(i < games.length-1) gamesDiv.appendChild(neonDivider());
   });
 }
 
-// ---------- CLEAR ----------
-document.getElementById("clearBtn").onclick = ()=>{
-  localStorage.removeItem(LS_MAT);
-  localStorage.removeItem(LS_NIK);
-  render();
-};
-
-// ---------- SUBMIT PICKS (WRITE CSV, VERIFIED) ----------
+// ---------- SUBMIT PICKS ----------
 document.getElementById("issueBtn").onclick = async ()=>{
-  try {
-    const season = window._season;
-    const week = window._week;
+  const season = window._season;
+  const week = window._week;
+  const picksAll = loadPicks();
 
-    if(!season || !week){
-      throw new Error("Season/week not set yet (page not fully loaded).");
-    }
-
-    const picksAll = loadPicks();
-    const rows = [];
-
-    Object.entries(picksAll).forEach(([picker, games])=>{
-      Object.entries(games).forEach(([game_id, p])=>{
-        if(p && p.spread){
-          rows.push({ season, week, game_id, picker, pick_type: "ATS", pick: p.spread });
-        }
-        if(p && p.total){
-          rows.push({ season, week, game_id, picker, pick_type: "OU", pick: p.total });
-        }
-      });
+  const rows = [];
+  Object.entries(picksAll).forEach(([picker, games])=>{
+    Object.entries(games).forEach(([game_id,p])=>{
+      if(p.spread) rows.push({season,week,game_id,picker,pick_type:"ATS",pick:p.spread});
+      if(p.total)  rows.push({season,week,game_id,picker,pick_type:"OU", pick:p.total});
     });
+  });
 
-    if(!rows.length){
-      alert("No picks selected.");
-      return;
-    }
+  const headers = ["season","week","game_id","picker","pick_type","pick"];
+  const csv = headers.join(",") + "\n" + rows.map(r=>headers.map(h=>r[h]).join(",")).join("\n");
 
-    const headers = ["season","week","game_id","picker","pick_type","pick"];
-    const csv = headers.join(",") + "\n" + rows.map(r => headers.map(h => (r[h] ?? "")).join(",")).join("\n");
+  const token = prompt("GitHub token (contents:write)");
+  if(!token) return;
 
-    const token = prompt("Enter GitHub token (contents:write)");
-    if(!token) return;
+  const path = `docs/data/picks/${season}_wk${week}_picks.csv`;
+  let sha = null;
+  const meta = await fetch(apiContentsUrl(path), { headers:{Authorization:`token ${token}`}});
+  if(meta.ok) sha = (await meta.json()).sha;
 
-    const path = `docs/data/picks/${season}_wk${week}_picks.csv`;
+  const res = await fetch(apiContentsUrl(path), {
+    method:"PUT",
+    headers:{
+      Authorization:`token ${token}`,
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      message:`Save picks ${season} wk${week}`,
+      content:b64EncodeUtf8(csv),
+      sha,
+      branch:BRANCH
+    })
+  });
 
-    // Get sha if file already exists
-    let sha = null;
-    const metaRes = await fetch(apiContentsUrl(path), {
-      headers: { Authorization: `token ${token}` }
-    });
-    if(metaRes.ok){
-      sha = (await metaRes.json()).sha;
-    }
-
-    const putRes = await fetch(apiContentsUrl(path), {
-      method: "PUT",
-      headers: {
-        Authorization: `token ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: `Save picks ${season} wk${week}`,
-        content: b64EncodeUtf8(csv),
-        sha,
-        branch: BRANCH
-      })
-    });
-
-    const out = await putRes.json();
-
-    // VERIFIED SUCCESS ONLY
-    if(!putRes.ok || !out || !out.content || out.content.path !== path){
-      console.error(out);
-      throw new Error("Save failed (GitHub did not confirm file write).");
-    }
-
-    alert(`Picks saved: ${out.content.path}`);
-  } catch (e) {
-    alert("Error: " + (e && e.message ? e.message : String(e)));
-  }
+  const out = await res.json();
+  if(!out.content || out.content.path !== path) throw new Error("Save failed");
+  alert(`Picks saved: ${out.content.path}`);
 };
 
-render().catch(err=>{
-  console.error(err);
-  alert("Failed to load schedule CSV.");
-});
+render().catch(e=>alert(e.message));
