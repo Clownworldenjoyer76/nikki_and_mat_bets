@@ -1,6 +1,6 @@
 season,week,game_id,picker,pick_type,pick
 2025,19,Los Angeles Rams@Carolina Panthers_2026-01-10T21:30:00+00:00,mat,ATS,away
-2025,19,Los Angeles Rams@Carolina Panthers_2026-01-10T21:30:00+00:00,mat,OU,over
+2025,19,Los Angeles Rams@Carolina Panthers_2026-01-10T21:30:00+00:00,mat,OU,under
 2025,19,Green Bay Packers@Chicago Bears_2026-01-11T01:00:00+00:00,mat,ATS,away
 2025,19,Green Bay Packers@Chicago Bears_2026-01-11T01:00:00+00:00,mat,OU,over
 2025,19,Buffalo Bills@Jacksonville Jaguars_2026-01-11T18:00:00+00:00,mat,ATS,away
@@ -11,15 +11,15 @@ season,week,game_id,picker,pick_type,pick
 2025,19,Los Angeles Chargers@New England Patriots_2026-01-12T01:00:00+00:00,mat,OU,over
 2025,19,Houston Texans@Pittsburgh Steelers_2026-01-13T01:00:00+00:00,mat,ATS,away
 2025,19,Houston Texans@Pittsburgh Steelers_2026-01-13T01:00:00+00:00,mat,OU,under
-2025,19,Los Angeles Rams@Carolina Panthers_2026-01-10T21:30:00+00:00,nikki,ATS,home
-2025,19,Los Angeles Rams@Carolina Panthers_2026-01-10T21:30:00+00:00,nikki,OU,under
-2025,19,Green Bay Packers@Chicago Bears_2026-01-11T01:00:00+00:00,nikki,ATS,home
+2025,19,Los Angeles Rams@Carolina Panthers_2026-01-10T21:30:00+00:00,nikki,ATS,away
+2025,19,Los Angeles Rams@Carolina Panthers_2026-01-10T21:30:00+00:00,nikki,OU,over
+2025,19,Green Bay Packers@Chicago Bears_2026-01-11T01:00:00+00:00,nikki,ATS,away
 2025,19,Green Bay Packers@Chicago Bears_2026-01-11T01:00:00+00:00,nikki,OU,under
 2025,19,Buffalo Bills@Jacksonville Jaguars_2026-01-11T18:00:00+00:00,nikki,ATS,home
-2025,19,Buffalo Bills@Jacksonville Jaguars_2026-01-11T18:00:00+00:00,nikki,OU,over
-2025,19,San Francisco 49ers@Philadelphia Eagles_2026-01-11T21:30:00+00:00,nikki,ATS,away
+2025,19,Buffalo Bills@Jacksonville Jaguars_2026-01-11T18:00:00+00:00,nikki,OU,under
+2025,19,San Francisco 49ers@Philadelphia Eagles_2026-01-11T21:30:00+00:00,nikki,ATS,home
 2025,19,San Francisco 49ers@Philadelphia Eagles_2026-01-11T21:30:00+00:00,nikki,OU,under
 2025,19,Los Angeles Chargers@New England Patriots_2026-01-12T01:00:00+00:00,nikki,ATS,home
 2025,19,Los Angeles Chargers@New England Patriots_2026-01-12T01:00:00+00:00,nikki,OU,under
 2025,19,Houston Texans@Pittsburgh Steelers_2026-01-13T01:00:00+00:00,nikki,ATS,away
-2025,19,Houston Texans@Pittsburgh Steelers_2026-01-13T01:00:00+00:00,nikki,OU,over
+2025,19,Houston Texans@Pittsburgh Steelers_2026-01-13T01:00:00+00:00,nikki,OU,under
