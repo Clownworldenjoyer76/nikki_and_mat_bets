@@ -1,320 +1,131 @@
-// ---------- CONFIG ----------
-const PRIMARY_CSV = "docs/data/weekly/latest.csv";
-const CSV_CANDIDATES = [
-  PRIMARY_CSV,
-  "/nikki_and_mat_bets/docs/data/weekly/latest.csv",
-  "data/weekly/latest.csv"
-];
+// ===== SOURCE: single file accumulating all weeks of the season =====
+const METRICS_CSV = "data/metrics/2025_metrics.csv";
 
-const OWNER = "clownworldenjoyer76";
-const REPO  = "nikki_and_mat_bets";
-const BRANCH = "main";
-
-// ---------- UTILS ----------
-function normalizeTeamName(name){
-  if(name === "Washington Commanders") return "Washington Redskins";
-  return name;
-}
-async function fetchFirstAvailable(urls){
-  for(const p of urls){
-    const url = p + (p.includes("?") ? "&" : "?") + "v=" + Date.now();
-    try{
-      const r = await fetch(url, { cache: "no-store" });
-      if(r.ok) return { txt: await r.text(), used: p };
-    }catch(_e){}
-  }
-  throw new Error("Schedule CSV not found");
-}
-function parseCSV(txt){
-  const rows = txt.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/));
-  const hdr = rows.shift() || [];
-  return { hdr, rows };
-}
-function onlyConsensus(rows, hdr){
-  const iBook = hdr.indexOf("book");
-  const iCons = hdr.indexOf("is_consensus");
-  return rows.filter(r =>
-    (iCons !== -1 && String(r[iCons]).trim() === "1") ||
-    (iBook !== -1 && String(r[iBook]).trim().toUpperCase() === "CONSENSUS")
-  );
-}
-function keyOf(r,h){
-  return `${r[h.indexOf("away_team")]}@${r[h.indexOf("home_team")]}_${r[h.indexOf("commence_time_utc")]}`;
-}
-function fmtDate(iso){
-  const d = new Date(iso);
-  return d.toLocaleString("en-US", { weekday:"long", month:"long", day:"numeric", hour:"numeric", minute:"2-digit", hour12:true });
-}
-function nflWeekLabel(csvWeek){
-  const base = 36;
-  return ((parseInt(csvWeek,10) - base) % 18 + 18) % 18 + 1;
-}
-function fmtSigned(n){
-  if(n === "" || n === null || n === undefined) return "";
-  const v = Number(n);
-  if(Number.isNaN(v)) return String(n);
-  return v>0?`+${v}`:`${v}`;
-}
-function logoPath(team){
-  const cleaned = team.replace(/[^A-Za-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
-  const parts = cleaned.split(" ");
-  const nickname = parts[parts.length - 1].toLowerCase();
-  return `assets/logos/${nickname}.png`;
-}
-function apiContentsUrl(path){
-  return `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`;
-}
-function b64EncodeUtf8(str){
-  return btoa(unescape(encodeURIComponent(str)));
+// ===== CSV HELPERS =====
+async function fetchText(url) {
+  const r = await fetch(url, { cache: "no-store" });
+  if (!r.ok) throw new Error(`Fetch failed: ${url} (${r.status})`);
+  return r.text();
 }
 
-// ---------- STORAGE ----------
-const LS_MAT = "picks_mat";
-const LS_NIK = "picks_nikki";
-function loadPicks(){
-  return {
-    mat: JSON.parse(localStorage.getItem(LS_MAT) || "{}"),
-    nikki: JSON.parse(localStorage.getItem(LS_NIK) || "{}"),
-  };
-}
-function savePicks(all){
-  localStorage.setItem(LS_MAT, JSON.stringify(all.mat || {}));
-  localStorage.setItem(LS_NIK, JSON.stringify(all.nikki || {}));
-}
-function ensurePickShape(obj){
-  if(!obj || typeof obj !== "object") return { spread: null, total: null };
-  return { spread: obj.spread ?? null, total: obj.total ?? null };
-}
-
-// ---------- RENDER HELPERS ----------
-function makePickButton(label, type, side, curPick, color, key, user){
-  const b = document.createElement("button");
-  b.className = "pickbtn";
-  b.type = "button";
-  b.textContent = label;
-  b.dataset.type = type;
-  b.dataset.side = side;
-  if(
-    (type === "spread" && curPick.spread === side) ||
-    (type === "total"  && curPick.total  === side)
-  ){
-    b.classList.add("active", color);
-  }
-  b.onclick = async ()=>{
-    const all = loadPicks();
-    const mine = all[user] || {};
-    const current = ensurePickShape(mine[key]);
-
-    if(type === "spread"){
-      current.spread = (current.spread === side) ? null : side;
-    }else{
-      current.total  = (current.total  === side) ? null : side;
+function smartSplit(line) {
+  const out = [];
+  let cur = "";
+  let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      inQ = !inQ;
+    } else if (ch === "," && !inQ) {
+      out.push(cur);
+      cur = "";
+    } else {
+      cur += ch;
     }
+  }
+  out.push(cur);
+  return out.map(s => s.replace(/^"|"$/g, ""));
+}
 
-    if(current.spread === null && current.total === null){
-      delete mine[key];
-    }else{
-      mine[key] = current;
+function parseCSV(text) {
+  const lines = text.trim().split("\n");
+  const headers = smartSplit(lines[0]);
+  return lines.slice(1).map(l => {
+    const vals = smartSplit(l);
+    const o = {};
+    headers.forEach((h, i) => (o[h] = vals[i]));
+    return o;
+  });
+}
+
+// ===== GRADING =====
+function gradeByWeek(rows, picker) {
+  const byWeek = new Map();
+
+  rows.forEach(r => {
+    const wk = parseInt(r.week, 10);
+    if (!byWeek.has(wk)) {
+      byWeek.set(wk, { ats: { W: 0, L: 0, P: 0 }, ou: { W: 0, L: 0, P: 0 } });
     }
-
-    all[user] = mine;
-    savePicks(all);
-    await render();
-  };
-  return b;
-}
-
-// ---------- CARD (UNCHANGED MARKUP) ----------
-function card(h, r, picksAll){
-  const when = fmtDate(r[h.indexOf("commence_time_utc")]);
-  const home = normalizeTeamName(r[h.indexOf("home_team")]);
-  const away = normalizeTeamName(r[h.indexOf("away_team")]);
-
-  const spreadHome  = r[h.indexOf("spread_home")] || "";
-  const total       = r[h.indexOf("total")] || "";
-  const spreadAway  = spreadHome === "" ? "" : fmtSigned(-Number(spreadHome));
-  const spreadHomeDisp = fmtSigned(spreadHome);
-  const totalDisp   = total;
-
-  const key  = keyOf(r,h);
-
-  const el = document.createElement("article");
-  el.className = "card";
-  el.innerHTML = `
-    <div class="matchgrid">
-      <img class="team-logo" src="${logoPath(away)}" alt="${away} logo">
-      <div class="matchtext">
-        <div class="team">${away}</div>
-        <div class="at">@</div>
-        <div class="team">${home}</div>
-      </div>
-      <img class="team-logo right" src="${logoPath(home)}" alt="${home} logo">
-    </div>
-    <div class="when" style="text-align:center; margin-top:6px;">${when}</div>
-    <div class="line" style="text-align:center; margin-top:6px;">
-      <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
-      <span class="pill" style="margin-left:8px;">Total: <b>${totalDisp}</b></span>
-    </div>
-  `;
-
-  ["mat","nikki"].forEach(user=>{
-    const section = document.createElement("div");
-    section.style.marginTop = "10px";
-
-    const nameDiv = document.createElement("div");
-    nameDiv.className = "name " + user;
-    nameDiv.textContent = user==="mat" ? "Mat" : "Nikki";
-    nameDiv.style.textAlign = "center";
-    nameDiv.style.fontWeight = "600";
-    nameDiv.style.margin = "6px 0";
-    section.appendChild(nameDiv);
-
-    const grid = document.createElement("div");
-    grid.className = "pick-grid";
-    grid.style.display = "grid";
-    grid.style.gridTemplateColumns = "1fr 1fr";
-    grid.style.columnGap = "8px";
-    grid.style.rowGap = "8px";
-    grid.style.marginTop = "6px";
-
-    const color = user==="mat" ? "mat" : "nikki";
-    const picksUser = picksAll[user] || {};
-    const curPick = ensurePickShape(picksUser[key]);
-
-    [
-      makePickButton(`${away} ${spreadAway}`, "spread","away",curPick,color,key,user),
-      makePickButton(`Over ${totalDisp}`, "total","over",curPick,color,key,user),
-      makePickButton(`${home} ${spreadHomeDisp}`, "spread","home",curPick,color,key,user),
-      makePickButton(`Under ${totalDisp}`, "total","under",curPick,color,key,user)
-    ].forEach(b=>grid.appendChild(b));
-
-    section.appendChild(grid);
-    el.appendChild(section);
+    const rec = byWeek.get(wk);
+    const ats = r[`${picker}_ats`];
+    const ou  = r[`${picker}_ou`];
+    if (rec.ats[ats] !== undefined) rec.ats[ats]++;
+    if (rec.ou[ou] !== undefined) rec.ou[ou]++;
   });
 
-  return el;
+  return byWeek;
 }
 
-function neonDivider(){
-  const div = document.createElement("div");
-  div.className = "neon-divider";
-  div.setAttribute(
-    "style",
-    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;pointer-events:none;"
-  );
-  return div;
+function recordStr(r) {
+  return `${r.W}-${r.L}${r.P ? "-" + r.P : ""}`;
 }
 
-// ---------- RENDER ----------
-async function render(){
-  const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
-  const { hdr, rows } = parseCSV(txt);
-  const source = onlyConsensus(rows, hdr).length ? onlyConsensus(rows, hdr) : rows;
+// ===== TABLE FILL =====
+function fillTable(tbody, byWeek) {
+  tbody.innerHTML = "";
 
-  const iWeek   = hdr.indexOf("week");
-  const iSeason = hdr.indexOf("season");
-  const iTime   = hdr.indexOf("commence_time_utc");
-
-  const csvWeek   = parseInt(source[0][iWeek],10);
-  const csvSeason = parseInt(source[0][iSeason],10);
-  const gameYear  = new Date(source[0][iTime]).getFullYear();
-
-  let nflWeek = csvWeek;
-  let nflSeason = csvSeason;
-
-  // ✅ FIX: postseason remap
-  if(csvWeek >= 1 && csvWeek <= 4 && gameYear > csvSeason){
-    nflWeek = 18 + csvWeek;
-    nflSeason = csvSeason - 1;
+  // Weeks 1–18 (UNCHANGED)
+  for (let wk = 1; wk <= 18; wk++) {
+    const rec = byWeek.get(wk);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>Week ${wk}</td>
+      <td>${rec ? recordStr(rec.ats) : "—"}</td>
+      <td>${rec ? recordStr(rec.ou) : "—"}</td>
+    `;
+    tbody.appendChild(tr);
   }
 
-  window._week   = String(nflWeek).padStart(2,"0");
-  window._season = nflSeason;
+  // Weeks 19–22 (APPENDED, DATA-AWARE)
+  const playoffWeeks = [
+    { wk: 19, label: "WC" },
+    { wk: 20, label: "DIV" },
+    { wk: 21, label: "CONF" },
+    { wk: 22, label: "SB" }
+  ];
 
-  document.getElementById("seasonWeek").textContent = `NFL Week ${nflWeek}`;
-
-  const picksAll = loadPicks();
-  const gamesDiv = document.getElementById("games");
-  gamesDiv.innerHTML = "";
-
-  source.forEach((r,i)=>{
-    gamesDiv.appendChild(card(hdr,r,picksAll));
-    if(i < source.length - 1){
-      gamesDiv.appendChild(neonDivider());
-    }
+  playoffWeeks.forEach(p => {
+    const rec = byWeek.get(p.wk);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${p.label}</td>
+      <td>${rec ? recordStr(rec.ats) : "—"}</td>
+      <td>${rec ? recordStr(rec.ou) : "—"}</td>
+    `;
+    tbody.appendChild(tr);
   });
 }
 
-// ---------- SAVE PICKS (VERIFIED) ----------
-document.getElementById("issueBtn").onclick = async ()=>{
-  const season = window._season;
-  const week   = window._week;
+// ===== UI =====
+function setSubtitle(seasonLabel) {
+  const el = document.getElementById("subtitle");
+  if (el) el.textContent = seasonLabel;
+}
 
-  if(!season || !week){
-    alert("Season/week not set");
-    return;
-  }
+function highlightWinners() {
+  // unchanged
+}
 
-  const picksAll = loadPicks();
-  const rows = [];
+// ===== MAIN =====
+async function main() {
+  const csv = await fetchText(METRICS_CSV);
+  const rows = parseCSV(csv);
 
-  Object.entries(picksAll).forEach(([picker,games])=>{
-    Object.entries(games).forEach(([game_id,p])=>{
-      if(p.spread) rows.push({season,week,game_id,picker,pick_type:"ATS",pick:p.spread});
-      if(p.total)  rows.push({season,week,game_id,picker,pick_type:"OU", pick:p.total});
-    });
-  });
+  const seasonLabel = "2025";
 
-  if(!rows.length){
-    alert("No picks selected");
-    return;
-  }
+  const nikki = gradeByWeek(rows, "nikki");
+  const mat   = gradeByWeek(rows, "mat");
 
-  const headers = ["season","week","game_id","picker","pick_type","pick"];
-  const csv = headers.join(",") + "\n" +
-    rows.map(r=>headers.map(h=>r[h]).join(",")).join("\n");
+  const nikBody = document.querySelector("#nikkiTable tbody");
+  const matBody = document.querySelector("#matTable tbody");
+  if (!nikBody || !matBody) return;
 
-  const token = prompt("GitHub token (contents:write)");
-  if(!token) return;
+  fillTable(nikBody, nikki);
+  fillTable(matBody, mat);
+  setSubtitle(seasonLabel);
 
-  const path = `docs/data/picks/${season}_wk${week}_picks.csv`;
+  highlightWinners();
+}
 
-  let sha = null;
-  const meta = await fetch(apiContentsUrl(path), {
-    headers:{ Authorization:`token ${token}` }
-  });
-  if(meta.ok){
-    sha = (await meta.json()).sha;
-  }
-
-  const res = await fetch(apiContentsUrl(path), {
-    method:"PUT",
-    headers:{
-      Authorization:`token ${token}`,
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      message:`Save picks ${season} wk${week}`,
-      content:b64EncodeUtf8(csv),
-      sha,
-      branch:BRANCH
-    })
-  });
-
-  const out = await res.json();
-  if(!out.content || out.content.path !== path){
-    alert("SAVE FAILED — file not written");
-    console.error(out);
-    return;
-  }
-
-  alert(`Saved: ${out.content.path}`);
-};
-
-document.getElementById("clearBtn").onclick = ()=>{
-  localStorage.removeItem(LS_MAT);
-  localStorage.removeItem(LS_NIK);
-  render();
-};
-
-render().catch(()=>alert("Failed to load schedule CSV"));
+main();
