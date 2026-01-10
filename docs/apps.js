@@ -23,7 +23,7 @@ async function fetchFirstAvailable(urls){
       if(r.ok) return { txt: await r.text(), used: p };
     }catch(_e){}
   }
-  throw new Error("Schedule CSV not found at: " + urls.join(" | "));
+  throw new Error("Schedule CSV not found");
 }
 function parseCSV(txt){
   const rows = txt.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/));
@@ -85,7 +85,7 @@ function ensurePickShape(obj){
   return { spread: obj.spread ?? null, total: obj.total ?? null };
 }
 
-// ---------- RENDER HELPERS ----------
+// ---------- UI ----------
 function makePickButton(label, type, side, curPick, color, key, user){
   const b = document.createElement("button");
   b.className = "pickbtn";
@@ -105,9 +105,9 @@ function makePickButton(label, type, side, curPick, color, key, user){
     const current = ensurePickShape(mine[key]);
 
     if(type === "spread"){
-      current.spread = (current.spread === side) ? null : side;
+      current.spread = current.spread === side ? null : side;
     }else{
-      current.total  = (current.total  === side) ? null : side;
+      current.total  = current.total === side ? null : side;
     }
 
     if(current.spread === null && current.total === null){
@@ -132,7 +132,6 @@ function card(h, r, picksAll){
   const total       = r[h.indexOf("total")] || "";
   const spreadAway  = spreadHome === "" ? "" : fmtSigned(-Number(spreadHome));
   const spreadHomeDisp = fmtSigned(spreadHome);
-  const totalDisp   = total;
 
   const key  = keyOf(r,h);
 
@@ -151,7 +150,7 @@ function card(h, r, picksAll){
     <div class="when" style="text-align:center;margin-top:6px;">${when}</div>
     <div class="line" style="text-align:center;margin-top:6px;">
       <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
-      <span class="pill" style="margin-left:8px;">Total: <b>${totalDisp}</b></span>
+      <span class="pill" style="margin-left:8px;">Total: <b>${total}</b></span>
     </div>
   `;
 
@@ -161,7 +160,7 @@ function card(h, r, picksAll){
 
     const nameDiv = document.createElement("div");
     nameDiv.className = "name " + user;
-    nameDiv.textContent = user==="mat" ? "Mat" : "Nikki";
+    nameDiv.textContent = user === "mat" ? "Mat" : "Nikki";
     nameDiv.style.textAlign = "center";
     nameDiv.style.fontWeight = "600";
     nameDiv.style.margin = "6px 0";
@@ -173,17 +172,15 @@ function card(h, r, picksAll){
     grid.style.gridTemplateColumns = "1fr 1fr";
     grid.style.columnGap = "8px";
     grid.style.rowGap = "8px";
-    grid.style.marginTop = "6px";
 
-    const color = user==="mat" ? "mat" : "nikki";
-    const picksUser = picksAll[user] || {};
-    const curPick = ensurePickShape(picksUser[key]);
+    const color = user === "mat" ? "mat" : "nikki";
+    const curPick = ensurePickShape((picksAll[user]||{})[key]);
 
     [
       makePickButton(`${away} ${spreadAway}`, "spread","away",curPick,color,key,user),
-      makePickButton(`Over ${totalDisp}`,     "total","over",curPick,color,key,user),
-      makePickButton(`${home} ${spreadHomeDisp}`,"spread","home",curPick,color,key,user),
-      makePickButton(`Under ${totalDisp}`,    "total","under",curPick,color,key,user)
+      makePickButton(`Over ${total}`, "total","over",curPick,color,key,user),
+      makePickButton(`${home} ${spreadHomeDisp}`, "spread","home",curPick,color,key,user),
+      makePickButton(`Under ${total}`, "total","under",curPick,color,key,user)
     ].forEach(b=>grid.appendChild(b));
 
     section.appendChild(grid);
@@ -193,34 +190,26 @@ function card(h, r, picksAll){
   return el;
 }
 
-function neonDivider(){
-  const div = document.createElement("div");
-  div.className = "neon-divider";
-  div.style.cssText =
-    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;";
-  return div;
-}
-
 // ---------- RENDER ----------
 async function render(){
   const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
   const { hdr, rows } = parseCSV(txt);
-  const source = onlyConsensus(rows, hdr).length ? onlyConsensus(rows, hdr) : rows;
-  if(!source.length) throw new Error("No rows");
+  const src = onlyConsensus(rows,hdr).length ? onlyConsensus(rows,hdr) : rows;
 
   const iWeek = hdr.indexOf("week");
-  const csvWeek = parseInt(source[0][iWeek], 10);
-  const csvSeason = parseInt(source[0][hdr.indexOf("season")], 10);
+  const iSeason = hdr.indexOf("season");
+  const iTime = hdr.indexOf("commence_time_utc");
 
-  // ---------- POSTSEASON FIX ----------
+  const csvWeek = parseInt(src[0][iWeek],10);
+  const csvSeason = parseInt(src[0][iSeason],10);
+  const gameYear = new Date(src[0][iTime]).getFullYear();
+
   let nflSeason = csvSeason;
-  let nflWeek;
+  let nflWeek = csvWeek;
 
-  if (csvWeek >= 1 && csvWeek <= 4 && new Date(source[0][hdr.indexOf("commence_time_utc")]).getFullYear() > csvSeason) {
+  if(csvWeek >= 1 && csvWeek <= 4 && gameYear > csvSeason){
     nflSeason = csvSeason - 1;
     nflWeek = 18 + csvWeek;
-  } else {
-    nflWeek = csvWeek;
   }
 
   document.getElementById("seasonWeek").textContent = `NFL Week ${nflWeek}`;
@@ -230,26 +219,33 @@ async function render(){
   const picksAll = loadPicks();
   const gamesDiv = document.getElementById("games");
   gamesDiv.innerHTML = "";
-  source.forEach((r,i)=>{
+
+  src.forEach((r,i)=>{
     gamesDiv.appendChild(card(hdr,r,picksAll));
-    if(i < source.length-1) gamesDiv.appendChild(neonDivider());
+    if(i < src.length-1){
+      const d = document.createElement("div");
+      d.className = "neon-divider";
+      d.style.cssText = "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;";
+      gamesDiv.appendChild(d);
+    }
   });
 }
 
-// ---------- SAVE PICKS DIRECT ----------
+// ---------- SAVE PICKS (FIXED) ----------
 document.getElementById("issueBtn").onclick = async ()=>{
   const season = window._season;
   const week   = window._week;
+
   if(!season || !week){
-    alert("Season/week not set.");
+    alert("Season/week not set");
     return;
   }
 
   const picksAll = loadPicks();
   const rows = [];
 
-  Object.entries(picksAll).forEach(([picker, games])=>{
-    Object.entries(games).forEach(([game_id, p])=>{
+  Object.entries(picksAll).forEach(([picker,games])=>{
+    Object.entries(games).forEach(([game_id,p])=>{
       if(p.spread){
         rows.push({ season, week, game_id, picker, pick_type:"ATS", pick:p.spread });
       }
@@ -260,13 +256,12 @@ document.getElementById("issueBtn").onclick = async ()=>{
   });
 
   if(!rows.length){
-    alert("No picks selected.");
+    alert("No picks selected");
     return;
   }
 
   const headers = ["season","week","game_id","picker","pick_type","pick"];
-  const csv =
-    headers.join(",") + "\n" +
+  const csv = headers.join(",") + "\n" +
     rows.map(r=>headers.map(h=>r[h]).join(",")).join("\n");
 
   const token = prompt("GitHub token (contents:write)");
@@ -297,11 +292,11 @@ document.getElementById("issueBtn").onclick = async ()=>{
   });
 
   if(!res.ok){
-    alert("Save failed.");
+    alert("Save failed");
     return;
   }
 
-  alert("Picks saved to CSV.");
+  alert("Picks saved to CSV");
 };
 
 document.getElementById("clearBtn").onclick = ()=>{
@@ -310,4 +305,4 @@ document.getElementById("clearBtn").onclick = ()=>{
   render();
 };
 
-render().catch(()=>alert("Failed to load schedule CSV."));
+render().catch(()=>alert("Failed to load schedule CSV"));
