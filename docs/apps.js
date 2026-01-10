@@ -13,8 +13,8 @@ const BRANCH = "main";
 // FORCE NFL SEASON
 const FORCED_SEASON = "2025";
 
-// NFL Week 1 anchor (2025 season)
-const NFL_WEEK1_UTC = Date.UTC(2025, 8, 4); // Sep 4 2025
+// NFL Week 1 anchor for 2025 season (Thu Sep 4, 2025)
+const NFL_WEEK1_UTC = Date.UTC(2025, 8, 4);
 
 // ---------- UTILS ----------
 function normalizeTeamName(name){
@@ -80,7 +80,7 @@ function pad2(n){
   return String(n).padStart(2,"0");
 }
 
-// NFL week calculation (only new logic)
+// NFL week calculation (ONLY new logic)
 function nflWeekFromISO(iso){
   const t = new Date(iso).getTime();
   return Math.floor((t - NFL_WEEK1_UTC) / (7 * 24 * 60 * 60 * 1000)) + 1;
@@ -109,18 +109,19 @@ async function render(){
   const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
   const { hdr, rows } = parseCSV(txt);
 
+  const iCommence = hdr.indexOf("commence_time_utc");
+
   const consensus = onlyConsensus(rows, hdr);
   const sourceAll = consensus.length ? consensus : rows;
 
-  const iCommence = hdr.indexOf("commence_time_utc");
-
-  // determine latest NFL week
-  const nflWeeks = sourceAll.map(r => nflWeekFromISO(r[iCommence]));
-  const maxWeek = Math.max(...nflWeeks);
+  // NFL week selection (replaces calendar week ONLY)
+  const weeks = sourceAll.map(r => nflWeekFromISO(r[iCommence]));
+  const maxWeek = Math.max(...weeks);
 
   const games = sourceAll.filter(
     r => nflWeekFromISO(r[iCommence]) === maxWeek
   );
+  if(!games.length) throw new Error("No games for latest week");
 
   document.getElementById("seasonWeek").textContent =
     `NFL ${FORCED_SEASON} — Week ${maxWeek}`;
