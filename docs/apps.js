@@ -10,11 +10,11 @@ const OWNER = "clownworldenjoyer76";
 const REPO  = "nikki_and_mat_bets";
 const BRANCH = "main";
 
-// Force NFL season labeling and NFL week calculation (do not use calendar year/week)
-const FIXED_NFL_SEASON = "2025";
-// Week 1 kickoff for the 2025 NFL season was Thursday, Sept 4, 2025.
-// We use this as the anchor to compute NFL week numbers (regular season weeks 1-18; postseason continues 19+).
-const NFL_WEEK1_ANCHOR_UTC = Date.UTC(2025, 8, 4, 0, 0, 0); // months are 0-indexed
+// FORCE NFL SEASON
+const FORCED_SEASON = "2025";
+
+// NFL Week 1 anchor (2025 season)
+const NFL_WEEK1_UTC = Date.UTC(2025, 8, 4); // Sep 4 2025
 
 // ---------- UTILS ----------
 function normalizeTeamName(name){
@@ -80,14 +80,10 @@ function pad2(n){
   return String(n).padStart(2,"0");
 }
 
-// Compute NFL week number from a game commence_time_utc ISO string.
-// This avoids ISO/calendar week numbering (e.g., "week 2" in January) and instead follows NFL weeks.
-function nflWeekFromCommenceISO(iso){
-  const d = new Date(iso);
-  if(Number.isNaN(d.getTime())) return null;
-  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
-  const w = Math.floor((d.getTime() - NFL_WEEK1_ANCHOR_UTC) / msPerWeek) + 1;
-  return (Number.isFinite(w) && w > 0) ? w : null;
+// NFL week calculation (only new logic)
+function nflWeekFromISO(iso){
+  const t = new Date(iso).getTime();
+  return Math.floor((t - NFL_WEEK1_UTC) / (7 * 24 * 60 * 60 * 1000)) + 1;
 }
 
 // ---------- STORAGE ----------
@@ -108,151 +104,29 @@ function ensurePickShape(obj){
   return { spread: obj.spread ?? null, total: obj.total ?? null };
 }
 
-// ---------- RENDER HELPERS ----------
-function makePickButton(label, type, side, curPick, color, key, user){
-  const b = document.createElement("button");
-  b.className = "pickbtn";
-  b.type = "button";
-  b.textContent = label;
-  b.dataset.type = type;
-  b.dataset.side = side;
-  if(
-    (type === "spread" && curPick.spread === side) ||
-    (type === "total"  && curPick.total  === side)
-  ){
-    b.classList.add("active", color);
-  }
-  b.onclick = async ()=>{
-    const all = loadPicks();
-    const mine = all[user] || {};
-    const current = ensurePickShape(mine[key]);
-
-    if(type === "spread"){
-      current.spread = (current.spread === side) ? null : side;
-    }else{
-      current.total  = (current.total  === side) ? null : side;
-    }
-
-    if(current.spread === null && current.total === null){
-      delete mine[key];
-    }else{
-      mine[key] = current;
-    }
-
-    all[user] = mine;
-    savePicks(all);
-    await render();
-  };
-  return b;
-}
-
-function card(h, r, picksAll){
-  const when = fmtDate(r[h.indexOf("commence_time_utc")]);
-  const home = normalizeTeamName(r[h.indexOf("home_team")]);
-  const away = normalizeTeamName(r[h.indexOf("away_team")]);
-
-  const spreadHome  = r[h.indexOf("spread_home")] || "";
-  const total       = r[h.indexOf("total")] || "";
-  const spreadAway  = spreadHome === "" ? "" : fmtSigned(-Number(spreadHome));
-  const spreadHomeDisp = fmtSigned(spreadHome);
-  const totalDisp   = total;
-
-  const key  = keyOf(r,h);
-
-  const el = document.createElement("article");
-  el.className = "card";
-  el.innerHTML = `
-    <div class="matchgrid">
-      <img class="team-logo" src="${logoPath(away)}">
-      <div class="matchtext">
-        <div class="team">${away}</div>
-        <div class="at">@</div>
-        <div class="team">${home}</div>
-      </div>
-      <img class="team-logo right" src="${logoPath(home)}">
-    </div>
-    <div class="when" style="text-align:center; margin-top:6px;">${when}</div>
-    <div class="line" style="text-align:center; margin-top:6px;">
-      <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
-      <span class="pill" style="margin-left:8px;">Total: <b>${totalDisp}</b></span>
-    </div>
-  `;
-
-  ["mat","nikki"].forEach(user=>{
-    const section = document.createElement("div");
-    section.style.marginTop = "10px";
-
-    const nameDiv = document.createElement("div");
-    nameDiv.className = "name " + user;
-    nameDiv.textContent = user==="mat" ? "Mat" : "Nikki";
-    nameDiv.style.textAlign = "center";
-    nameDiv.style.fontWeight = "600";
-    nameDiv.style.margin = "6px 0";
-    section.appendChild(nameDiv);
-
-    const grid = document.createElement("div");
-    grid.className = "pick-grid";
-    grid.style.display = "grid";
-    grid.style.gridTemplateColumns = "1fr 1fr";
-    grid.style.columnGap = "8px";
-    grid.style.rowGap = "8px";
-    grid.style.marginTop = "6px";
-
-    const color = user==="mat" ? "mat" : "nikki";
-    const picksUser = picksAll[user] || {};
-    const curPick = ensurePickShape(picksUser[key]);
-
-    grid.append(
-      makePickButton(`${away} ${spreadAway}`, "spread", "away", curPick, color, key, user),
-      makePickButton(`Over ${totalDisp}`, "total", "over", curPick, color, key, user),
-      makePickButton(`${home} ${spreadHomeDisp}`, "spread", "home", curPick, color, key, user),
-      makePickButton(`Under ${totalDisp}`, "total", "under", curPick, color, key, user)
-    );
-
-    section.appendChild(grid);
-    el.appendChild(section);
-  });
-
-  return el;
-}
-
-function neonDivider(){
-  const div = document.createElement("div");
-  div.className = "neon-divider";
-  div.setAttribute(
-    "style",
-    "height:3px;background:#39ff14;margin:10px 0;border-radius:2px;box-shadow:0 0 8px #39ff14;"
-  );
-  return div;
-}
-
 // ---------- RENDER ----------
 async function render(){
   const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
   const { hdr, rows } = parseCSV(txt);
 
-  const iWeek = hdr.indexOf("week");
-  const iSeason = hdr.indexOf("season");
-
   const consensus = onlyConsensus(rows, hdr);
   const sourceAll = consensus.length ? consensus : rows;
 
-  // Select latest NFL week based on commence_time_utc, not the CSV's "week" column (which may be calendar week).
   const iCommence = hdr.indexOf("commence_time_utc");
-  if(iCommence === -1) throw new Error('Missing "commence_time_utc" column in latest.csv');
 
-  const nflWeeks = sourceAll.map(r => nflWeekFromCommenceISO(r[iCommence])).filter(Number.isFinite);
+  // determine latest NFL week
+  const nflWeeks = sourceAll.map(r => nflWeekFromISO(r[iCommence]));
   const maxWeek = Math.max(...nflWeeks);
-  if(!Number.isFinite(maxWeek)) throw new Error("Unable to determine NFL week from commence_time_utc");
 
-  const games = sourceAll.filter(r => nflWeekFromCommenceISO(r[iCommence]) === maxWeek);
-  if(!games.length) throw new Error("No games for latest week");
+  const games = sourceAll.filter(
+    r => nflWeekFromISO(r[iCommence]) === maxWeek
+  );
 
-  const csvWeek   = maxWeek;
+  document.getElementById("seasonWeek").textContent =
+    `NFL ${FORCED_SEASON} — Week ${maxWeek}`;
 
-  document.getElementById("seasonWeek").textContent = `NFL ${FIXED_NFL_SEASON} — Week ${csvWeek}`;
-  window._season = String(FIXED_NFL_SEASON);
-  window._week   = pad2(csvWeek);
+  window._season = FORCED_SEASON;
+  window._week   = pad2(maxWeek);
 
   const picksAll = loadPicks();
   const gamesDiv = document.getElementById("games");
