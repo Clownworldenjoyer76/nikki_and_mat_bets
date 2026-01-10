@@ -215,27 +215,24 @@ async function render(){
   const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
   const { hdr, rows } = parseCSV(txt);
 
-  const iWeek = hdr.indexOf("week");
-  const iSeason = hdr.indexOf("season");
-
   const consensus = onlyConsensus(rows, hdr);
   const sourceAll = consensus.length ? consensus : rows;
 
-  const weeks = sourceAll.map(r => parseInt(r[iWeek], 10)).filter(Number.isFinite);
+  const weeks = sourceAll.map(r => {
+    const t = new Date(r[hdr.indexOf("commence_time_utc")]).getTime();
+    return Math.floor((t - Date.UTC(2025,8,4)) / (7*24*60*60*1000)) + 1;
+  });
   const maxWeek = Math.max(...weeks);
 
-  const games = sourceAll.filter(r => parseInt(r[iWeek], 10) === maxWeek);
+  const games = sourceAll.filter(r => {
+    const t = new Date(r[hdr.indexOf("commence_time_utc")]).getTime();
+    return Math.floor((t - Date.UTC(2025,8,4)) / (7*24*60*60*1000)) + 1 === maxWeek;
+  });
   if(!games.length) throw new Error("No games for latest week");
 
-  const csvSeason = games[0][iSeason];
-  const csvWeek = Math.floor(
-    (new Date(games[0][hdr.indexOf("commence_time_utc")]).getTime() -
-     Date.UTC(2025, 8, 4)) / (7 * 24 * 60 * 60 * 1000)
-  ) + 1;
-
-  document.getElementById("seasonWeek").textContent = `NFL Week ${csvWeek}`;
+  document.getElementById("seasonWeek").textContent = `NFL Week ${maxWeek}`;
   window._season = "2025";
-  window._week   = pad2(csvWeek);
+  window._week   = pad2(maxWeek);
 
   const picksAll = loadPicks();
   const gamesDiv = document.getElementById("games");
