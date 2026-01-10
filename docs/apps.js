@@ -1,5 +1,3 @@
-// docs/apps.js
-
 // ---------- CONFIG ----------
 const PRIMARY_CSV = "docs/data/weekly/latest.csv";
 const CSV_CANDIDATES = [
@@ -46,8 +44,12 @@ function keyOf(r,h){
 function fmtDate(iso){
   const d = new Date(iso);
   return d.toLocaleString("en-US", {
-    weekday:"long", month:"long", day:"numeric",
-    hour:"numeric", minute:"2-digit", hour12:true
+    weekday:"long",
+    month:"long",
+    day:"numeric",
+    hour:"numeric",
+    minute:"2-digit",
+    hour12:true
   });
 }
 function fmtSigned(n){
@@ -96,6 +98,8 @@ function makePickButton(label, type, side, curPick, color, key, user){
   b.className = "pickbtn";
   b.type = "button";
   b.textContent = label;
+  b.dataset.type = type;
+  b.dataset.side = side;
   if(
     (type === "spread" && curPick.spread === side) ||
     (type === "total"  && curPick.total  === side)
@@ -110,7 +114,7 @@ function makePickButton(label, type, side, curPick, color, key, user){
     if(type === "spread"){
       current.spread = (current.spread === side) ? null : side;
     }else{
-      current.total = (current.total === side) ? null : side;
+      current.total  = (current.total  === side) ? null : side;
     }
 
     if(current.spread === null && current.total === null){
@@ -135,8 +139,9 @@ function card(h, r, picksAll){
   const total       = r[h.indexOf("total")] || "";
   const spreadAway  = spreadHome === "" ? "" : fmtSigned(-Number(spreadHome));
   const spreadHomeDisp = fmtSigned(spreadHome);
+  const totalDisp   = total;
 
-  const key = keyOf(r,h);
+  const key  = keyOf(r,h);
 
   const el = document.createElement("article");
   el.className = "card";
@@ -153,7 +158,7 @@ function card(h, r, picksAll){
     <div class="when" style="text-align:center; margin-top:6px;">${when}</div>
     <div class="line" style="text-align:center; margin-top:6px;">
       <span class="pill">Home spread: <b>${spreadHomeDisp}</b></span>
-      <span class="pill" style="margin-left:8px;">Total: <b>${total}</b></span>
+      <span class="pill" style="margin-left:8px;">Total: <b>${totalDisp}</b></span>
     </div>
   `;
 
@@ -183,9 +188,9 @@ function card(h, r, picksAll){
 
     grid.append(
       makePickButton(`${away} ${spreadAway}`, "spread", "away", curPick, color, key, user),
-      makePickButton(`Over ${total}`, "total", "over", curPick, color, key, user),
+      makePickButton(`Over ${totalDisp}`, "total", "over", curPick, color, key, user),
       makePickButton(`${home} ${spreadHomeDisp}`, "spread", "home", curPick, color, key, user),
-      makePickButton(`Under ${total}`, "total", "under", curPick, color, key, user)
+      makePickButton(`Under ${totalDisp}`, "total", "under", curPick, color, key, user)
     );
 
     section.appendChild(grid);
@@ -209,18 +214,26 @@ function neonDivider(){
 async function render(){
   const { txt } = await fetchFirstAvailable(CSV_CANDIDATES);
   const { hdr, rows } = parseCSV(txt);
-  const source = onlyConsensus(rows, hdr);
-  const games = source.length ? source : rows;
 
   const iWeek = hdr.indexOf("week");
   const iSeason = hdr.indexOf("season");
 
-  const nflWeek = parseInt(games[0][iWeek], 10);
-  const nflSeason = parseInt(games[0][iSeason], 10);
+  const consensus = onlyConsensus(rows, hdr);
+  const sourceAll = consensus.length ? consensus : rows;
 
-  document.getElementById("seasonWeek").textContent = `NFL Week ${nflWeek}`;
-  window._season = String(nflSeason);
-  window._week = pad2(nflWeek);
+  // *** MINIMAL FIX: select latest NFL week ***
+  const weeks = sourceAll.map(r => parseInt(r[iWeek], 10)).filter(Number.isFinite);
+  const maxWeek = Math.max(...weeks);
+
+  const games = sourceAll.filter(r => parseInt(r[iWeek], 10) === maxWeek);
+  if(!games.length) throw new Error("No games for latest week");
+
+  const csvSeason = games[0][iSeason];
+  const csvWeek   = games[0][iWeek];
+
+  document.getElementById("seasonWeek").textContent = `NFL Week ${csvWeek}`;
+  window._season = String(csvSeason);
+  window._week   = pad2(csvWeek);
 
   const picksAll = loadPicks();
   const gamesDiv = document.getElementById("games");
@@ -255,7 +268,6 @@ document.getElementById("issueBtn").onclick = async ()=>{
 
   const path = `docs/data/picks/${season}_wk${week}_picks.csv`;
   let sha = null;
-
   const meta = await fetch(apiContentsUrl(path), {
     headers:{ Authorization:`token ${token}` }
   });
@@ -276,9 +288,7 @@ document.getElementById("issueBtn").onclick = async ()=>{
   });
 
   const out = await res.json();
-  if(!out.content || out.content.path !== path){
-    throw new Error("Save failed");
-  }
+  if(!out.content || out.content.path !== path) throw new Error("Save failed");
   alert(`Picks saved: ${out.content.path}`);
 };
 
