@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account — NFL Picks</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="wrap">
+    <h1>Account</h1>
+
+    <section id="loggedOutSection">
+      <h2>Create account</h2>
+
+      <input id="signupDisplayName" type="text" placeholder="Display name">
+      <input id="signupEmail" type="email" placeholder="Email">
+      <input id="signupPassword" type="password" placeholder="Password">
+      <button id="signupBtn" type="button">Create account</button>
+
+      <h2>Log in</h2>
+
+      <input id="loginEmail" type="email" placeholder="Email">
+      <input id="loginPassword" type="password" placeholder="Password">
+      <button id="loginBtn" type="button">Log in</button>
+
+      <h2>Password reset</h2>
+
+      <input id="resetEmail" type="email" placeholder="Email">
+      <button id="resetBtn" type="button">Send reset email</button>
+    </section>
+
+    <section id="loggedInSection" hidden>
+      <p>Signed in as <strong id="currentUser"></strong></p>
+      <button id="logoutBtn" type="button">Log out</button>
+    </section>
+
+    <p id="authMessage"></p>
+
+    <p><a href="./index.html">Return to picks</a></p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase-client.js"></script>
+  <script src="./auth.js"></script>
+</body>
+</html>
