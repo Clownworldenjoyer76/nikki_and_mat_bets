@@ -1,4 +1,4 @@
-name: Fetch NFL odds (manual)
+name: Fetch NFL odds
 
 on:
   workflow_dispatch:
@@ -9,8 +9,7 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
-    env:
-      TZ: America/New_York
+
     steps:
       - uses: actions/checkout@v4
 
@@ -19,11 +18,9 @@ jobs:
           python-version: "3.11"
 
       - name: Install deps
-        run: python -m pip install --upgrade pip requests python-dateutil pytz
+        run: python -m pip install --upgrade pip requests
 
       - name: Pull odds and write CSV
-        env:
-          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/pull_nfl_odds.py
 
       - name: Publish CSVs to /docs for Pages
