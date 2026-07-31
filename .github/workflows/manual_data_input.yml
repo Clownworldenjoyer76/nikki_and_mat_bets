@@ -22,7 +22,10 @@ on:
       file_type:
         description: File Type
         required: true
-        type: string
+        type: choice
+        options:
+          - Odds
+          - Final Scores
       raw_text:
         description: Raw pasted data
         required: true
@@ -32,7 +35,7 @@ permissions:
   contents: write
 
 jobs:
-  create-nfl-odds-csv:
+  process-manual-data:
     runs-on: ubuntu-latest
 
     env:
@@ -59,7 +62,7 @@ jobs:
             exit 1
           fi
 
-          if [[ "$FILE_TYPE" != "Odds" ]]; then
+          if [[ "$FILE_TYPE" != "Odds" && "$FILE_TYPE" != "Final Scores" ]]; then
             echo "Unsupported file type: $FILE_TYPE"
             exit 1
           fi
@@ -95,23 +98,22 @@ jobs:
               encoding="utf-8",
           )
 
-      - name: Run NFL odds parser
+      - name: Run selected parser
         shell: bash
         run: |
           set -euo pipefail
 
-          python scripts/manual_nfl_odds.py \
-            --season "$SEASON" \
-            --week "$WEEK" \
-            --raw-file raw_input.txt
+          if [[ "$FILE_TYPE" == "Odds" ]]; then
+            python scripts/manual_nfl_odds.py               --season "$SEASON"               --week "$WEEK"               --raw-file raw_input.txt
 
-      - name: Set output path
-        shell: bash
-        run: |
-          set -euo pipefail
+            OUTPUT_PATH="docs/data/weekly/${SEASON}_wk${WEEK}_odds.csv"
+          else
+            printf -v PADDED_WEEK "%02d" "$WEEK"
 
-          printf -v PADDED_WEEK "%02d" "$WEEK"
-          OUTPUT_PATH="docs/data/weekly/${SEASON}_wk${PADDED_WEEK}_odds.csv"
+            python scripts/manual_nfl_final_scores.py               --season "$SEASON"               --week "$WEEK"               --raw-file raw_input.txt
+
+            OUTPUT_PATH="docs/data/scores/${SEASON}_wk${PADDED_WEEK}_scores.csv"
+          fi
 
           if [[ ! -f "$OUTPUT_PATH" ]]; then
             echo "Expected output file was not created: $OUTPUT_PATH"
@@ -135,5 +137,5 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Update NFL odds: ${SEASON} week ${WEEK}"
+          git commit -m "Update NFL ${FILE_TYPE}: ${SEASON} week ${WEEK}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
