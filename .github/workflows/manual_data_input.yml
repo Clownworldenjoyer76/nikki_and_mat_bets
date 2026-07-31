@@ -1,0 +1,139 @@
+name: Manual Data Input
+
+on:
+  workflow_dispatch:
+    inputs:
+      sport:
+        description: Sport
+        required: true
+        type: string
+      league:
+        description: League
+        required: true
+        type: string
+      season:
+        description: Season
+        required: true
+        type: string
+      week:
+        description: Week
+        required: true
+        type: string
+      file_type:
+        description: File Type
+        required: true
+        type: string
+      raw_text:
+        description: Raw pasted data
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  create-nfl-odds-csv:
+    runs-on: ubuntu-latest
+
+    env:
+      SPORT: ${{ inputs.sport }}
+      LEAGUE: ${{ inputs.league }}
+      SEASON: ${{ inputs.season }}
+      WEEK: ${{ inputs.week }}
+      FILE_TYPE: ${{ inputs.file_type }}
+      RAW_TEXT: ${{ inputs.raw_text }}
+
+    steps:
+      - name: Validate request
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$SPORT" != "Football" ]]; then
+            echo "Unsupported sport: $SPORT"
+            exit 1
+          fi
+
+          if [[ "$LEAGUE" != "NFL" ]]; then
+            echo "Unsupported league: $LEAGUE"
+            exit 1
+          fi
+
+          if [[ "$FILE_TYPE" != "Odds" ]]; then
+            echo "Unsupported file type: $FILE_TYPE"
+            exit 1
+          fi
+
+          if [[ ! "$SEASON" =~ ^[0-9]+$ ]]; then
+            echo "Season must be numeric"
+            exit 1
+          fi
+
+          if [[ ! "$WEEK" =~ ^[0-9]+$ ]]; then
+            echo "Week must be numeric"
+            exit 1
+          fi
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Save raw input
+        shell: python
+        run: |
+          import os
+          from pathlib import Path
+
+          Path("raw_input.txt").write_text(
+              os.environ["RAW_TEXT"],
+              encoding="utf-8",
+          )
+
+      - name: Run NFL odds parser
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python scripts/manual_nfl_odds.py \
+            --season "$SEASON" \
+            --week "$WEEK" \
+            --raw-file raw_input.txt
+
+      - name: Set output path
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          printf -v PADDED_WEEK "%02d" "$WEEK"
+          OUTPUT_PATH="docs/data/weekly/${SEASON}_wk${PADDED_WEEK}_odds.csv"
+
+          if [[ ! -f "$OUTPUT_PATH" ]]; then
+            echo "Expected output file was not created: $OUTPUT_PATH"
+            exit 1
+          fi
+
+          echo "OUTPUT_PATH=$OUTPUT_PATH" >> "$GITHUB_ENV"
+
+      - name: Commit generated CSV
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add "$OUTPUT_PATH"
+
+          if git diff --cached --quiet; then
+            echo "No CSV changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Update NFL odds: ${SEASON} week ${WEEK}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
