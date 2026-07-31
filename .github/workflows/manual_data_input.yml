@@ -1,4 +1,4 @@
-  name: Manual Data Input
+name: Manual Data Input
 
 on:
   workflow_dispatch:
