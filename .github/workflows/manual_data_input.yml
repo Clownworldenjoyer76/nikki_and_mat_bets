@@ -104,21 +104,33 @@ jobs:
           set -euo pipefail
 
           if [[ "$FILE_TYPE" == "Odds" ]]; then
-            python scripts/manual_nfl_odds.py               --season "$SEASON"               --week "$WEEK"               --raw-file raw_input.txt
+            python scripts/manual_nfl_odds.py \
+              --season "$SEASON" \
+              --week "$WEEK" \
+              --raw-file raw_input.txt
 
-            OUTPUT_PATH="docs/data/weekly/${SEASON}_wk${WEEK}_odds.csv"
+            printf -v PADDED_WEEK "%02d" "$WEEK"
+            OUTPUT_PATH="docs/data/weekly/${SEASON}_wk${PADDED_WEEK}_odds.csv"
+
+            if [[ ! -f "$OUTPUT_PATH" ]]; then
+              echo "Expected output file was not created: $OUTPUT_PATH"
+              exit 1
+            fi
+
             cp -f "$OUTPUT_PATH" docs/data/weekly/latest.csv
           else
+            python scripts/manual_nfl_final_scores.py \
+              --season "$SEASON" \
+              --week "$WEEK" \
+              --raw-file raw_input.txt
+
             printf -v PADDED_WEEK "%02d" "$WEEK"
-
-            python scripts/manual_nfl_final_scores.py               --season "$SEASON"               --week "$WEEK"               --raw-file raw_input.txt
-
             OUTPUT_PATH="docs/data/scores/${SEASON}_wk${PADDED_WEEK}_scores.csv"
-          fi
 
-          if [[ ! -f "$OUTPUT_PATH" ]]; then
-            echo "Expected output file was not created: $OUTPUT_PATH"
-            exit 1
+            if [[ ! -f "$OUTPUT_PATH" ]]; then
+              echo "Expected output file was not created: $OUTPUT_PATH"
+              exit 1
+            fi
           fi
 
           echo "OUTPUT_PATH=$OUTPUT_PATH" >> "$GITHUB_ENV"
@@ -134,7 +146,7 @@ jobs:
           git add "$OUTPUT_PATH"
 
           if [[ "$FILE_TYPE" == "Odds" ]]; then
-          git add docs/data/weekly/latest.csv
+            git add docs/data/weekly/latest.csv
           fi
 
           if git diff --cached --quiet; then
