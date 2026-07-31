@@ -1,4 +1,4 @@
-name: Manual Data Input
+  name: Manual Data Input
 
 on:
   workflow_dispatch:
@@ -107,6 +107,7 @@ jobs:
             python scripts/manual_nfl_odds.py               --season "$SEASON"               --week "$WEEK"               --raw-file raw_input.txt
 
             OUTPUT_PATH="docs/data/weekly/${SEASON}_wk${WEEK}_odds.csv"
+            cp -f "$OUTPUT_PATH" docs/data/weekly/latest.csv
           else
             printf -v PADDED_WEEK "%02d" "$WEEK"
 
@@ -131,6 +132,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add "$OUTPUT_PATH"
+
+          if [[ "$FILE_TYPE" == "Odds" ]]; then
+          git add docs/data/weekly/latest.csv
+          fi
 
           if git diff --cached --quiet; then
             echo "No CSV changes to commit"
