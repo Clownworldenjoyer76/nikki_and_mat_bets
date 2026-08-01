@@ -135,6 +135,13 @@ jobs:
 
           echo "OUTPUT_PATH=$OUTPUT_PATH" >> "$GITHUB_ENV"
 
+      - name: Sync games to Supabase
+        if: inputs.file_type == 'Odds'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/sync_games_to_supabase.py
+
       - name: Commit generated CSV
         shell: bash
         run: |
