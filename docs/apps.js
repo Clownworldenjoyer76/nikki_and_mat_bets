@@ -428,85 +428,34 @@
       }`;
   }
 
-  function gameKey(
-    season,
-    week,
-    homeTeam,
-    awayTeam,
-    kickoffUtc
-  ) {
-    const kickoff =
-      new Date(kickoffUtc);
-
-    if (
-      Number.isNaN(
-        kickoff.getTime()
-      )
-    ) {
-      throw new Error(
-        `Invalid kickoff time: ${kickoffUtc}`
-      );
-    }
-
-    return [
-      String(season),
-      String(week),
-      homeTeam,
-      awayTeam,
-      kickoff.toISOString()
-    ].join("|");
-  }
-
   async function loadAndMatchGames() {
-    const {
-      season,
-      week
-    } = state.schedule[0];
+    const csvGameIds = state.schedule.map(
+      scheduleGame => scheduleGame.csvGameId
+    );
 
     const {
       data,
       error
     } = await client
       .from("games")
-      .select(
-        [
-          "id",
-          "season",
-          "week",
-          "away_team",
-          "home_team",
-          "kickoff_utc"
-        ].join(", ")
-      )
-      .eq("season", season)
-      .eq("week", week);
+      .select("id, game_id, kickoff_utc")
+      .in("game_id", csvGameIds);
 
     if (error) {
       throw error;
     }
 
-    const gamesByKey =
-      new Map();
+    const gamesByGameId = new Map();
 
     for (const game of data || []) {
-      const key = gameKey(
-        game.season,
-        game.week,
-        game.home_team,
-        game.away_team,
-        game.kickoff_utc
-      );
-
-      if (
-        gamesByKey.has(key)
-      ) {
+      if (gamesByGameId.has(game.game_id)) {
         throw new Error(
-          `Supabase contains duplicate matching games for ${game.away_team} at ${game.home_team}, ${game.kickoff_utc}.`
+          `Supabase contains duplicate games.game_id: ${game.game_id}`
         );
       }
 
-      gamesByKey.set(
-        key,
+      gamesByGameId.set(
+        game.game_id,
         game
       );
     }
@@ -515,16 +464,9 @@
       state.schedule.map(
         scheduleGame => ({
           ...scheduleGame,
-
           game:
-            gamesByKey.get(
-              gameKey(
-                scheduleGame.season,
-                scheduleGame.week,
-                scheduleGame.homeTeam,
-                scheduleGame.awayTeam,
-                scheduleGame.kickoffUtc
-              )
+            gamesByGameId.get(
+              scheduleGame.csvGameId
             ) || null
         })
       );
