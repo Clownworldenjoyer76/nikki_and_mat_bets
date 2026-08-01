@@ -1,1260 +1,1781 @@
-// docs/apps.js
-// Supabase-backed weekly pick entry.
+"use strict";
 
-const client = window.supabaseClient;
+(() => {
+  const client = window.supabaseClient;
+  const CSV_URL = "./data/weekly/latest.csv";
 
-// ---------- CONFIG ----------
-const PRIMARY_CSV = "docs/data/weekly/latest.csv";
-const CSV_CANDIDATES = [
-  PRIMARY_CSV,
-  "/nikki_and_mat_bets/docs/data/weekly/latest.csv",
-  "data/weekly/latest.csv"
-];
+  const REQUIRED_HEADERS = [
+    "season",
+    "week",
+    "game_id",
+    "commence_time_utc",
+    "home_team",
+    "away_team",
+    "spread_home",
+    "spread_away",
+    "total",
+    "total_over",
+    "total_under",
+    "is_consensus"
+  ];
 
-const PICKER_KEYS = ["mat", "nikki"];
-
-const PICKER_LABELS = {
-  mat: "Mat",
-  nikki: "Nikki"
-};
-
-// ---------- STATE ----------
-const state = {
-  session: null,
-  currentProfile: null,
-  isMaster: false,
-
-  profilesByPicker: {
-    mat: null,
-    nikki: null
-  },
-
-  scheduleHeader: [],
-  scheduleRows: [],
-  renderedGames: [],
-
-  season: "",
-  week: "",
-
-  originalPicks: {
-    mat: {},
-    nikki: {}
-  },
-
-  draftPicks: {
-    mat: {},
-    nikki: {}
-  }
-};
-
-// ---------- GENERAL HELPERS ----------
-function normalizeTeamName(name) {
-  if (name === "Washington Commanders") {
-    return "Washington Redskins";
-  }
-
-  return name;
-}
-
-function canonicalTeamName(name) {
-  const value = String(name || "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
-
-  if (
-    value === "washington redskins" ||
-    value === "washington commanders"
-  ) {
-    return "washington commanders";
-  }
-
-  return value;
-}
-
-async function fetchFirstAvailable(urls) {
-  for (const path of urls) {
-    const separator = path.includes("?") ? "&" : "?";
-    const url = `${path}${separator}v=${Date.now()}`;
-
-    try {
-      const response = await fetch(url, {
-        cache: "no-store"
-      });
-
-      if (response.ok) {
-        return {
-          txt: await response.text(),
-          used: path
-        };
-      }
-    } catch (_error) {
-      // Try the next path.
+  const PICKERS = {
+    mat: {
+      label: "Mat",
+      className: "mat"
+    },
+    nikki: {
+      label: "Nikki",
+      className: "nikki"
     }
-  }
-
-  throw new Error(
-    "Schedule CSV not found at: " + urls.join(" | ")
-  );
-}
-
-function parseCSV(text) {
-  const rows = text
-    .trim()
-    .split(/\r?\n/)
-    .map(line =>
-      line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/)
-    );
-
-  const header = rows.shift() || [];
-
-  return {
-    hdr: header.map(value =>
-      value.replace(/^"|"$/g, "").trim()
-    ),
-
-    rows: rows.map(row =>
-      row.map(value =>
-        value.replace(/^"|"$/g, "").trim()
-      )
-    )
-  };
-}
-
-function onlyConsensus(rows, header) {
-  const bookIndex = header.indexOf("book");
-  const consensusIndex =
-    header.indexOf("is_consensus");
-
-  return rows.filter(row => {
-    const markedConsensus =
-      consensusIndex !== -1 &&
-      String(row[consensusIndex]).trim() === "1";
-
-    const consensusBook =
-      bookIndex !== -1 &&
-      String(row[bookIndex])
-        .trim()
-        .toUpperCase() === "CONSENSUS";
-
-    return markedConsensus || consensusBook;
-  });
-}
-
-function cell(header, row, columnName) {
-  const index = header.indexOf(columnName);
-
-  if (index === -1) {
-    return "";
-  }
-
-  return String(row[index] ?? "").trim();
-}
-
-function fmtDate(iso) {
-  const date = new Date(iso);
-
-  return date.toLocaleString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true
-  });
-}
-
-function nflWeekLabel(csvWeek) {
-  const base = 36;
-
-  return (
-    ((parseInt(csvWeek, 10) - base) % 18 + 18) % 18 + 1
-  );
-}
-
-function fmtSigned(number) {
-  if (
-    number === "" ||
-    number === null ||
-    number === undefined
-  ) {
-    return "";
-  }
-
-  const value = Number(number);
-
-  if (Number.isNaN(value)) {
-    return String(number);
-  }
-
-  return value > 0 ? `+${value}` : `${value}`;
-}
-
-function logoPath(team) {
-  const cleaned = team
-    .replace(/[^A-Za-z0-9 ]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  const parts = cleaned.split(" ");
-  const nickname =
-    parts[parts.length - 1].toLowerCase();
-
-  return `assets/logos/${nickname}.png`;
-}
-
-// ---------- PICK HELPERS ----------
-function emptyPick() {
-  return {
-    spread: null,
-    total: null
-  };
-}
-
-function normalizePick(pick) {
-  if (!pick || typeof pick !== "object") {
-    return emptyPick();
-  }
-
-  return {
-    spread: pick.spread ?? null,
-    total: pick.total ?? null
-  };
-}
-
-function copyPickMap(source) {
-  const result = {};
-
-  for (
-    const [gameId, pick]
-    of Object.entries(source || {})
-  ) {
-    result[gameId] = normalizePick(pick);
-  }
-
-  return result;
-}
-
-function picksEqual(left, right) {
-  const first = normalizePick(left);
-  const second = normalizePick(right);
-
-  return (
-    first.spread === second.spread &&
-    first.total === second.total
-  );
-}
-
-function isCompletePick(pick) {
-  const normalized = normalizePick(pick);
-
-  return Boolean(
-    normalized.spread &&
-    normalized.total
-  );
-}
-
-function isKickoffInFuture(game) {
-  const kickoff =
-    new Date(game.kickoff_utc).getTime();
-
-  return (
-    Number.isFinite(kickoff) &&
-    Date.now() < kickoff
-  );
-}
-
-// ---------- SESSION AND PROFILES ----------
-async function loadSessionAndProfiles() {
-  const {
-    data: { session },
-    error: sessionError
-  } = await client.auth.getSession();
-
-  if (sessionError) {
-    throw sessionError;
-  }
-
-  state.session = session;
-  state.currentProfile = null;
-  state.isMaster = false;
-
-  state.profilesByPicker = {
-    mat: null,
-    nikki: null
   };
 
-  if (!session?.user) {
-    return;
-  }
+  const state = {
+    session: null,
+    currentProfile: null,
+    profilesByPicker: {
+      mat: null,
+      nikki: null
+    },
+    schedule: [],
+    originalPicks: {
+      mat: {},
+      nikki: {}
+    },
+    draftPicks: {
+      mat: {},
+      nikki: {}
+    },
+    saving: false
+  };
 
-  const {
-    data: profiles,
-    error: profileError
-  } = await client
-    .from("profiles")
-    .select("id, display_name, role, status");
+  const gamesContainer =
+    document.getElementById("games");
 
-  if (profileError) {
-    throw profileError;
-  }
-
-  state.currentProfile =
-    profiles.find(
-      profile =>
-        profile.id === session.user.id
-    ) || null;
-
-  state.isMaster =
-    String(
-      state.currentProfile?.role || ""
-    ).toLowerCase() === "master";
-
-  for (const profile of profiles) {
-    const displayName = String(
-      profile.display_name || ""
-    )
-      .trim()
-      .toLowerCase();
-
-    if (displayName === "mat") {
-      state.profilesByPicker.mat = profile;
-    }
-
-    if (displayName === "nikki") {
-      state.profilesByPicker.nikki = profile;
-    }
-  }
-}
-
-// ---------- SCHEDULE ----------
-async function loadSchedule() {
-  const { txt } =
-    await fetchFirstAvailable(CSV_CANDIDATES);
-
-  const { hdr, rows } = parseCSV(txt);
-
-  const consensusRows =
-    onlyConsensus(rows, hdr);
-
-  const sourceRows =
-    consensusRows.length
-      ? consensusRows
-      : rows;
-
-  if (!sourceRows.length) {
-    throw new Error(
-      "No rows found in latest.csv."
-    );
-  }
-
-  const season =
-    cell(hdr, sourceRows[0], "season");
-
-  const csvWeek =
-    cell(hdr, sourceRows[0], "week");
-
-  if (!season) {
-    throw new Error(
-      "latest.csv is missing the season value."
-    );
-  }
-
-  state.scheduleHeader = hdr;
-  state.scheduleRows = sourceRows;
-  state.season = season;
-
-  state.week = csvWeek
-    ? String(nflWeekLabel(csvWeek)).padStart(2, "0")
-    : "";
-
-  const seasonWeek =
+  const seasonWeekElement =
     document.getElementById("seasonWeek");
 
-  seasonWeek.textContent =
-    state.week
-      ? `NFL Week ${Number(state.week)}`
-      : "NFL Schedule";
-}
+  const clearButton =
+    document.getElementById("clearBtn");
 
-// ---------- SUPABASE GAMES ----------
-async function loadSupabaseGames() {
-  const seasonNumber = Number(state.season);
+  const submitButton =
+    document.getElementById("issueBtn");
 
-  if (!Number.isInteger(seasonNumber)) {
-    throw new Error(
-      `Invalid season value in latest.csv: ${state.season}`
+  function assertReady() {
+    const missing = [];
+
+    if (!gamesContainer) {
+      missing.push("#games");
+    }
+
+    if (!seasonWeekElement) {
+      missing.push("#seasonWeek");
+    }
+
+    if (!clearButton) {
+      missing.push("#clearBtn");
+    }
+
+    if (!submitButton) {
+      missing.push("#issueBtn");
+    }
+
+    if (missing.length) {
+      throw new Error(
+        `Missing required page element${
+          missing.length === 1 ? "" : "s"
+        }: ${missing.join(", ")}`
+      );
+    }
+
+    if (
+      !client?.auth ||
+      typeof client.from !== "function"
+    ) {
+      throw new Error(
+        "Supabase client is not available."
+      );
+    }
+  }
+
+  function parseCSV(text) {
+    const rows = [];
+
+    let row = [];
+    let field = "";
+    let quoted = false;
+
+    for (
+      let index = 0;
+      index < text.length;
+      index += 1
+    ) {
+      const character = text[index];
+
+      if (quoted) {
+        if (character === '"') {
+          if (text[index + 1] === '"') {
+            field += '"';
+            index += 1;
+          } else {
+            quoted = false;
+          }
+        } else {
+          field += character;
+        }
+
+        continue;
+      }
+
+      if (character === '"') {
+        quoted = true;
+      } else if (character === ",") {
+        row.push(field);
+        field = "";
+      } else if (character === "\n") {
+        row.push(field);
+        rows.push(row);
+
+        row = [];
+        field = "";
+      } else if (character !== "\r") {
+        field += character;
+      }
+    }
+
+    if (quoted) {
+      throw new Error(
+        "latest.csv contains an unterminated quoted field."
+      );
+    }
+
+    if (field.length || row.length) {
+      row.push(field);
+      rows.push(row);
+    }
+
+    if (!rows.length) {
+      throw new Error(
+        "latest.csv is empty."
+      );
+    }
+
+    const headers = rows
+      .shift()
+      .map(value => value.trim());
+
+    if (
+      new Set(headers).size !==
+      headers.length
+    ) {
+      throw new Error(
+        "latest.csv contains duplicate headers."
+      );
+    }
+
+    return rows
+      .filter(values =>
+        values.some(value => value !== "")
+      )
+      .map((values, rowIndex) => {
+        if (
+          values.length !==
+          headers.length
+        ) {
+          throw new Error(
+            `latest.csv row ${
+              rowIndex + 2
+            } has ${
+              values.length
+            } fields; expected ${
+              headers.length
+            }.`
+          );
+        }
+
+        return Object.fromEntries(
+          headers.map(
+            (header, columnIndex) => [
+              header,
+              values[columnIndex].trim()
+            ]
+          )
+        );
+      });
+  }
+
+  function validateScheduleRows(rows) {
+    if (!rows.length) {
+      throw new Error(
+        "latest.csv contains no data rows."
+      );
+    }
+
+    const headers =
+      Object.keys(rows[0]);
+
+    const missingHeaders =
+      REQUIRED_HEADERS.filter(
+        header =>
+          !headers.includes(header)
+      );
+
+    if (missingHeaders.length) {
+      throw new Error(
+        `latest.csv is missing required header${
+          missingHeaders.length === 1
+            ? ""
+            : "s"
+        }: ${missingHeaders.join(", ")}`
+      );
+    }
+
+    const consensusRows =
+      rows.filter(
+        row =>
+          row.is_consensus === "1"
+      );
+
+    if (!consensusRows.length) {
+      throw new Error(
+        "latest.csv contains no consensus rows."
+      );
+    }
+
+    const seenGameIds = new Set();
+
+    const schedule =
+      consensusRows.map(
+        (row, index) => {
+          const rowNumber = index + 2;
+          const season =
+            Number(row.season);
+          const week =
+            Number(row.week);
+          const kickoff =
+            new Date(
+              row.commence_time_utc
+            );
+
+          if (
+            !Number.isInteger(season)
+          ) {
+            throw new Error(
+              `latest.csv row ${rowNumber} has an invalid season.`
+            );
+          }
+
+          if (
+            !Number.isInteger(week) ||
+            week < 1 ||
+            week > 22
+          ) {
+            throw new Error(
+              `latest.csv row ${rowNumber} has an invalid week.`
+            );
+          }
+
+          if (!row.game_id) {
+            throw new Error(
+              `latest.csv row ${rowNumber} has a blank game_id.`
+            );
+          }
+
+          if (
+            seenGameIds.has(
+              row.game_id
+            )
+          ) {
+            throw new Error(
+              `latest.csv contains duplicate consensus game_id: ${row.game_id}`
+            );
+          }
+
+          seenGameIds.add(
+            row.game_id
+          );
+
+          if (
+            !row.home_team ||
+            !row.away_team
+          ) {
+            throw new Error(
+              `latest.csv row ${rowNumber} has a blank team name.`
+            );
+          }
+
+          if (
+            row.home_team ===
+            row.away_team
+          ) {
+            throw new Error(
+              `latest.csv row ${rowNumber} has the same home and away team.`
+            );
+          }
+
+          if (
+            Number.isNaN(
+              kickoff.getTime()
+            )
+          ) {
+            throw new Error(
+              `latest.csv row ${rowNumber} has an invalid commence_time_utc.`
+            );
+          }
+
+          for (
+            const column of [
+              "spread_home",
+              "spread_away",
+              "total",
+              "total_over",
+              "total_under"
+            ]
+          ) {
+            if (
+              row[column] === "" ||
+              Number.isNaN(
+                Number(row[column])
+              )
+            ) {
+              throw new Error(
+                `latest.csv row ${rowNumber} has an invalid ${column}.`
+              );
+            }
+          }
+
+          return {
+            csvGameId:
+              row.game_id,
+
+            season,
+            week,
+
+            kickoffUtc:
+              kickoff.toISOString(),
+
+            homeTeam:
+              row.home_team,
+
+            awayTeam:
+              row.away_team,
+
+            spreadHome:
+              row.spread_home,
+
+            spreadAway:
+              row.spread_away,
+
+            total:
+              row.total,
+
+            totalOver:
+              row.total_over,
+
+            totalUnder:
+              row.total_under,
+
+            game: null
+          };
+        }
+      );
+
+    const {
+      season,
+      week
+    } = schedule[0];
+
+    if (
+      schedule.some(
+        game =>
+          game.season !== season ||
+          game.week !== week
+      )
+    ) {
+      throw new Error(
+        "latest.csv consensus rows contain more than one season or week."
+      );
+    }
+
+    return schedule;
+  }
+
+  async function loadSchedule() {
+    const response = await fetch(
+      `${CSV_URL}?v=${Date.now()}`,
+      {
+        cache: "no-store"
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Could not load ${CSV_URL}: HTTP ${response.status}`
+      );
+    }
+
+    const text =
+      await response.text();
+
+    state.schedule =
+      validateScheduleRows(
+        parseCSV(text)
+      );
+
+    seasonWeekElement.textContent =
+      `NFL Week ${
+        state.schedule[0].week
+      }`;
+  }
+
+  function gameKey(
+    season,
+    week,
+    homeTeam,
+    awayTeam,
+    kickoffUtc
+  ) {
+    const kickoff =
+      new Date(kickoffUtc);
+
+    if (
+      Number.isNaN(
+        kickoff.getTime()
+      )
+    ) {
+      throw new Error(
+        `Invalid kickoff time: ${kickoffUtc}`
+      );
+    }
+
+    return [
+      String(season),
+      String(week),
+      homeTeam,
+      awayTeam,
+      kickoff.toISOString()
+    ].join("|");
+  }
+
+  async function loadAndMatchGames() {
+    const {
+      season,
+      week
+    } = state.schedule[0];
+
+    const {
+      data,
+      error
+    } = await client
+      .from("games")
+      .select(
+        [
+          "id",
+          "season",
+          "week",
+          "away_team",
+          "home_team",
+          "kickoff_utc"
+        ].join(", ")
+      )
+      .eq("season", season)
+      .eq("week", week);
+
+    if (error) {
+      throw error;
+    }
+
+    const gamesByKey =
+      new Map();
+
+    for (const game of data || []) {
+      const key = gameKey(
+        game.season,
+        game.week,
+        game.home_team,
+        game.away_team,
+        game.kickoff_utc
+      );
+
+      if (
+        gamesByKey.has(key)
+      ) {
+        throw new Error(
+          `Supabase contains duplicate matching games for ${game.away_team} at ${game.home_team}, ${game.kickoff_utc}.`
+        );
+      }
+
+      gamesByKey.set(
+        key,
+        game
+      );
+    }
+
+    state.schedule =
+      state.schedule.map(
+        scheduleGame => ({
+          ...scheduleGame,
+
+          game:
+            gamesByKey.get(
+              gameKey(
+                scheduleGame.season,
+                scheduleGame.week,
+                scheduleGame.homeTeam,
+                scheduleGame.awayTeam,
+                scheduleGame.kickoffUtc
+              )
+            ) || null
+        })
+      );
+  }
+
+  function pickerKeyForDisplayName(
+    displayName
+  ) {
+    const value =
+      String(displayName || "")
+        .trim()
+        .toLowerCase();
+
+    if (value === "mat") {
+      return "mat";
+    }
+
+    if (value === "nikki") {
+      return "nikki";
+    }
+
+    return null;
+  }
+
+  async function loadSessionAndProfiles() {
+    const {
+      data: {
+        session
+      },
+      error: sessionError
+    } = await client.auth.getSession();
+
+    if (sessionError) {
+      throw sessionError;
+    }
+
+    state.session = session;
+    state.currentProfile = null;
+
+    state.profilesByPicker = {
+      mat: null,
+      nikki: null
+    };
+
+    if (!session?.user) {
+      return;
+    }
+
+    const {
+      data,
+      error
+    } = await client
+      .from("profiles")
+      .select(
+        "id, display_name, role, status"
+      );
+
+    if (error) {
+      throw error;
+    }
+
+    const profiles =
+      data || [];
+
+    state.currentProfile =
+      profiles.find(
+        profile =>
+          profile.id ===
+          session.user.id
+      ) || null;
+
+    if (
+      !state.currentProfile
+    ) {
+      throw new Error(
+        "The signed-in user does not have a readable profiles row."
+      );
+    }
+
+    for (
+      const profile of profiles
+    ) {
+      const pickerKey =
+        pickerKeyForDisplayName(
+          profile.display_name
+        );
+
+      if (!pickerKey) {
+        continue;
+      }
+
+      if (
+        state.profilesByPicker[
+          pickerKey
+        ]
+      ) {
+        throw new Error(
+          `More than one readable profile uses the display name ${PICKERS[pickerKey].label}.`
+        );
+      }
+
+      state.profilesByPicker[
+        pickerKey
+      ] = profile;
+    }
+  }
+
+  function blankPick() {
+    return {
+      spread: null,
+      total: null
+    };
+  }
+
+  function normalizePick(pick) {
+    if (!pick) {
+      return blankPick();
+    }
+
+    return {
+      spread:
+        pick.spread ?? null,
+
+      total:
+        pick.total ?? null
+    };
+  }
+
+  function clonePickMap(picks) {
+    return Object.fromEntries(
+      Object.entries(
+        picks || {}
+      ).map(
+        ([gameId, pick]) => [
+          gameId,
+          normalizePick(pick)
+        ]
+      )
     );
   }
 
-  const {
-    data: games,
-    error
-  } = await client
-    .from("games")
-    .select(
-      [
-        "id",
-        "espn_game_id",
-        "season",
-        "week",
-        "away_team",
-        "home_team",
-        "kickoff_utc",
-        "spread_home",
-        "total",
-        "status"
-      ].join(", ")
-    )
-    .eq("season", seasonNumber)
-    .order("kickoff_utc", {
-      ascending: true
-    });
+  function resetPickState() {
+    state.originalPicks = {
+      mat: {},
+      nikki: {}
+    };
 
-  if (error) {
-    throw error;
+    state.draftPicks = {
+      mat: {},
+      nikki: {}
+    };
   }
 
-  return games || [];
-}
+  async function loadExistingPicks() {
+    resetPickState();
 
-function matchScheduleRowToGame(
-  header,
-  row,
-  databaseGames
-) {
-  const csvEspnId =
-    cell(header, row, "espn_game_id");
-
-  const csvGameId =
-    cell(header, row, "game_id");
-
-  if (csvEspnId) {
-    const matchingEspnGames =
-      databaseGames.filter(
-        game =>
-          String(game.espn_game_id || "") ===
-          csvEspnId
-      );
-
-    if (matchingEspnGames.length === 1) {
-      return matchingEspnGames[0];
+    if (!state.session?.user) {
+      return;
     }
-  }
 
-  if (csvGameId) {
-    const matchingGameIds =
-      databaseGames.filter(game => {
-        return (
-          String(game.id) === csvGameId ||
-          String(game.espn_game_id || "") ===
-            csvGameId
-        );
-      });
-
-    if (matchingGameIds.length === 1) {
-      return matchingGameIds[0];
-    }
-  }
-
-  const awayTeam = canonicalTeamName(
-    cell(header, row, "away_team")
-  );
-
-  const homeTeam = canonicalTeamName(
-    cell(header, row, "home_team")
-  );
-
-  const kickoffValue =
-    cell(header, row, "commence_time_utc");
-
-  const kickoffTime =
-    new Date(kickoffValue).getTime();
-
-  const exactMatches =
-    databaseGames.filter(game => {
-      return (
-        canonicalTeamName(game.away_team) ===
-          awayTeam &&
-        canonicalTeamName(game.home_team) ===
-          homeTeam &&
-        new Date(game.kickoff_utc).getTime() ===
-          kickoffTime
-      );
-    });
-
-  if (exactMatches.length === 1) {
-    return exactMatches[0];
-  }
-
-  return null;
-}
-
-function mapScheduleRowsToGames(databaseGames) {
-  state.renderedGames =
-    state.scheduleRows.map(row => {
-      return {
-        csvRow: row,
-
-        game: matchScheduleRowToGame(
-          state.scheduleHeader,
-          row,
-          databaseGames
+    const gameIds =
+      state.schedule
+        .map(
+          item =>
+            item.game?.id
         )
-      };
-    });
-}
+        .filter(Boolean);
 
-// ---------- LOAD SAVED PICKS ----------
-async function loadExistingPicks() {
-  state.originalPicks = {
-    mat: {},
-    nikki: {}
-  };
+    const userIds =
+      Object.values(
+        state.profilesByPicker
+      )
+        .map(
+          profile =>
+            profile?.id
+        )
+        .filter(Boolean);
 
-  state.draftPicks = {
-    mat: {},
-    nikki: {}
-  };
-
-  if (!state.session?.user) {
-    return;
-  }
-
-  const gameIds = state.renderedGames
-    .map(entry => entry.game?.id)
-    .filter(Boolean);
-
-  const userIds = PICKER_KEYS
-    .map(
-      pickerKey =>
-        state.profilesByPicker[pickerKey]?.id
-    )
-    .filter(Boolean);
-
-  if (!gameIds.length || !userIds.length) {
-    return;
-  }
-
-  const {
-    data: picks,
-    error
-  } = await client
-    .from("picks")
-    .select(
-      [
-        "id",
-        "user_id",
-        "game_id",
-        "spread_pick",
-        "total_pick"
-      ].join(", ")
-    )
-    .in("game_id", gameIds)
-    .in("user_id", userIds);
-
-  if (error) {
-    throw error;
-  }
-
-  for (const row of picks || []) {
-    const pickerKey =
-      PICKER_KEYS.find(key => {
-        return (
-          state.profilesByPicker[key]?.id ===
-          row.user_id
-        );
-      });
-
-    if (!pickerKey) {
-      continue;
+    if (
+      !gameIds.length ||
+      !userIds.length
+    ) {
+      return;
     }
 
-    state.originalPicks[pickerKey][row.game_id] = {
-      spread: row.spread_pick,
-      total: row.total_pick
-    };
-  }
-
-  for (const pickerKey of PICKER_KEYS) {
-    state.draftPicks[pickerKey] =
-      copyPickMap(
-        state.originalPicks[pickerKey]
+    const {
+      data,
+      error
+    } = await client
+      .from("picks")
+      .select(
+        [
+          "user_id",
+          "game_id",
+          "spread_pick",
+          "total_pick"
+        ].join(", ")
+      )
+      .in(
+        "game_id",
+        gameIds
+      )
+      .in(
+        "user_id",
+        userIds
       );
+
+    if (error) {
+      throw error;
+    }
+
+    for (
+      const pick of data || []
+    ) {
+      const pickerKey =
+        Object.keys(
+          PICKERS
+        ).find(
+          key =>
+            state
+              .profilesByPicker[
+                key
+              ]?.id ===
+            pick.user_id
+        );
+
+      if (!pickerKey) {
+        continue;
+      }
+
+      state.originalPicks[
+        pickerKey
+      ][pick.game_id] = {
+        spread:
+          pick.spread_pick,
+
+        total:
+          pick.total_pick
+      };
+    }
+
+    for (
+      const pickerKey of
+      Object.keys(PICKERS)
+    ) {
+      state.draftPicks[
+        pickerKey
+      ] = clonePickMap(
+        state.originalPicks[
+          pickerKey
+        ]
+      );
+    }
   }
-}
 
-// ---------- EDIT PERMISSIONS ----------
-function editPermission(pickerKey, game) {
-  if (!state.session?.user) {
-    return {
-      allowed: false,
-      reason: "Log in before making picks."
-    };
+  function isMaster() {
+    return (
+      state.currentProfile?.role ===
+      "master"
+    );
   }
 
-  if (!state.currentProfile) {
-    return {
-      allowed: false,
-      reason: "Your profile could not be loaded."
-    };
-  }
+  function canEdit(
+    pickerKey,
+    scheduleGame
+  ) {
+    if (!state.session?.user) {
+      return {
+        allowed: false,
+        reason:
+          "Log in before making picks."
+      };
+    }
 
-  if (state.currentProfile.status !== "ACTIVE") {
-    return {
-      allowed: false,
-      reason: "This account is not active."
-    };
-  }
+    if (
+      !state.currentProfile
+    ) {
+      return {
+        allowed: false,
+        reason:
+          "The signed-in profile is unavailable."
+      };
+    }
 
-  const targetProfile =
-    state.profilesByPicker[pickerKey];
+    if (
+      state.currentProfile
+        .status !== "active"
+    ) {
+      return {
+        allowed: false,
+        reason:
+          "This account is not active."
+      };
+    }
 
-  if (!targetProfile) {
-    return {
-      allowed: false,
-      reason:
-        `${PICKER_LABELS[pickerKey]} profile not found.`
-    };
-  }
+    const targetProfile =
+      state.profilesByPicker[
+        pickerKey
+      ];
 
-  if (!game) {
-    return {
-      allowed: false,
-      reason:
-        "This schedule row has no matching Supabase game."
-    };
-  }
+    if (!targetProfile) {
+      return {
+        allowed: false,
 
-  if (state.isMaster) {
+        reason:
+          `${PICKERS[pickerKey].label} does not have a readable profile.`
+      };
+    }
+
+    if (!scheduleGame.game) {
+      return {
+        allowed: false,
+
+        reason:
+          "This CSV game does not exactly match a Supabase games row."
+      };
+    }
+
+    if (isMaster()) {
+      return {
+        allowed: true,
+        reason: ""
+      };
+    }
+
+    if (
+      targetProfile.id !==
+      state.session.user.id
+    ) {
+      return {
+        allowed: false,
+
+        reason:
+          "Members can edit only their own picks."
+      };
+    }
+
+    const kickoffTime =
+      new Date(
+        scheduleGame.game
+          .kickoff_utc
+      ).getTime();
+
+    if (
+      Date.now() >=
+      kickoffTime
+    ) {
+      return {
+        allowed: false,
+        reason:
+          "This game has started."
+      };
+    }
+
     return {
       allowed: true,
       reason: ""
     };
   }
 
-  if (
-    targetProfile.id !==
-    state.currentProfile.id
+  function picksEqual(
+    firstPick,
+    secondPick
   ) {
-    return {
-      allowed: false,
-      reason:
-        "Members can edit only their own picks."
-    };
-  }
+    const first =
+      normalizePick(firstPick);
 
-  if (!isKickoffInFuture(game)) {
-    return {
-      allowed: false,
-      reason: "This game has started."
-    };
-  }
+    const second =
+      normalizePick(secondPick);
 
-  return {
-    allowed: true,
-    reason: ""
-  };
-}
-
-// ---------- PICK BUTTONS ----------
-function makePickButton({
-  label,
-  type,
-  side,
-  currentPick,
-  color,
-  pickerKey,
-  game
-}) {
-  const button =
-    document.createElement("button");
-
-  const permission =
-    editPermission(pickerKey, game);
-
-  button.className = "pickbtn";
-  button.type = "button";
-  button.textContent = label;
-  button.dataset.type = type;
-  button.dataset.side = side;
-  button.disabled = !permission.allowed;
-  button.title = permission.reason;
-
-  const spreadSelected =
-    type === "spread" &&
-    currentPick.spread === side;
-
-  const totalSelected =
-    type === "total" &&
-    currentPick.total === side;
-
-  if (spreadSelected || totalSelected) {
-    button.classList.add(
-      "active",
-      color
+    return (
+      first.spread ===
+        second.spread &&
+      first.total ===
+        second.total
     );
   }
 
-  button.onclick = () => {
-    const latestPermission =
-      editPermission(pickerKey, game);
+  function createElement(
+    tagName,
+    className = "",
+    text = ""
+  ) {
+    const element =
+      document.createElement(
+        tagName
+      );
 
-    if (!latestPermission.allowed) {
-      alert(latestPermission.reason);
+    if (className) {
+      element.className =
+        className;
+    }
+
+    if (text !== "") {
+      element.textContent =
+        text;
+    }
+
+    return element;
+  }
+
+  function formatDate(iso) {
+    return new Date(
+      iso
+    ).toLocaleString(
+      "en-US",
+      {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+      }
+    );
+  }
+
+  function logoPath(team) {
+    const cleaned =
+      team
+        .replace(
+          /[^A-Za-z0-9 ]/g,
+          " "
+        )
+        .replace(
+          /\s+/g,
+          " "
+        )
+        .trim();
+
+    const parts =
+      cleaned.split(" ");
+
+    const nickname =
+      parts[
+        parts.length - 1
+      ].toLowerCase();
+
+    return (
+      `assets/logos/${nickname}.png`
+    );
+  }
+
+  function createPickButton({
+    label,
+    type,
+    value,
+    pickerKey,
+    scheduleGame,
+    currentPick
+  }) {
+    const button =
+      createElement(
+        "button",
+        "pickbtn",
+        label
+      );
+
+    const permission =
+      canEdit(
+        pickerKey,
+        scheduleGame
+      );
+
+    button.type = "button";
+    button.dataset.type = type;
+    button.dataset.side = value;
+
+    button.disabled =
+      state.saving ||
+      !permission.allowed;
+
+    button.title =
+      permission.reason;
+
+    if (
+      (
+        type === "spread" &&
+        currentPick.spread ===
+          value
+      ) ||
+      (
+        type === "total" &&
+        currentPick.total ===
+          value
+      )
+    ) {
+      button.classList.add(
+        "active",
+        PICKERS[pickerKey]
+          .className
+      );
+    }
+
+    button.addEventListener(
+      "click",
+      () => {
+        const latestPermission =
+          canEdit(
+            pickerKey,
+            scheduleGame
+          );
+
+        if (
+          !latestPermission.allowed
+        ) {
+          alert(
+            latestPermission.reason
+          );
+
+          return;
+        }
+
+        const gameId =
+          scheduleGame.game.id;
+
+        const current =
+          normalizePick(
+            state.draftPicks[
+              pickerKey
+            ][gameId]
+          );
+
+        if (
+          type === "spread"
+        ) {
+          current.spread =
+            current.spread ===
+            value
+              ? null
+              : value;
+        } else {
+          current.total =
+            current.total ===
+            value
+              ? null
+              : value;
+        }
+
+        if (
+          current.spread ===
+            null &&
+          current.total ===
+            null
+        ) {
+          delete state
+            .draftPicks[
+              pickerKey
+            ][gameId];
+        } else {
+          state.draftPicks[
+            pickerKey
+          ][gameId] = current;
+        }
+
+        render();
+      }
+    );
+
+    return button;
+  }
+
+  function createGameCard(
+    scheduleGame
+  ) {
+    const card =
+      createElement(
+        "article",
+        "card"
+      );
+
+    const matchup =
+      createElement(
+        "div",
+        "matchgrid"
+      );
+
+    const awayLogo =
+      createElement(
+        "img",
+        "team-logo"
+      );
+
+    awayLogo.src =
+      logoPath(
+        scheduleGame.awayTeam
+      );
+
+    awayLogo.alt =
+      `${scheduleGame.awayTeam} logo`;
+
+    const matchupText =
+      createElement(
+        "div",
+        "matchtext"
+      );
+
+    matchupText.append(
+      createElement(
+        "div",
+        "team",
+        scheduleGame.awayTeam
+      ),
+
+      createElement(
+        "div",
+        "at",
+        "@"
+      ),
+
+      createElement(
+        "div",
+        "team",
+        scheduleGame.homeTeam
+      )
+    );
+
+    const homeLogo =
+      createElement(
+        "img",
+        "team-logo right"
+      );
+
+    homeLogo.src =
+      logoPath(
+        scheduleGame.homeTeam
+      );
+
+    homeLogo.alt =
+      `${scheduleGame.homeTeam} logo`;
+
+    matchup.append(
+      awayLogo,
+      matchupText,
+      homeLogo
+    );
+
+    const when =
+      createElement(
+        "div",
+        "when",
+        formatDate(
+          scheduleGame.kickoffUtc
+        )
+      );
+
+    when.style.textAlign =
+      "center";
+
+    when.style.marginTop =
+      "6px";
+
+    const line =
+      createElement(
+        "div",
+        "line"
+      );
+
+    line.style.textAlign =
+      "center";
+
+    line.style.marginTop =
+      "6px";
+
+    const spreadPill =
+      createElement(
+        "span",
+        "pill"
+      );
+
+    spreadPill.append(
+      document.createTextNode(
+        "Home spread: "
+      ),
+
+      createElement(
+        "b",
+        "",
+        scheduleGame.spreadHome
+      )
+    );
+
+    const totalPill =
+      createElement(
+        "span",
+        "pill"
+      );
+
+    totalPill.style.marginLeft =
+      "8px";
+
+    totalPill.append(
+      document.createTextNode(
+        "Total: "
+      ),
+
+      createElement(
+        "b",
+        "",
+        scheduleGame.total
+      )
+    );
+
+    line.append(
+      spreadPill,
+      totalPill
+    );
+
+    card.append(
+      matchup,
+      when,
+      line
+    );
+
+    if (!scheduleGame.game) {
+      const warning =
+        createElement(
+          "div",
+          "when",
+          "No exact matching Supabase game. Picks cannot be saved for this game."
+        );
+
+      warning.style.textAlign =
+        "center";
+
+      warning.style.marginTop =
+        "8px";
+
+      card.appendChild(
+        warning
+      );
+    }
+
+    for (
+      const pickerKey of
+      Object.keys(PICKERS)
+    ) {
+      const section =
+        createElement("div");
+
+      section.style.marginTop =
+        "10px";
+
+      const name =
+        createElement(
+          "div",
+
+          `name ${
+            PICKERS[pickerKey]
+              .className
+          }`,
+
+          PICKERS[pickerKey]
+            .label
+        );
+
+      name.style.textAlign =
+        "center";
+
+      name.style.fontWeight =
+        "600";
+
+      name.style.margin =
+        "6px 0";
+
+      const grid =
+        createElement(
+          "div",
+          "pick-grid"
+        );
+
+      grid.style.display =
+        "grid";
+
+      grid.style
+        .gridTemplateColumns =
+        "1fr 1fr";
+
+      grid.style.columnGap =
+        "8px";
+
+      grid.style.rowGap =
+        "8px";
+
+      grid.style.marginTop =
+        "6px";
+
+      const currentPick =
+        scheduleGame.game
+          ? normalizePick(
+              state.draftPicks[
+                pickerKey
+              ][
+                scheduleGame.game
+                  .id
+              ]
+            )
+          : blankPick();
+
+      grid.append(
+        createPickButton({
+          label:
+            `${scheduleGame.awayTeam} ${scheduleGame.spreadAway}`,
+
+          type: "spread",
+          value: "away",
+          pickerKey,
+          scheduleGame,
+          currentPick
+        }),
+
+        createPickButton({
+          label:
+            `Over ${scheduleGame.totalOver}`,
+
+          type: "total",
+          value: "over",
+          pickerKey,
+          scheduleGame,
+          currentPick
+        }),
+
+        createPickButton({
+          label:
+            `${scheduleGame.homeTeam} ${scheduleGame.spreadHome}`,
+
+          type: "spread",
+          value: "home",
+          pickerKey,
+          scheduleGame,
+          currentPick
+        }),
+
+        createPickButton({
+          label:
+            `Under ${scheduleGame.totalUnder}`,
+
+          type: "total",
+          value: "under",
+          pickerKey,
+          scheduleGame,
+          currentPick
+        })
+      );
+
+      section.append(
+        name,
+        grid
+      );
+
+      card.appendChild(
+        section
+      );
+    }
+
+    return card;
+  }
+
+  function createDivider() {
+    const divider =
+      createElement(
+        "div",
+        "neon-divider"
+      );
+
+    divider.style.height =
+      "3px";
+
+    divider.style.background =
+      "#39ff14";
+
+    divider.style.margin =
+      "10px 0";
+
+    divider.style.borderRadius =
+      "2px";
+
+    divider.style.boxShadow =
+      "0 0 8px #39ff14";
+
+    divider.style.pointerEvents =
+      "none";
+
+    return divider;
+  }
+
+  function updateButtons() {
+    clearButton.disabled =
+      state.saving;
+
+    submitButton.disabled =
+      state.saving;
+
+    submitButton.textContent =
+      state.saving
+        ? "Saving…"
+        : "Submit Picks";
+  }
+
+  function render() {
+    gamesContainer.replaceChildren();
+
+    state.schedule.forEach(
+      (
+        scheduleGame,
+        index
+      ) => {
+        gamesContainer.appendChild(
+          createGameCard(
+            scheduleGame
+          )
+        );
+
+        if (
+          index <
+          state.schedule.length - 1
+        ) {
+          gamesContainer.appendChild(
+            createDivider()
+          );
+        }
+      }
+    );
+
+    updateButtons();
+  }
+
+  function collectChanges() {
+    const upserts = [];
+    const deletes = [];
+
+    for (
+      const pickerKey of
+      Object.keys(PICKERS)
+    ) {
+      const profile =
+        state.profilesByPicker[
+          pickerKey
+        ];
+
+      if (!profile) {
+        continue;
+      }
+
+      for (
+        const scheduleGame of
+        state.schedule
+      ) {
+        if (
+          !scheduleGame.game
+        ) {
+          continue;
+        }
+
+        const gameId =
+          scheduleGame.game.id;
+
+        const original =
+          state.originalPicks[
+            pickerKey
+          ][gameId] || null;
+
+        const draft =
+          state.draftPicks[
+            pickerKey
+          ][gameId] || null;
+
+        if (
+          picksEqual(
+            original,
+            draft
+          )
+        ) {
+          continue;
+        }
+
+        const permission =
+          canEdit(
+            pickerKey,
+            scheduleGame
+          );
+
+        if (
+          !permission.allowed
+        ) {
+          throw new Error(
+            `${PICKERS[pickerKey].label} — ${scheduleGame.awayTeam} at ${scheduleGame.homeTeam}: ${permission.reason}`
+          );
+        }
+
+        if (
+          draft &&
+          (
+            !draft.spread ||
+            !draft.total
+          )
+        ) {
+          throw new Error(
+            `${PICKERS[pickerKey].label} must select both spread and total for ${scheduleGame.awayTeam} at ${scheduleGame.homeTeam}.`
+          );
+        }
+
+        if (
+          !draft &&
+          original
+        ) {
+          deletes.push({
+            userId:
+              profile.id,
+
+            gameId
+          });
+        } else if (draft) {
+          upserts.push({
+            user_id:
+              profile.id,
+
+            game_id:
+              gameId,
+
+            spread_pick:
+              draft.spread,
+
+            total_pick:
+              draft.total
+          });
+        }
+      }
+    }
+
+    return {
+      upserts,
+      deletes
+    };
+  }
+
+  async function submitPicks() {
+    if (state.saving) {
       return;
     }
 
-    const gameId = game.id;
-
-    const current = normalizePick(
-      state.draftPicks[pickerKey][gameId]
-    );
-
-    if (type === "spread") {
-      current.spread =
-        current.spread === side
-          ? null
-          : side;
-    } else {
-      current.total =
-        current.total === side
-          ? null
-          : side;
-    }
+    const {
+      upserts,
+      deletes
+    } = collectChanges();
 
     if (
-      current.spread === null &&
-      current.total === null
+      !upserts.length &&
+      !deletes.length
     ) {
-      delete state.draftPicks[pickerKey][gameId];
-    } else {
-      state.draftPicks[pickerKey][gameId] =
-        current;
-    }
-
-    renderCards();
-  };
-
-  return button;
-}
-
-// ---------- GAME CARD ----------
-function card(header, csvRow, game) {
-  const kickoff =
-    cell(
-      header,
-      csvRow,
-      "commence_time_utc"
-    );
-
-  const when = fmtDate(kickoff);
-
-  const home = normalizeTeamName(
-    cell(header, csvRow, "home_team")
-  );
-
-  const away = normalizeTeamName(
-    cell(header, csvRow, "away_team")
-  );
-
-  const spreadHome =
-    cell(header, csvRow, "spread_home");
-
-  const total =
-    cell(header, csvRow, "total");
-
-  const spreadAway =
-    spreadHome === ""
-      ? ""
-      : fmtSigned(-Number(spreadHome));
-
-  const spreadHomeDisplay =
-    fmtSigned(spreadHome);
-
-  const element =
-    document.createElement("article");
-
-  element.className = "card";
-
-  element.innerHTML = `
-    <div class="matchgrid">
-      <img
-        class="team-logo"
-        src="${logoPath(away)}"
-        alt="${away} logo"
-      >
-
-      <div class="matchtext">
-        <div class="team">${away}</div>
-        <div class="at">@</div>
-        <div class="team">${home}</div>
-      </div>
-
-      <img
-        class="team-logo right"
-        src="${logoPath(home)}"
-        alt="${home} logo"
-      >
-    </div>
-
-    <div
-      class="when"
-      style="text-align:center; margin-top:6px;"
-    >
-      ${when}
-    </div>
-
-    <div
-      class="line"
-      style="text-align:center; margin-top:6px;"
-    >
-      <span class="pill">
-        Home spread:
-        <b>${spreadHomeDisplay}</b>
-      </span>
-
-      <span
-        class="pill"
-        style="margin-left:8px;"
-      >
-        Total:
-        <b>${total}</b>
-      </span>
-    </div>
-  `;
-
-  if (!game) {
-    const warning =
-      document.createElement("div");
-
-    warning.className = "when";
-    warning.style.textAlign = "center";
-    warning.style.marginTop = "8px";
-
-    warning.textContent =
-      "No matching Supabase game. Picks cannot be saved.";
-
-    element.appendChild(warning);
-  }
-
-  for (const pickerKey of PICKER_KEYS) {
-    const section =
-      document.createElement("div");
-
-    section.style.marginTop = "10px";
-
-    const nameDiv =
-      document.createElement("div");
-
-    nameDiv.className =
-      `name ${pickerKey}`;
-
-    nameDiv.textContent =
-      PICKER_LABELS[pickerKey];
-
-    nameDiv.style.textAlign = "center";
-    nameDiv.style.fontWeight = "600";
-    nameDiv.style.margin = "6px 0";
-
-    section.appendChild(nameDiv);
-
-    const grid =
-      document.createElement("div");
-
-    grid.className = "pick-grid";
-    grid.style.display = "grid";
-    grid.style.gridTemplateColumns =
-      "1fr 1fr";
-    grid.style.columnGap = "8px";
-    grid.style.rowGap = "8px";
-    grid.style.marginTop = "6px";
-
-    const currentPick = game
-      ? normalizePick(
-          state.draftPicks[pickerKey][game.id]
-        )
-      : emptyPick();
-
-    const color = pickerKey;
-
-    const buttons = [
-      makePickButton({
-        label: `${away} ${spreadAway}`,
-        type: "spread",
-        side: "away",
-        currentPick,
-        color,
-        pickerKey,
-        game
-      }),
-
-      makePickButton({
-        label: `Over ${total}`,
-        type: "total",
-        side: "over",
-        currentPick,
-        color,
-        pickerKey,
-        game
-      }),
-
-      makePickButton({
-        label:
-          `${home} ${spreadHomeDisplay}`,
-        type: "spread",
-        side: "home",
-        currentPick,
-        color,
-        pickerKey,
-        game
-      }),
-
-      makePickButton({
-        label: `Under ${total}`,
-        type: "total",
-        side: "under",
-        currentPick,
-        color,
-        pickerKey,
-        game
-      })
-    ];
-
-    for (const button of buttons) {
-      grid.appendChild(button);
-    }
-
-    section.appendChild(grid);
-    element.appendChild(section);
-  }
-
-  return element;
-}
-
-function neonDivider() {
-  const divider =
-    document.createElement("div");
-
-  divider.className = "neon-divider";
-
-  divider.setAttribute(
-    "style",
-    [
-      "height:3px",
-      "background:#39ff14",
-      "margin:10px 0",
-      "border-radius:2px",
-      "box-shadow:0 0 8px #39ff14",
-      "pointer-events:none"
-    ].join(";")
-  );
-
-  return divider;
-}
-
-function renderCards() {
-  const gamesDiv =
-    document.getElementById("games");
-
-  gamesDiv.innerHTML = "";
-
-  state.renderedGames.forEach(
-    (entry, index) => {
-      gamesDiv.appendChild(
-        card(
-          state.scheduleHeader,
-          entry.csvRow,
-          entry.game
-        )
+      alert(
+        "No pick changes to save."
       );
 
-      if (
-        index <
-        state.renderedGames.length - 1
-      ) {
-        gamesDiv.appendChild(
-          neonDivider()
-        );
-      }
-    }
-  );
-}
-
-// ---------- FIND CHANGES ----------
-function changedRecords() {
-  const upserts = [];
-
-  const deletesByPicker = {
-    mat: [],
-    nikki: []
-  };
-
-  for (const pickerKey of PICKER_KEYS) {
-    const targetProfile =
-      state.profilesByPicker[pickerKey];
-
-    if (!targetProfile) {
-      continue;
+      return;
     }
 
-    for (
-      const entry
-      of state.renderedGames
-    ) {
-      const game = entry.game;
+    state.saving = true;
+    updateButtons();
 
-      if (!game) {
-        continue;
-      }
+    try {
+      if (upserts.length) {
+        const {
+          error
+        } = await client
+          .from("picks")
+          .upsert(
+            upserts,
+            {
+              onConflict:
+                "user_id,game_id"
+            }
+          );
 
-      const original =
-        state.originalPicks[pickerKey][game.id] ||
-        null;
-
-      const draft =
-        state.draftPicks[pickerKey][game.id] ||
-        null;
-
-      if (picksEqual(original, draft)) {
-        continue;
-      }
-
-      const permission =
-        editPermission(pickerKey, game);
-
-      if (!permission.allowed) {
-        throw new Error(
-          [
-            PICKER_LABELS[pickerKey],
-            `${game.away_team} at ${game.home_team}`,
-            permission.reason
-          ].join(" — ")
-        );
-      }
-
-      if (
-        draft &&
-        !isCompletePick(draft)
-      ) {
-        throw new Error(
-          [
-            PICKER_LABELS[pickerKey],
-            "must select both spread and total for",
-            `${game.away_team} at ${game.home_team}.`
-          ].join(" ")
-        );
-      }
-
-      if (!draft && original) {
-        deletesByPicker[pickerKey].push(
-          game.id
-        );
-
-        continue;
-      }
-
-      if (draft) {
-        upserts.push({
-          user_id: targetProfile.id,
-          game_id: game.id,
-          spread_pick: draft.spread,
-          total_pick: draft.total
-        });
-      }
-    }
-  }
-
-  return {
-    upserts,
-    deletesByPicker
-  };
-}
-
-// ---------- SAVE PICKS ----------
-async function submitPicks() {
-  const {
-    upserts,
-    deletesByPicker
-  } = changedRecords();
-
-  const deleteCount =
-    deletesByPicker.mat.length +
-    deletesByPicker.nikki.length;
-
-  if (
-    !upserts.length &&
-    !deleteCount
-  ) {
-    alert("No pick changes to save.");
-    return;
-  }
-
-  if (upserts.length) {
-    const { error } = await client
-      .from("picks")
-      .upsert(
-        upserts,
-        {
-          onConflict: "user_id,game_id"
+        if (error) {
+          throw error;
         }
-      );
-
-    if (error) {
-      throw error;
-    }
-  }
-
-  for (const pickerKey of PICKER_KEYS) {
-    const gameIds =
-      deletesByPicker[pickerKey];
-
-    const targetProfile =
-      state.profilesByPicker[pickerKey];
-
-    if (
-      !gameIds.length ||
-      !targetProfile
-    ) {
-      continue;
-    }
-
-    const { error } = await client
-      .from("picks")
-      .delete()
-      .eq(
-        "user_id",
-        targetProfile.id
-      )
-      .in("game_id", gameIds);
-
-    if (error) {
-      throw error;
-    }
-  }
-
-  await loadExistingPicks();
-  renderCards();
-
-  alert("Picks saved.");
-}
-
-// ---------- CLEAR PICKS ----------
-function clearEditablePicks() {
-  let changed = false;
-
-  for (const pickerKey of PICKER_KEYS) {
-    for (
-      const entry
-      of state.renderedGames
-    ) {
-      const game = entry.game;
-
-      if (!game) {
-        continue;
       }
 
-      const permission =
-        editPermission(pickerKey, game);
-
-      if (!permission.allowed) {
-        continue;
-      }
-
-      if (
-        state.draftPicks[pickerKey][game.id]
+      for (
+        const deletion of
+        deletes
       ) {
-        delete state
-          .draftPicks[pickerKey][game.id];
+        const {
+          error
+        } = await client
+          .from("picks")
+          .delete()
+          .eq(
+            "user_id",
+            deletion.userId
+          )
+          .eq(
+            "game_id",
+            deletion.gameId
+          );
 
-        changed = true;
+        if (error) {
+          throw error;
+        }
       }
-    }
-  }
 
-  renderCards();
-
-  if (changed) {
-    alert(
-      "Editable picks cleared on this page. Click Submit Picks to save the deletions."
-    );
-  } else {
-    alert(
-      "No editable picks were selected."
-    );
-  }
-}
-
-// ---------- LOAD PAGE ----------
-async function loadPage() {
-  await loadSessionAndProfiles();
-  await loadSchedule();
-
-  const databaseGames =
-    await loadSupabaseGames();
-
-  mapScheduleRowsToGames(databaseGames);
-
-  await loadExistingPicks();
-
-  renderCards();
-}
-
-// ---------- BUTTON EVENTS ----------
-document
-  .getElementById("clearBtn")
-  .addEventListener(
-    "click",
-    () => {
-      try {
-        clearEditablePicks();
-      } catch (error) {
-        console.error(error);
-
-        alert(
-          "Error: " + error.message
-        );
-      }
-    }
-  );
-
-document
-  .getElementById("issueBtn")
-  .addEventListener(
-    "click",
-    async () => {
-      try {
-        await submitPicks();
-      } catch (error) {
-        console.error(error);
-
-        alert(
-          "Error: " + error.message
-        );
-      }
-    }
-  );
-
-// ---------- AUTH CHANGES ----------
-client.auth.onAuthStateChange(() => {
-  setTimeout(() => {
-    loadPage().catch(error => {
-      console.error(error);
+      await loadExistingPicks();
 
       alert(
-        "Failed to reload picks: " +
-        error.message
+        "Picks saved."
       );
-    });
-  }, 0);
-});
+    } catch (error) {
+      try {
+        await loadExistingPicks();
+      } catch (reloadError) {
+        console.error(
+          reloadError
+        );
+      }
 
-// ---------- START ----------
-loadPage().catch(error => {
-  console.error(error);
+      throw error;
+    } finally {
+      state.saving = false;
+      render();
+    }
+  }
 
-  alert(
-    "Failed to load picks page: " +
-    error.message
+  function clearEditablePicks() {
+    let changed = false;
+
+    for (
+      const pickerKey of
+      Object.keys(PICKERS)
+    ) {
+      for (
+        const scheduleGame of
+        state.schedule
+      ) {
+        if (
+          !scheduleGame.game ||
+          !canEdit(
+            pickerKey,
+            scheduleGame
+          ).allowed
+        ) {
+          continue;
+        }
+
+        const gameId =
+          scheduleGame.game.id;
+
+        if (
+          state.draftPicks[
+            pickerKey
+          ][gameId]
+        ) {
+          delete state
+            .draftPicks[
+              pickerKey
+            ][gameId];
+
+          changed = true;
+        }
+      }
+    }
+
+    render();
+
+    alert(
+      changed
+        ? "Editable picks cleared. Click Submit Picks to save the deletions."
+        : "No editable picks were selected."
+    );
+  }
+
+  async function loadPage() {
+    await loadSessionAndProfiles();
+    await loadSchedule();
+    await loadAndMatchGames();
+    await loadExistingPicks();
+
+    render();
+  }
+
+  function reportError(
+    prefix,
+    error
+  ) {
+    console.error(error);
+
+    alert(
+      `${prefix}: ${error.message}`
+    );
+  }
+
+  async function start() {
+    assertReady();
+
+    clearButton.addEventListener(
+      "click",
+      () => {
+        if (!state.saving) {
+          clearEditablePicks();
+        }
+      }
+    );
+
+    submitButton.addEventListener(
+      "click",
+      () => {
+        submitPicks().catch(
+          error => {
+            reportError(
+              "Could not save picks",
+              error
+            );
+          }
+        );
+      }
+    );
+
+    client.auth.onAuthStateChange(
+      event => {
+        if (
+          ![
+            "SIGNED_IN",
+            "SIGNED_OUT",
+            "USER_UPDATED"
+          ].includes(event)
+        ) {
+          return;
+        }
+
+        setTimeout(() => {
+          loadPage().catch(
+            error => {
+              reportError(
+                "Could not reload the Picks page",
+                error
+              );
+            }
+          );
+        }, 0);
+      }
+    );
+
+    await loadPage();
+  }
+
+  start().catch(
+    error => {
+      reportError(
+        "Could not load the Picks page",
+        error
+      );
+    }
   );
-});
+})();
