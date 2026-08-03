@@ -19,35 +19,63 @@
     "is_consensus"
   ];
 
-  const PICKERS = {
-    mat: {
-      label: "Mat",
-      className: "mat"
-    },
-    nikki: {
-      label: "Nikki",
-      className: "nikki"
-    }
-  };
-
   const state = {
     session: null,
     currentProfile: null,
-    profilesByPicker: {
-      mat: null,
-      nikki: null
-    },
+    pickers: [],
+    profilesById: {},
     schedule: [],
-    originalPicks: {
-      mat: {},
-      nikki: {}
-    },
-    draftPicks: {
-      mat: {},
-      nikki: {}
-    },
+    originalPicks: {},
+    draftPicks: {},
     saving: false
   };
+
+  function pickerLabel(pickerKey) {
+    return (
+      state.profilesById[
+        pickerKey
+      ]?.display_name ||
+      "Unknown account"
+    );
+  }
+
+  function pickerClassName(
+    pickerKey
+  ) {
+    return `picker-${pickerKey}`;
+  }
+
+  function draftMapFor(pickerKey) {
+    if (
+      !state.draftPicks[pickerKey]
+    ) {
+      state.draftPicks[
+        pickerKey
+      ] = {};
+    }
+
+    return state.draftPicks[
+      pickerKey
+    ];
+  }
+
+  function originalMapFor(
+    pickerKey
+  ) {
+    if (
+      !state.originalPicks[
+        pickerKey
+      ]
+    ) {
+      state.originalPicks[
+        pickerKey
+      ] = {};
+    }
+
+    return state.originalPicks[
+      pickerKey
+    ];
+  }
 
   const gamesContainer =
     document.getElementById("games");
@@ -472,25 +500,6 @@
       );
   }
 
-  function pickerKeyForDisplayName(
-    displayName
-  ) {
-    const value =
-      String(displayName || "")
-        .trim()
-        .toLowerCase();
-
-    if (value === "mat") {
-      return "mat";
-    }
-
-    if (value === "nikki") {
-      return "nikki";
-    }
-
-    return null;
-  }
-
   async function loadSessionAndProfiles() {
     const {
       data: {
@@ -506,10 +515,8 @@
     state.session = session;
     state.currentProfile = null;
 
-    state.profilesByPicker = {
-      mat: null,
-      nikki: null
-    };
+    state.pickers = [];
+    state.profilesById = {};
 
     if (!session?.user) {
       return;
@@ -549,29 +556,28 @@
     for (
       const profile of profiles
     ) {
-      const pickerKey =
-        pickerKeyForDisplayName(
-          profile.display_name
-        );
-
-      if (!pickerKey) {
-        continue;
-      }
-
-      if (
-        state.profilesByPicker[
-          pickerKey
-        ]
-      ) {
-        throw new Error(
-          `More than one readable profile uses the display name ${PICKERS[pickerKey].label}.`
-        );
-      }
-
-      state.profilesByPicker[
-        pickerKey
+      state.profilesById[
+        profile.id
       ] = profile;
     }
+
+    state.pickers =
+      profiles
+        .slice()
+        .sort(
+          (first, second) =>
+            String(
+              first.display_name || ""
+            ).localeCompare(
+              String(
+                second.display_name ||
+                  ""
+              )
+            )
+        )
+        .map(
+          profile => profile.id
+        );
   }
 
   function blankPick() {
@@ -609,15 +615,21 @@
   }
 
   function resetPickState() {
-    state.originalPicks = {
-      mat: {},
-      nikki: {}
-    };
+    state.originalPicks = {};
+    state.draftPicks = {};
 
-    state.draftPicks = {
-      mat: {},
-      nikki: {}
-    };
+    for (
+      const pickerKey of
+      state.pickers
+    ) {
+      state.originalPicks[
+        pickerKey
+      ] = {};
+
+      state.draftPicks[
+        pickerKey
+      ] = {};
+    }
   }
 
   async function loadExistingPicks() {
@@ -636,14 +648,7 @@
         .filter(Boolean);
 
     const userIds =
-      Object.values(
-        state.profilesByPicker
-      )
-        .map(
-          profile =>
-            profile?.id
-        )
-        .filter(Boolean);
+      state.pickers.slice();
 
     if (
       !gameIds.length ||
@@ -682,24 +687,19 @@
       const pick of data || []
     ) {
       const pickerKey =
-        Object.keys(
-          PICKERS
-        ).find(
-          key =>
-            state
-              .profilesByPicker[
-                key
-              ]?.id ===
-            pick.user_id
-        );
+        pick.user_id;
 
-      if (!pickerKey) {
+      if (
+        !state.profilesById[
+          pickerKey
+        ]
+      ) {
         continue;
       }
 
-      state.originalPicks[
+      originalMapFor(
         pickerKey
-      ][pick.game_id] = {
+      )[pick.game_id] = {
         spread:
           pick.spread_pick,
 
@@ -710,7 +710,7 @@
 
     for (
       const pickerKey of
-      Object.keys(PICKERS)
+      state.pickers
     ) {
       state.draftPicks[
         pickerKey
@@ -763,7 +763,7 @@
     }
 
     const targetProfile =
-      state.profilesByPicker[
+      state.profilesById[
         pickerKey
       ];
 
@@ -772,7 +772,7 @@
         allowed: false,
 
         reason:
-          `${PICKERS[pickerKey].label} does not have a readable profile.`
+          "That account does not have a readable profile."
       };
     }
 
@@ -956,8 +956,9 @@
     ) {
       button.classList.add(
         "active",
-        PICKERS[pickerKey]
-          .className
+        pickerClassName(
+          pickerKey
+        )
       );
     }
 
@@ -985,9 +986,9 @@
 
         const current =
           normalizePick(
-            state.draftPicks[
+            draftMapFor(
               pickerKey
-            ][gameId]
+            )[gameId]
           );
 
         if (
@@ -1012,14 +1013,13 @@
           current.total ===
             null
         ) {
-          delete state
-            .draftPicks[
-              pickerKey
-            ][gameId];
-        } else {
-          state.draftPicks[
+          delete draftMapFor(
             pickerKey
-          ][gameId] = current;
+          )[gameId];
+        } else {
+          draftMapFor(
+            pickerKey
+          )[gameId] = current;
         }
 
         render();
@@ -1202,7 +1202,7 @@
 
     for (
       const pickerKey of
-      Object.keys(PICKERS)
+      state.pickers
     ) {
       const section =
         createElement("div");
@@ -1215,12 +1215,14 @@
           "div",
 
           `name ${
-            PICKERS[pickerKey]
-              .className
+            pickerClassName(
+              pickerKey
+            )
           }`,
 
-          PICKERS[pickerKey]
-            .label
+          pickerLabel(
+            pickerKey
+          )
         );
 
       name.style.textAlign =
@@ -1257,9 +1259,9 @@
       const currentPick =
         scheduleGame.game
           ? normalizePick(
-              state.draftPicks[
+              draftMapFor(
                 pickerKey
-              ][
+              )[
                 scheduleGame.game
                   .id
               ]
@@ -1400,10 +1402,10 @@
 
     for (
       const pickerKey of
-      Object.keys(PICKERS)
+      state.pickers
     ) {
       const profile =
-        state.profilesByPicker[
+        state.profilesById[
           pickerKey
         ];
 
@@ -1425,14 +1427,14 @@
           scheduleGame.game.id;
 
         const original =
-          state.originalPicks[
+          originalMapFor(
             pickerKey
-          ][gameId] || null;
+          )[gameId] || null;
 
         const draft =
-          state.draftPicks[
+          draftMapFor(
             pickerKey
-          ][gameId] || null;
+          )[gameId] || null;
 
         if (
           picksEqual(
@@ -1453,7 +1455,7 @@
           !permission.allowed
         ) {
           throw new Error(
-            `${PICKERS[pickerKey].label} — ${scheduleGame.awayTeam} at ${scheduleGame.homeTeam}: ${permission.reason}`
+            `${pickerLabel(pickerKey)} — ${scheduleGame.awayTeam} at ${scheduleGame.homeTeam}: ${permission.reason}`
           );
         }
 
@@ -1465,7 +1467,7 @@
           )
         ) {
           throw new Error(
-            `${PICKERS[pickerKey].label} must select both spread and total for ${scheduleGame.awayTeam} at ${scheduleGame.homeTeam}.`
+            `${pickerLabel(pickerKey)} must select both spread and total for ${scheduleGame.awayTeam} at ${scheduleGame.homeTeam}.`
           );
         }
 
@@ -1595,7 +1597,7 @@
 
     for (
       const pickerKey of
-      Object.keys(PICKERS)
+      state.pickers
     ) {
       for (
         const scheduleGame of
@@ -1615,14 +1617,13 @@
           scheduleGame.game.id;
 
         if (
-          state.draftPicks[
+          draftMapFor(
             pickerKey
-          ][gameId]
+          )[gameId]
         ) {
-          delete state
-            .draftPicks[
-              pickerKey
-            ][gameId];
+          delete draftMapFor(
+            pickerKey
+          )[gameId];
 
           changed = true;
         }
