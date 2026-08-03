@@ -148,6 +148,14 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: python scripts/sync_scores_to_supabase.py
+        
+      - name: Grade picks
+        if: inputs.file_type == 'Final Scores'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/grade_picks.py
+
 
       - name: Commit generated CSV
         shell: bash
