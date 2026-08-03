@@ -90,6 +90,22 @@ def validate_timestamp(
     return value
 
 
+def week_type_for_week(
+    week_number: int,
+    row_number: int,
+) -> str:
+    if 1 <= week_number <= 18:
+        return "regular"
+
+    if 19 <= week_number <= 22:
+        return "playoff"
+
+    raise ValueError(
+        f"Row {row_number}: week must be between 1 and 22; "
+        f"received {week_number}"
+    )
+
+
 def load_consensus_games(path: Path) -> list[dict]:
     if not path.exists():
         raise FileNotFoundError(
@@ -193,6 +209,15 @@ def load_consensus_games(path: Path) -> list[dict]:
                     f"Row {row_number}: total is blank"
                 )
 
+            week_number = parse_integer(
+                (
+                    row.get("week")
+                    or ""
+                ).strip(),
+                "week",
+                row_number,
+            )
+
             games.append(
                 {
                     "game_id": game_id,
@@ -204,12 +229,9 @@ def load_consensus_games(path: Path) -> list[dict]:
                         "season",
                         row_number,
                     ),
-                    "week": parse_integer(
-                        (
-                            row.get("week")
-                            or ""
-                        ).strip(),
-                        "week",
+                    "week": week_number,
+                    "week_type": week_type_for_week(
+                        week_number,
                         row_number,
                     ),
                     "away_team": away_team,
