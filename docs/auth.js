@@ -11,20 +11,20 @@ const authMessage = document.getElementById("authMessage");
 let inRecovery = false;
 let awaitingConfirmation = false;
 
-function hide(el, value) {
+function setHidden(el, value) {
   if (el) {
     el.hidden = value;
   }
 }
 
-function on(id, handler) {
+function bindClick(id, handler) {
   const el = document.getElementById(id);
   if (el) {
     el.addEventListener("click", handler);
   }
 }
 
-function valueOf(id) {
+function readField(id) {
   const el = document.getElementById(id);
   return el ? el.value : "";
 }
@@ -51,10 +51,10 @@ function showRecovery() {
   }
   inRecovery = true;
   awaitingConfirmation = false;
-  hide(loggedOutSection, true);
-  hide(loggedInSection, true);
-  hide(checkEmailSection, true);
-  hide(recoverySection, false);
+  setHidden(loggedOutSection, true);
+  setHidden(loggedInSection, true);
+  setHidden(checkEmailSection, true);
+  setHidden(recoverySection, false);
   showMessage("Enter a new password for your account.");
 }
 
@@ -67,20 +67,20 @@ function showCheckEmail(email) {
   if (checkEmailAddress) {
     checkEmailAddress.textContent = email;
   }
-  hide(loggedOutSection, true);
-  hide(loggedInSection, true);
-  hide(recoverySection, true);
-  hide(checkEmailSection, false);
+  setHidden(loggedOutSection, true);
+  setHidden(loggedInSection, true);
+  setHidden(recoverySection, true);
+  setHidden(checkEmailSection, false);
   showMessage("");
   window.scrollTo(0, 0);
 }
 
 function showLoggedOut() {
   awaitingConfirmation = false;
-  hide(checkEmailSection, true);
-  hide(recoverySection, true);
-  hide(loggedInSection, true);
-  hide(loggedOutSection, false);
+  setHidden(checkEmailSection, true);
+  setHidden(recoverySection, true);
+  setHidden(loggedInSection, true);
+  setHidden(loggedOutSection, false);
   showMessage("");
 }
 
@@ -93,13 +93,13 @@ async function updatePage(session) {
     return;
   }
 
-  hide(recoverySection, true);
-  hide(checkEmailSection, true);
+  setHidden(recoverySection, true);
+  setHidden(checkEmailSection, true);
   awaitingConfirmation = false;
 
   if (!session?.user) {
-    hide(loggedOutSection, false);
-    hide(loggedInSection, true);
+    setHidden(loggedOutSection, false);
+    setHidden(loggedInSection, true);
     if (currentUser) {
       currentUser.textContent = "";
     }
@@ -117,14 +117,14 @@ async function updatePage(session) {
       profile?.display_name || session.user.email || "Unknown user";
   }
 
-  hide(loggedOutSection, true);
-  hide(loggedInSection, false);
+  setHidden(loggedOutSection, true);
+  setHidden(loggedInSection, false);
 }
 
-on("signupBtn", async () => {
-  const displayName = valueOf("signupDisplayName").trim();
-  const email = valueOf("signupEmail").trim();
-  const password = valueOf("signupPassword");
+bindClick("signupBtn", async () => {
+  const displayName = readField("signupDisplayName").trim();
+  const email = readField("signupEmail").trim();
+  const password = readField("signupPassword");
 
   if (!displayName || !email || !password) {
     showMessage("Enter a display name, email, and password.", true);
@@ -161,13 +161,13 @@ on("signupBtn", async () => {
   }
 });
 
-on("backToAuthBtn", () => {
+bindClick("backToAuthBtn", () => {
   showLoggedOut();
 });
 
-on("loginBtn", async () => {
-  const email = valueOf("loginEmail").trim();
-  const password = valueOf("loginPassword");
+bindClick("loginBtn", async () => {
+  const email = readField("loginEmail").trim();
+  const password = readField("loginPassword");
 
   if (!email || !password) {
     showMessage("Enter your email and password.", true);
@@ -190,7 +190,7 @@ on("loginBtn", async () => {
   await updatePage(data.session);
 });
 
-on("logoutBtn", async () => {
+bindClick("logoutBtn", async () => {
   const { error } = await client.auth.signOut();
 
   if (error) {
@@ -202,8 +202,8 @@ on("logoutBtn", async () => {
   await updatePage(null);
 });
 
-on("resetBtn", async () => {
-  const email = valueOf("resetEmail").trim();
+bindClick("resetBtn", async () => {
+  const email = readField("resetEmail").trim();
 
   if (!email) {
     showMessage("Enter your email address.", true);
@@ -224,9 +224,9 @@ on("resetBtn", async () => {
   showMessage("Password reset email sent.");
 });
 
-on("updatePasswordBtn", async () => {
-  const newPassword = valueOf("newPassword");
-  const confirmPassword = valueOf("confirmPassword");
+bindClick("updatePasswordBtn", async () => {
+  const newPassword = readField("newPassword");
+  const confirmPassword = readField("confirmPassword");
 
   if (!newPassword || !confirmPassword) {
     showMessage("Enter and confirm your new password.", true);
@@ -253,7 +253,7 @@ on("updatePasswordBtn", async () => {
   clearField("confirmPassword");
 
   inRecovery = false;
-  hide(recoverySection, true);
+  setHidden(recoverySection, true);
 
   showMessage("Password updated. You are signed in.");
 
