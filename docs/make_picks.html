@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Picks — NFL Picks</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body style="padding-bottom:130px">
+    <header class="main-header" id="topbar">
+      <div class="titles">
+        <h1 id="pageTitle">NFL Picks</h1>
+        <div class="sub" id="seasonWeek">Loading…</div>
+      </div>
+    </header>
+
+    <main id="games" class="wrap"></main>
+
+    <div id="navbar"></div>
+
+    <div class="bar" id="actionbar" style="bottom:54px">
+      <div class="row">
+        <button class="btn" id="clearBtn">Clear Picks</button>
+        <button class="btn primary" id="issueBtn">Submit Picks</button>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="./supabase-client.js" defer></script>
+    <script src="./nav.js" defer></script>
+    <script src="./make_picks.js" defer></script>
+</body>
+</html>
