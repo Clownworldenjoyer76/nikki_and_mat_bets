@@ -112,3 +112,411 @@ header.main-header .titles .sub {
     background: linear-gradient(180deg, #141414 0%, #0a0a0a 100%);
     border-top:1px solid var(--neon-pink);
     padding:8px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    z-index: 1000;
+    box-shadow: 0 -2px 14px rgba(0,0,0,.9), 0 0 18px rgba(255,57,195,.18);
+}
+
+.bar nav{
+    display:flex;
+    gap:14px;
+    justify-content:center;
+    margin:0 auto;
+    flex-wrap: wrap;
+}
+
+.bar a{
+    color:#ddd;
+    text-decoration:none;
+    font-size:.85rem;
+    font-weight:600;
+    letter-spacing:.6px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: color .18s, border-color .18s, text-shadow .18s;
+}
+
+.bar a:hover{
+    color:var(--neon);
+    border-color: rgba(57,255,20,.45);
+    text-shadow: 0 0 8px rgba(57,255,20,.7);
+}
+
+.bar .row{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    align-items:center;
+}
+
+/* ---------- BUTTONS ---------- */
+
+.btn{
+    background:#111;
+    color:#fff;
+    border:1px solid var(--chrome);
+    border-radius:10px;
+    padding:9px 16px;
+    font-weight:700;
+    font-size:.85rem;
+    letter-spacing:1.2px;
+    text-transform: uppercase;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .18s, box-shadow .18s, transform .1s, color .18s;
+}
+
+.btn:hover{
+    background:#1b1b1b;
+    border-color:#555;
+}
+
+.btn:active{ transform: translateY(1px); }
+
+.btn.primary{
+    background:var(--neon);
+    border-color:var(--neon);
+    color:#000;
+    box-shadow: var(--glow-green);
+}
+
+.btn.primary:hover{
+    background:#4dff2b;
+    box-shadow: 0 0 18px rgba(57,255,20,.85);
+}
+
+/* ---------- GAME CARDS ---------- */
+
+#games{display:flex;flex-direction:column;gap:14px;margin:12px 0}
+
+#games > * {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 12px;
+    box-shadow: 0 6px 22px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.matchgrid {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.matchtext {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    line-height:1.25;
+    letter-spacing:.5px;
+}
+
+.team-logo {
+    width:50px;
+    height:auto;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,.18));
+}
+
+/* ---------- PICK BUTTONS (odds tiles) ---------- */
+
+.pickbtn {
+    pointer-events:auto !important;
+    position:relative;
+    z-index:1;
+    cursor:pointer;
+    touch-action:manipulation;
+    width:100%;
+    min-height:44px;
+    padding: 12px 10px;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #2b2b2b 0%, #1c1c1c 100%);
+    color: #eee;
+    font-weight: 700;
+    letter-spacing: .8px;
+    transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s, border-color .2s;
+    font-size: 1em;
+}
+
+.pickbtn:hover {
+    background: linear-gradient(180deg, #3a3a3a 0%, #262626 100%);
+    border-color: #555;
+}
+
+.pickbtn.active.mat {
+    background-color: #39ff14;
+    background-image: none;
+    border-color: #39ff14;
+    color: #000;
+    box-shadow: 0 0 14px rgba(57, 255, 20, 0.8);
+    transform: translateY(-2px);
+}
+
+.pickbtn.active.nikki {
+    background-color: #ff39c3;
+    background-image: none;
+    border-color: #ff39c3;
+    color: #000;
+    box-shadow: 0 0 14px rgba(255, 57, 195, 0.8);
+    transform: translateY(-2px);
+}
+
+.neon-divider {
+    height:3px;
+    background:var(--neon);
+    margin:10px 0;
+    border-radius:2px;
+    box-shadow:0 0 8px var(--neon), 0 0 18px rgba(57,255,20,.45);
+    pointer-events:none;
+}
+
+/* ---------- SHARED TABLE STYLING (weekly / insights / metrics) ---------- */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 12px 0;
+    font-size: .92rem;
+}
+
+th {
+    background: linear-gradient(180deg, #151515 0%, #0d0d0d 100%);
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    font-size: .75rem;
+    font-weight: 800;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--neon);
+}
+
+td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #1c1c1c;
+    color: #e6e6e6;
+}
+
+tbody tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+tbody tr:hover td { background: rgba(57,255,20,.05); }
+tbody tr:last-child td { border-bottom: none; }
+
+/* ============================================================
+   AUTH PAGE (docs/auth.html — body class="auth-page")
+   ============================================================ */
+
+.auth-page {
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+
+.auth-page .wrap {
+    max-width: 460px;
+    padding: 20px 16px 40px;
+}
+
+.auth-page h1 {
+    text-align: center;
+    font-size: 2rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--neon);
+    text-shadow: 0 0 6px var(--neon), 0 0 18px rgba(57,255,20,.55);
+    margin: 8px 0 22px;
+}
+
+.auth-page section {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 16px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 0 0 1px rgba(57,255,20,.08), 0 6px 22px rgba(0,0,0,.75);
+}
+
+.auth-page h2 {
+    font-size: .82rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--neon-pink);
+    text-shadow: 0 0 8px rgba(255,57,195,.6);
+    margin: 20px 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+}
+
+.auth-page h2:first-child { margin-top: 0; }
+
+.auth-page input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background: #050505;
+    color: var(--fg);
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 13px 14px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color .18s, box-shadow .18s;
+}
+
+.auth-page input::placeholder { color: #666; letter-spacing: .5px; }
+
+.auth-page input:focus {
+    outline: none;
+    border-color: var(--neon);
+    box-shadow: 0 0 0 1px var(--neon), 0 0 12px rgba(57,255,20,.35);
+}
+
+.auth-page button {
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    margin-top: 4px;
+    background: #111;
+    color: var(--fg);
+    border: 1px solid var(--chrome);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: .95rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .18s, box-shadow .18s, transform .1s, color .18s;
+}
+
+.auth-page button:hover { background: #1a1a1a; }
+.auth-page button:active { transform: translateY(1px); }
+
+.auth-page #signupBtn,
+.auth-page #updatePasswordBtn {
+    background: var(--neon);
+    border-color: var(--neon);
+    color: #000;
+    box-shadow: 0 0 12px rgba(57,255,20,.5);
+}
+
+.auth-page #signupBtn:hover,
+.auth-page #updatePasswordBtn:hover {
+    background: #4dff2b;
+    box-shadow: 0 0 18px rgba(57,255,20,.8);
+}
+
+.auth-page #loginBtn {
+    background: var(--neon-pink);
+    border-color: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 12px rgba(255,57,195,.5);
+}
+
+.auth-page #loginBtn:hover {
+    background: #ff56cf;
+    box-shadow: 0 0 18px rgba(255,57,195,.8);
+}
+
+.auth-page #logoutBtn { border-color: #555; color: var(--muted); }
+.auth-page #logoutBtn:hover { color: #fff; border-color: #777; }
+
+.auth-page #currentUser {
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+    letter-spacing: 1px;
+}
+
+.auth-page #authMessage {
+    min-height: 1.2em;
+    text-align: center;
+    font-size: .9rem;
+    letter-spacing: .5px;
+    color: var(--muted);
+    margin: 4px 0 18px;
+}
+
+.auth-page .wrap > p:last-child { text-align: center; margin-top: 8px; }
+
+.auth-page .wrap > p:last-child a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: .85rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+}
+
+.auth-page .wrap > p:last-child a:hover {
+    color: var(--neon);
+    border-bottom-color: var(--neon);
+}
+
+/* ---------- CHECK YOUR EMAIL PANEL ---------- */
+
+.auth-page #checkEmailSection {
+    text-align: center;
+    padding: 34px 22px 30px;
+    border-color: rgba(57,255,20,.35);
+    box-shadow: 0 0 0 1px rgba(57,255,20,.18), 0 0 28px rgba(57,255,20,.14), 0 6px 22px rgba(0,0,0,.75);
+}
+
+.auth-page .notice-icon {
+    font-size: 2.6rem;
+    line-height: 1;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 10px rgba(57,255,20,.5));
+}
+
+.auth-page .notice-title {
+    font-size: 1.25rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--neon);
+    text-shadow: 0 0 8px var(--neon), 0 0 20px rgba(57,255,20,.5);
+    border-bottom: none;
+    padding-bottom: 0;
+    margin: 0 0 16px;
+}
+
+.auth-page .notice-body {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #ddd;
+    margin: 0 0 16px;
+}
+
+.auth-page .notice-body strong {
+    display: inline-block;
+    margin-top: 6px;
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+    letter-spacing: .8px;
+    word-break: break-all;
+}
+
+.auth-page .notice-sub {
+    font-size: .88rem;
+    line-height: 1.6;
+    color: var(--muted);
+    margin: 0 0 24px;
+}
+
+.auth-page #backToAuthBtn {
+    border-color: #555;
+    color: var(--muted);
+}
+
+.auth-page #backToAuthBtn:hover {
+    color: #fff;
+    border-color: #777;
+}
