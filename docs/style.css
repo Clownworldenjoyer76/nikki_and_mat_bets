@@ -1,4 +1,14 @@
-:root { --bg:#000; --fg:#fff; --muted:#bbb; --accent:#1f6feb; --neon:#39ff14; }
+:root {
+    --bg:#000;
+    --fg:#fff;
+    --muted:#bbb;
+    --accent:#1f6feb;
+    --neon:#39ff14;
+    --neon-pink:#ff39c3;
+    --gold:#ffc300;
+    --panel:#0d0d0d;
+    --line:#2a2a2a;
+}
 html,body{background:#000;color:#fff;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; padding-top: 70px; padding-bottom: 70px; box-sizing: border-box;}
 
 .wrap { max-width:1000px; margin:0 auto; padding:10px; }
@@ -135,4 +145,177 @@ header.main-header .titles .sub {
     border-radius:2px;
     box-shadow:0 0 8px var(--neon);
     pointer-events:none;
+}
+
+/* ============================================================
+   AUTH PAGE (docs/auth.html — body class="auth-page")
+   Scoped so index.html and other pages are unaffected.
+   ============================================================ */
+
+.auth-page {
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+
+.auth-page .wrap {
+    max-width: 460px;
+    padding: 20px 16px 40px;
+}
+
+.auth-page h1 {
+    text-align: center;
+    font-size: 2rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--neon);
+    text-shadow: 0 0 6px var(--neon), 0 0 18px rgba(57,255,20,.55);
+    margin: 8px 0 22px;
+}
+
+.auth-page section {
+    background: linear-gradient(180deg, var(--panel) 0%, #060606 100%);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 16px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 0 0 1px rgba(57,255,20,.08), 0 6px 22px rgba(0,0,0,.7);
+}
+
+.auth-page h2 {
+    font-size: .82rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--neon-pink);
+    text-shadow: 0 0 8px rgba(255,57,195,.6);
+    margin: 20px 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+}
+
+.auth-page h2:first-child {
+    margin-top: 0;
+}
+
+.auth-page input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background: #050505;
+    color: var(--fg);
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 13px 14px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color .18s, box-shadow .18s;
+}
+
+.auth-page input::placeholder {
+    color: #666;
+    letter-spacing: .5px;
+}
+
+.auth-page input:focus {
+    outline: none;
+    border-color: var(--neon);
+    box-shadow: 0 0 0 1px var(--neon), 0 0 12px rgba(57,255,20,.35);
+}
+
+.auth-page button {
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    margin-top: 4px;
+    background: #111;
+    color: var(--fg);
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: .95rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .18s, box-shadow .18s, transform .1s, color .18s;
+}
+
+.auth-page button:hover {
+    background: #1a1a1a;
+}
+
+.auth-page button:active {
+    transform: translateY(1px);
+}
+
+.auth-page #signupBtn,
+.auth-page #updatePasswordBtn {
+    background: var(--neon);
+    border-color: var(--neon);
+    color: #000;
+    box-shadow: 0 0 12px rgba(57,255,20,.5);
+}
+
+.auth-page #signupBtn:hover,
+.auth-page #updatePasswordBtn:hover {
+    background: #4dff2b;
+    box-shadow: 0 0 18px rgba(57,255,20,.8);
+}
+
+.auth-page #loginBtn {
+    background: var(--neon-pink);
+    border-color: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 12px rgba(255,57,195,.5);
+}
+
+.auth-page #loginBtn:hover {
+    background: #ff56cf;
+    box-shadow: 0 0 18px rgba(255,57,195,.8);
+}
+
+.auth-page #logoutBtn {
+    border-color: #555;
+    color: var(--muted);
+}
+
+.auth-page #logoutBtn:hover {
+    color: #fff;
+    border-color: #777;
+}
+
+.auth-page #currentUser {
+    color: var(--gold);
+    text-shadow: 0 0 8px rgba(255,195,0,.5);
+    letter-spacing: 1px;
+}
+
+.auth-page #authMessage {
+    min-height: 1.2em;
+    text-align: center;
+    font-size: .9rem;
+    letter-spacing: .5px;
+    color: var(--muted);
+    margin: 4px 0 18px;
+}
+
+.auth-page .wrap > p:last-child {
+    text-align: center;
+    margin-top: 8px;
+}
+
+.auth-page .wrap > p:last-child a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: .85rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+}
+
+.auth-page .wrap > p:last-child a:hover {
+    color: var(--neon);
+    border-bottom-color: var(--neon);
 }
