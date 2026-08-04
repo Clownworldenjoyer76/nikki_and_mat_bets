@@ -11,38 +11,76 @@ const authMessage = document.getElementById("authMessage");
 let inRecovery = false;
 let awaitingConfirmation = false;
 
+function hide(el, value) {
+  if (el) {
+    el.hidden = value;
+  }
+}
+
+function on(id, handler) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener("click", handler);
+  }
+}
+
+function valueOf(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : "";
+}
+
+function clearField(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.value = "";
+  }
+}
+
 function showMessage(message, isError = false) {
+  if (!authMessage) {
+    return;
+  }
   authMessage.textContent = message;
   authMessage.style.color = isError ? "red" : "";
 }
 
 function showRecovery() {
+  if (!recoverySection) {
+    showMessage("Open the password reset link again to set a new password.", true);
+    return;
+  }
   inRecovery = true;
   awaitingConfirmation = false;
-  loggedOutSection.hidden = true;
-  loggedInSection.hidden = true;
-  checkEmailSection.hidden = true;
-  recoverySection.hidden = false;
+  hide(loggedOutSection, true);
+  hide(loggedInSection, true);
+  hide(checkEmailSection, true);
+  hide(recoverySection, false);
   showMessage("Enter a new password for your account.");
 }
 
 function showCheckEmail(email) {
+  if (!checkEmailSection) {
+    showMessage("Account created. Check your email to confirm the account.");
+    return;
+  }
   awaitingConfirmation = true;
-  checkEmailAddress.textContent = email;
-  loggedOutSection.hidden = true;
-  loggedInSection.hidden = true;
-  recoverySection.hidden = true;
-  checkEmailSection.hidden = false;
+  if (checkEmailAddress) {
+    checkEmailAddress.textContent = email;
+  }
+  hide(loggedOutSection, true);
+  hide(loggedInSection, true);
+  hide(recoverySection, true);
+  hide(checkEmailSection, false);
   showMessage("");
   window.scrollTo(0, 0);
 }
 
 function showLoggedOut() {
   awaitingConfirmation = false;
-  checkEmailSection.hidden = true;
-  recoverySection.hidden = true;
-  loggedInSection.hidden = true;
-  loggedOutSection.hidden = false;
+  hide(checkEmailSection, true);
+  hide(recoverySection, true);
+  hide(loggedInSection, true);
+  hide(loggedOutSection, false);
   showMessage("");
 }
 
@@ -55,14 +93,16 @@ async function updatePage(session) {
     return;
   }
 
-  recoverySection.hidden = true;
-  checkEmailSection.hidden = true;
+  hide(recoverySection, true);
+  hide(checkEmailSection, true);
   awaitingConfirmation = false;
 
   if (!session?.user) {
-    loggedOutSection.hidden = false;
-    loggedInSection.hidden = true;
-    currentUser.textContent = "";
+    hide(loggedOutSection, false);
+    hide(loggedInSection, true);
+    if (currentUser) {
+      currentUser.textContent = "";
+    }
     return;
   }
 
@@ -72,23 +112,19 @@ async function updatePage(session) {
     .eq("id", session.user.id)
     .single();
 
-  currentUser.textContent =
-    profile?.display_name || session.user.email || "Unknown user";
+  if (currentUser) {
+    currentUser.textContent =
+      profile?.display_name || session.user.email || "Unknown user";
+  }
 
-  loggedOutSection.hidden = true;
-  loggedInSection.hidden = false;
+  hide(loggedOutSection, true);
+  hide(loggedInSection, false);
 }
 
-document.getElementById("signupBtn").addEventListener("click", async () => {
-  const displayName = document
-    .getElementById("signupDisplayName")
-    .value.trim();
-
-  const email = document
-    .getElementById("signupEmail")
-    .value.trim();
-
-  const password = document.getElementById("signupPassword").value;
+on("signupBtn", async () => {
+  const displayName = valueOf("signupDisplayName").trim();
+  const email = valueOf("signupEmail").trim();
+  const password = valueOf("signupPassword");
 
   if (!displayName || !email || !password) {
     showMessage("Enter a display name, email, and password.", true);
@@ -113,9 +149,9 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
     return;
   }
 
-  document.getElementById("signupDisplayName").value = "";
-  document.getElementById("signupEmail").value = "";
-  document.getElementById("signupPassword").value = "";
+  clearField("signupDisplayName");
+  clearField("signupEmail");
+  clearField("signupPassword");
 
   if (data.session) {
     showMessage("Account created and signed in.");
@@ -125,16 +161,13 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
   }
 });
 
-document.getElementById("backToAuthBtn").addEventListener("click", () => {
+on("backToAuthBtn", () => {
   showLoggedOut();
 });
 
-document.getElementById("loginBtn").addEventListener("click", async () => {
-  const email = document
-    .getElementById("loginEmail")
-    .value.trim();
-
-  const password = document.getElementById("loginPassword").value;
+on("loginBtn", async () => {
+  const email = valueOf("loginEmail").trim();
+  const password = valueOf("loginPassword");
 
   if (!email || !password) {
     showMessage("Enter your email and password.", true);
@@ -157,7 +190,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
   await updatePage(data.session);
 });
 
-document.getElementById("logoutBtn").addEventListener("click", async () => {
+on("logoutBtn", async () => {
   const { error } = await client.auth.signOut();
 
   if (error) {
@@ -169,10 +202,8 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   await updatePage(null);
 });
 
-document.getElementById("resetBtn").addEventListener("click", async () => {
-  const email = document
-    .getElementById("resetEmail")
-    .value.trim();
+on("resetBtn", async () => {
+  const email = valueOf("resetEmail").trim();
 
   if (!email) {
     showMessage("Enter your email address.", true);
@@ -193,44 +224,42 @@ document.getElementById("resetBtn").addEventListener("click", async () => {
   showMessage("Password reset email sent.");
 });
 
-document
-  .getElementById("updatePasswordBtn")
-  .addEventListener("click", async () => {
-    const newPassword = document.getElementById("newPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
+on("updatePasswordBtn", async () => {
+  const newPassword = valueOf("newPassword");
+  const confirmPassword = valueOf("confirmPassword");
 
-    if (!newPassword || !confirmPassword) {
-      showMessage("Enter and confirm your new password.", true);
-      return;
-    }
+  if (!newPassword || !confirmPassword) {
+    showMessage("Enter and confirm your new password.", true);
+    return;
+  }
 
-    if (newPassword !== confirmPassword) {
-      showMessage("Passwords do not match.", true);
-      return;
-    }
+  if (newPassword !== confirmPassword) {
+    showMessage("Passwords do not match.", true);
+    return;
+  }
 
-    showMessage("Updating password...");
+  showMessage("Updating password...");
 
-    const { error } = await client.auth.updateUser({
-      password: newPassword
-    });
-
-    if (error) {
-      showMessage(error.message, true);
-      return;
-    }
-
-    document.getElementById("newPassword").value = "";
-    document.getElementById("confirmPassword").value = "";
-
-    inRecovery = false;
-    recoverySection.hidden = true;
-
-    showMessage("Password updated. You are signed in.");
-
-    const { data } = await client.auth.getSession();
-    await updatePage(data.session);
+  const { error } = await client.auth.updateUser({
+    password: newPassword
   });
+
+  if (error) {
+    showMessage(error.message, true);
+    return;
+  }
+
+  clearField("newPassword");
+  clearField("confirmPassword");
+
+  inRecovery = false;
+  hide(recoverySection, true);
+
+  showMessage("Password updated. You are signed in.");
+
+  const { data } = await client.auth.getSession();
+  await updatePage(data.session);
+});
 
 client.auth.onAuthStateChange((event, session) => {
   if (event === "PASSWORD_RECOVERY") {
