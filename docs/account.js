@@ -3,9 +3,13 @@
 (() => {
   const client = window.supabaseClient;
 
+  const PROFILE_IMAGE_DIR = "./assets/profile_image/";
+  const PROFILE_IMAGE_LIST = "./assets/profile_image/profile_image.json";
+
   const state = {
     session: null,
     profile: null,
+    images: [],
     busy: false
   };
 
@@ -129,6 +133,74 @@
     }
   }
 
+  function updateImagePreview() {
+    const preview = byId("profileImagePreview");
+    const empty = byId("profileImageEmpty");
+    const select = byId("profileImageSelect");
+
+    const file = select ? select.value : "";
+
+    if (file) {
+      if (preview) {
+        preview.src = PROFILE_IMAGE_DIR + file;
+        preview.hidden = false;
+      }
+
+      setHidden(empty, true);
+      return;
+    }
+
+    if (preview) {
+      preview.removeAttribute("src");
+      preview.hidden = true;
+    }
+
+    setHidden(empty, false);
+  }
+
+  async function loadImageList() {
+    const select = byId("profileImageSelect");
+
+    if (!select) {
+      return;
+    }
+
+    try {
+      const response = await fetch(PROFILE_IMAGE_LIST, { cache: "no-store" });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const list = await response.json();
+
+      state.images = Array.isArray(list)
+        ? list.filter((item) => item && item.file)
+        : [];
+    } catch (error) {
+      state.images = [];
+      sectionMessage(
+        "profileMessage",
+        `Could not load the profile image list: ${error.message}`,
+        true
+      );
+    }
+
+    select.replaceChildren();
+
+    const none = document.createElement("option");
+    none.value = "";
+    none.textContent = "No image";
+    select.appendChild(none);
+
+    for (const item of state.images) {
+      const option = document.createElement("option");
+      option.value = item.file;
+      option.textContent = item.label || item.file;
+      select.appendChild(option);
+    }
+  }
+
   function fillForm() {
     const displayNameInput = byId("displayNameInput");
     const bioInput = byId("bioInput");
@@ -141,6 +213,19 @@
       bioInput.value = state.profile?.bio || "";
     }
 
+    const select = byId("profileImageSelect");
+
+    if (select) {
+      const stored = state.profile?.profile_image || "";
+
+      const known = Array.from(select.options).some(
+        (option) => option.value === stored
+      );
+
+      select.value = known ? stored : "";
+    }
+
+    updateImagePreview();
     updateBioCount();
 
     setText(byId("currentEmail"), state.session?.user?.email || "Unknown");
@@ -163,6 +248,10 @@
 
     state.session = data.session;
 
+    if (!state.images.length) {
+      await loadImageList();
+    }
+
     if (!state.session?.user) {
       state.profile = null;
       showSignedOut();
@@ -171,7 +260,7 @@
 
     const profileResult = await client
       .from("profiles")
-      .select("id, display_name, bio, role, status, created_at")
+      .select("id, display_name, bio, profile_image, role, status, created_at")
       .eq("id", state.session.user.id)
       .single();
 
@@ -202,6 +291,12 @@
     bioInput.addEventListener("input", updateBioCount);
   }
 
+  const profileImageSelect = byId("profileImageSelect");
+
+  if (profileImageSelect) {
+    profileImageSelect.addEventListener("change", updateImagePreview);
+  }
+
   bindClick("saveProfileBtn", async () => {
     if (state.busy || !state.session?.user) {
       return;
@@ -223,10 +318,11 @@
       .update({
         display_name: displayName,
         bio: bio || null,
+        profile_image: readField("profileImageSelect") || null,
         updated_at: new Date().toISOString()
       })
       .eq("id", state.session.user.id)
-      .select("id, display_name, bio, role, status, created_at")
+      .select("id, display_name, bio, profile_image, role, status, created_at")
       .single();
 
     setBusy(false);

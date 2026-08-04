@@ -19,6 +19,15 @@
     <section id="profileSection" hidden>
       <h2>Profile</h2>
 
+      <div class="profile-image-row">
+        <img id="profileImagePreview" class="profile-image" alt="Profile image" hidden>
+        <div id="profileImageEmpty" class="profile-image profile-image-empty">?</div>
+        <div class="profile-image-side">
+          <label class="field-label" for="profileImageSelect">Profile image</label>
+          <select id="profileImageSelect"></select>
+        </div>
+      </div>
+
       <label class="field-label" for="displayNameInput">Display name</label>
       <input id="displayNameInput" type="text" maxlength="40" placeholder="Display name">
 

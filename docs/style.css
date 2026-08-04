@@ -641,3 +641,62 @@ tbody tr:last-child td { border-bottom: none; }
     border-color: rgba(57,255,20,.45);
     text-shadow: 0 0 8px rgba(57,255,20,.7);
 }
+
+/* ---------- PROFILE IMAGE PICKER ---------- */
+
+.auth-page .profile-image-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 4px;
+}
+
+.auth-page .profile-image {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #050505;
+    border: 1px solid var(--neon);
+    box-shadow: 0 0 10px rgba(57,255,20,.4);
+}
+
+.auth-page .profile-image-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #555;
+    border-color: #333;
+    box-shadow: none;
+}
+
+.auth-page .profile-image-side {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.auth-page .profile-image-side .field-label { margin-top: 0; }
+
+.auth-page select {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background: #050505;
+    color: var(--fg);
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color .18s, box-shadow .18s;
+}
+
+.auth-page select:focus {
+    outline: none;
+    border-color: var(--neon);
+    box-shadow: 0 0 0 1px var(--neon), 0 0 12px rgba(57,255,20,.35);
+}
