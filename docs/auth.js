@@ -2,15 +2,32 @@ const client = window.supabaseClient;
 
 const loggedOutSection = document.getElementById("loggedOutSection");
 const loggedInSection = document.getElementById("loggedInSection");
+const recoverySection = document.getElementById("recoverySection");
 const currentUser = document.getElementById("currentUser");
 const authMessage = document.getElementById("authMessage");
+
+let inRecovery = false;
 
 function showMessage(message, isError = false) {
   authMessage.textContent = message;
   authMessage.style.color = isError ? "red" : "";
 }
 
+function showRecovery() {
+  inRecovery = true;
+  loggedOutSection.hidden = true;
+  loggedInSection.hidden = true;
+  recoverySection.hidden = false;
+  showMessage("Enter a new password for your account.");
+}
+
 async function updatePage(session) {
+  if (inRecovery) {
+    return;
+  }
+
+  recoverySection.hidden = true;
+
   if (!session?.user) {
     loggedOutSection.hidden = false;
     loggedInSection.hidden = true;
@@ -137,10 +154,62 @@ document.getElementById("resetBtn").addEventListener("click", async () => {
   showMessage("Password reset email sent.");
 });
 
-client.auth.onAuthStateChange((_event, session) => {
+document
+  .getElementById("updatePasswordBtn")
+  .addEventListener("click", async () => {
+    const newPassword = document.getElementById("newPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (!newPassword || !confirmPassword) {
+      showMessage("Enter and confirm your new password.", true);
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      showMessage("Passwords do not match.", true);
+      return;
+    }
+
+    showMessage("Updating password...");
+
+    const { error } = await client.auth.updateUser({
+      password: newPassword
+    });
+
+    if (error) {
+      showMessage(error.message, true);
+      return;
+    }
+
+    document.getElementById("newPassword").value = "";
+    document.getElementById("confirmPassword").value = "";
+
+    inRecovery = false;
+    recoverySection.hidden = true;
+
+    showMessage("Password updated. You are signed in.");
+
+    const { data } = await client.auth.getSession();
+    await updatePage(data.session);
+  });
+
+client.auth.onAuthStateChange((event, session) => {
+  if (event === "PASSWORD_RECOVERY") {
+    showRecovery();
+    return;
+  }
+
   updatePage(session);
 });
 
 client.auth.getSession().then(({ data }) => {
+  const hash = window.location.hash || "";
+  const search = window.location.search || "";
+
+  if (hash.includes("type=recovery") || search.includes("type=recovery")) {
+    showRecovery();
+    return;
+  }
+
   updatePage(data.session);
 });
