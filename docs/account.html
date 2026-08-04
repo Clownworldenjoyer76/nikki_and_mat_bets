@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Settings — NFL Picks</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="auth-page" style="padding-bottom:100px">
+  <main class="wrap">
+    <h1>Settings</h1>
+
+    <section id="signedOutSection">
+      <h2>Not signed in</h2>
+      <p class="notice-sub">You need to be signed in to view your account settings.</p>
+      <button id="goToSignInBtn" type="button">Go to sign in</button>
+    </section>
+
+    <section id="profileSection" hidden>
+      <h2>Profile</h2>
+
+      <label class="field-label" for="displayNameInput">Display name</label>
+      <input id="displayNameInput" type="text" maxlength="40" placeholder="Display name">
+
+      <label class="field-label" for="bioInput">Bio</label>
+      <textarea id="bioInput" rows="4" maxlength="500" placeholder="Say something about yourself"></textarea>
+      <div class="field-hint"><span id="bioCount">0</span>/500</div>
+
+      <button id="saveProfileBtn" type="button">Save profile</button>
+      <p class="section-message" id="profileMessage"></p>
+    </section>
+
+    <section id="emailSection" hidden>
+      <h2>Email address</h2>
+
+      <p class="notice-sub">
+        Current: <strong id="currentEmail"></strong>
+      </p>
+
+      <label class="field-label" for="newEmailInput">New email</label>
+      <input id="newEmailInput" type="email" placeholder="New email address">
+
+      <button id="changeEmailBtn" type="button">Change email</button>
+      <p class="section-message" id="emailMessage"></p>
+      <p class="notice-sub">
+        A confirmation link is sent to the new address. The change takes effect
+        only after you click it.
+      </p>
+    </section>
+
+    <section id="passwordSection" hidden>
+      <h2>Password</h2>
+
+      <label class="field-label" for="newPasswordInput">New password</label>
+      <input id="newPasswordInput" type="password" placeholder="New password">
+
+      <label class="field-label" for="confirmPasswordInput">Confirm new password</label>
+      <input id="confirmPasswordInput" type="password" placeholder="Confirm new password">
+
+      <button id="changePasswordBtn" type="button">Update password</button>
+      <p class="section-message" id="passwordMessage"></p>
+    </section>
+
+    <section id="accountSection" hidden>
+      <h2>Account</h2>
+
+      <p class="notice-sub">
+        Role: <strong id="accountRole"></strong><br>
+        Status: <strong id="accountStatus"></strong><br>
+        Member since: <strong id="accountCreated"></strong>
+      </p>
+
+      <button id="signOutBtn" type="button">Sign out</button>
+    </section>
+
+    <p id="accountMessage"></p>
+  </main>
+
+  <div id="navbar"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase-client.js"></script>
+  <script src="./nav.js"></script>
+  <script src="./account.js"></script>
+</body>
+</html>
