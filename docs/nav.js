@@ -6,11 +6,11 @@
    ============================================================ */
 
 const NAV_LINKS = [
-  { href: "./index.html",    label: "\u{1F3C8} Picks" },
-  { href: "./account.html",  label: "\u{1F464} Account" },
-  { href: "./picks.html",    label: "\u{1F4CA} Weekly" },
-  { href: "./insights.html", label: "\u{1F4D0} Insights" },
-  { href: "./metrics.html",  label: "\u{1F4CF} By Team" }
+  { href: "./make_picks.html", label: "\u{1F3C8} Picks" },
+  { href: "./account.html",    label: "\u{1F464} Account" },
+  { href: "./picks.html",      label: "\u{1F4CA} Weekly" },
+  { href: "./insights.html",   label: "\u{1F4D0} Insights" },
+  { href: "./metrics.html",    label: "\u{1F4CF} By Team" }
 ];
 
 (() => {
