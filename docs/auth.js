@@ -3,10 +3,13 @@ const client = window.supabaseClient;
 const loggedOutSection = document.getElementById("loggedOutSection");
 const loggedInSection = document.getElementById("loggedInSection");
 const recoverySection = document.getElementById("recoverySection");
+const checkEmailSection = document.getElementById("checkEmailSection");
+const checkEmailAddress = document.getElementById("checkEmailAddress");
 const currentUser = document.getElementById("currentUser");
 const authMessage = document.getElementById("authMessage");
 
 let inRecovery = false;
+let awaitingConfirmation = false;
 
 function showMessage(message, isError = false) {
   authMessage.textContent = message;
@@ -15,10 +18,32 @@ function showMessage(message, isError = false) {
 
 function showRecovery() {
   inRecovery = true;
+  awaitingConfirmation = false;
   loggedOutSection.hidden = true;
   loggedInSection.hidden = true;
+  checkEmailSection.hidden = true;
   recoverySection.hidden = false;
   showMessage("Enter a new password for your account.");
+}
+
+function showCheckEmail(email) {
+  awaitingConfirmation = true;
+  checkEmailAddress.textContent = email;
+  loggedOutSection.hidden = true;
+  loggedInSection.hidden = true;
+  recoverySection.hidden = true;
+  checkEmailSection.hidden = false;
+  showMessage("");
+  window.scrollTo(0, 0);
+}
+
+function showLoggedOut() {
+  awaitingConfirmation = false;
+  checkEmailSection.hidden = true;
+  recoverySection.hidden = true;
+  loggedInSection.hidden = true;
+  loggedOutSection.hidden = false;
+  showMessage("");
 }
 
 async function updatePage(session) {
@@ -26,7 +51,13 @@ async function updatePage(session) {
     return;
   }
 
+  if (awaitingConfirmation && !session?.user) {
+    return;
+  }
+
   recoverySection.hidden = true;
+  checkEmailSection.hidden = true;
+  awaitingConfirmation = false;
 
   if (!session?.user) {
     loggedOutSection.hidden = false;
@@ -82,12 +113,20 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
     return;
   }
 
+  document.getElementById("signupDisplayName").value = "";
+  document.getElementById("signupEmail").value = "";
+  document.getElementById("signupPassword").value = "";
+
   if (data.session) {
     showMessage("Account created and signed in.");
     await updatePage(data.session);
   } else {
-    showMessage("Account created. Check your email to confirm the account.");
+    showCheckEmail(email);
   }
+});
+
+document.getElementById("backToAuthBtn").addEventListener("click", () => {
+  showLoggedOut();
 });
 
 document.getElementById("loginBtn").addEventListener("click", async () => {
