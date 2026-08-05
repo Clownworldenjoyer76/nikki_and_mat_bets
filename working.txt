@@ -1,3 +1,0 @@
-created: 
-scripts/manual_nfl_odds.py
-.github/workflows/manual_data_input.yml
