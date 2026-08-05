@@ -3,37 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nikki & Mat — NFL Picks</title>
-    <link rel="stylesheet" href="style.css">
+    <title>NFL Picks</title>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <header class="main-header" id="topbar">
-      <img src="assets/logos/IMG_0931.jpeg" alt="Left logo">
       <div class="titles">
-        <h1>Nikki and Mat’s NFL Picks</h1>
-        <div class="sub" id="seasonWeek">Loading…</div>
+        <h1 id="pageTitle">NFL Picks</h1>
       </div>
-      <img src="assets/logos/IMG_0930.jpeg" alt="Right logo">
     </header>
 
-    <main id="games" class="wrap"></main>
-    
-    <div class="bar" id="bottombar">
-      <nav>
-        <a href="./index.html">🏈 Picks</a>
-        <a href="./auth.html">👤 Account</a>
-        <a href="./picks.html">📊 Weekly</a>
-        <a href="./insights.html">📐 Insights</a>
-        <a href="./metrics.html">📏 By Team</a>
-      </nav>
-      <div class="row">
-        <button class="btn" id="clearBtn">Clear Picks</button>
-        <button class="btn primary" id="issueBtn">Submit Picks</button>
+    <main class="wrap">
+      <div class="home-grid">
+        <a class="home-card" href="./account.html">
+          <span class="home-card-icon">&#128100;</span>
+          <span class="home-card-title">Account</span>
+        </a>
+
+        <a class="home-card" href="./make_picks.html">
+          <span class="home-card-icon">&#127944;</span>
+          <span class="home-card-title">Weekly Picks</span>
+        </a>
+
+        <a class="home-card" href="./leaderboard.html">
+          <span class="home-card-icon">&#127942;</span>
+          <span class="home-card-title">Leaderboard</span>
+        </a>
+
+        <a class="home-card" href="./metrics.html">
+          <span class="home-card-icon">&#128207;</span>
+          <span class="home-card-title">Metrics</span>
+        </a>
+
+        <a class="home-card" href="./insights.html">
+          <span class="home-card-icon">&#128208;</span>
+          <span class="home-card-title">Insights</span>
+        </a>
       </div>
-    </div>
+
+      <div class="home-actions">
+        <button class="btn" id="logoutBtn" hidden>Log Out</button>
+      </div>
+    </main>
+
+    <div id="navbar"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="./supabase-client.js" defer></script>
-    <script src="./apps.js" defer></script>
+    <script src="./nav.js" defer></script>
+    <script src="./index.js" defer></script>
 </body>
 </html>
