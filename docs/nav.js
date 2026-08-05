@@ -10,7 +10,6 @@ const NAV_LINKS = [
   { href: "./account.html",     label: "\u{1F464} Account" },
   { href: "./make_picks.html",  label: "\u{1F3C8} Picks" },
   { href: "./leaderboard.html", label: "\u{1F3C6} Leaderboard" },
-  { href: "./metrics.html",     label: "\u{1F4CF} Metrics" },
   { href: "./insights.html",    label: "\u{1F4D0} Insights" }
 ];
 
