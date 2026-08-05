@@ -560,27 +560,7 @@
     when.style.textAlign = "center";
     when.style.marginTop = "6px";
 
-    const line = createElement("div", "line");
-    line.style.textAlign = "center";
-    line.style.marginTop = "6px";
-
-    const spreadPill = createElement("span", "pill");
-
-    spreadPill.append(
-      document.createTextNode("Home spread: "),
-      createElement("b", "", scheduleGame.spreadHome)
-    );
-
-    const totalPill = createElement("span", "pill");
-    totalPill.style.marginLeft = "8px";
-
-    totalPill.append(
-      document.createTextNode("Total: "),
-      createElement("b", "", scheduleGame.total)
-    );
-
-    line.append(spreadPill, totalPill);
-    card.append(matchup, when, line);
+    card.append(matchup, when);
 
     if (!scheduleGame.game) {
       const warning = createElement(
