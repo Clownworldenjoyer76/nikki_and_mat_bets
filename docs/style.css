@@ -298,12 +298,14 @@ th {
     padding: 10px 12px;
     text-align: left;
     border-bottom: 1px solid var(--neon);
+    white-space: nowrap;
 }
 
 td {
     padding: 10px 12px;
     border-bottom: 1px solid #1c1c1c;
     color: #e6e6e6;
+    white-space: nowrap;
 }
 
 tbody tr:nth-child(even) td { background: rgba(255,255,255,.02); }
@@ -902,4 +904,64 @@ tbody tr:last-child td { border-bottom: none; }
     margin: 0 0 4px;
     padding-bottom: 8px;
     border-bottom: 1px solid var(--line);
+}
+
+/* ============================================================
+   NARROW SCREENS — keep records on one line, let wide tables
+   scroll sideways instead of squeezing the columns
+   ============================================================ */
+
+#lbTable,
+.in-section > div {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 600px) {
+    table { font-size: .85rem; }
+
+    th {
+        padding: 8px 6px;
+        font-size: .66rem;
+        letter-spacing: .8px;
+    }
+
+    td { padding: 8px 6px; }
+
+    .lb-avatar {
+        width: 28px;
+        height: 28px;
+        flex: 0 0 28px;
+    }
+
+    .lb-name { gap: 8px; }
+}
+
+/* ============================================================
+   MAKE PICKS PAGE (docs/make_picks.html)
+   Two stacked bars at the bottom. They sit in the normal page
+   flow and stick to the bottom of the screen, so they can never
+   overlap the page content no matter how tall the nav wraps.
+   ============================================================ */
+
+body.picks-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-bottom: 0;
+}
+
+body.picks-page > main { flex: 1 0 auto; }
+
+.bottom-stack {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.bottom-stack .bar {
+    position: static;
+    width: 100%;
 }
