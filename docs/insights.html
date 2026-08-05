@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insights — NFL Picks</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <header class="main-header" id="topbar">
+      <div class="titles">
+        <h1 id="pageTitle">Insights</h1>
+        <div class="sub" id="scopeLabel">Loading…</div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="lb-controls">
+        <button class="btn" id="scopeSeasonBtn" type="button">Season</button>
+        <button class="btn" id="scopeLastWeekBtn" type="button">Last Week</button>
+        <button class="btn" id="scopeWeekBtn" type="button">Week #</button>
+        <select id="weekSelect" hidden></select>
+      </div>
+
+      <div class="in-filters">
+        <label class="in-field">
+          <span class="in-label">Team</span>
+          <select id="teamSelect"></select>
+        </label>
+
+        <label class="in-field">
+          <span class="in-label">User</span>
+          <select id="userSelect"></select>
+        </label>
+      </div>
+
+      <div id="inMessage" class="lb-message"></div>
+
+      <section class="in-section">
+        <h2 class="in-heading">ATS by Team</h2>
+        <div id="atsByTeam"></div>
+      </section>
+
+      <section class="in-section">
+        <h2 class="in-heading">Fade ATS by Opponent</h2>
+        <div id="fadeByTeam"></div>
+      </section>
+
+      <section class="in-section">
+        <h2 class="in-heading">Home / Away ATS</h2>
+        <div id="homeAway"></div>
+      </section>
+
+      <section class="in-section">
+        <h2 class="in-heading">Totals by Team</h2>
+        <div id="totalsByTeam"></div>
+      </section>
+
+      <section class="in-section">
+        <h2 class="in-heading">Overall Over / Under</h2>
+        <div id="totalsOverall"></div>
+      </section>
+    </main>
+
+    <div id="navbar"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="./supabase-client.js" defer></script>
+    <script src="./nav.js" defer></script>
+    <script src="./insights.js" defer></script>
+</body>
+</html>
