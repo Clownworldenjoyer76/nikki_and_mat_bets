@@ -762,3 +762,73 @@ tbody tr:last-child td { border-bottom: none; }
     opacity: .5;
     cursor: not-allowed;
 }
+
+/* ============================================================
+   LEADERBOARD PAGE (docs/leaderboard.html)
+   ============================================================ */
+
+.lb-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin: 16px 0 6px;
+}
+
+.lb-controls select {
+    background: #050505;
+    color: var(--fg);
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-size: .9rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color .18s, box-shadow .18s;
+}
+
+.lb-controls select:focus {
+    outline: none;
+    border-color: var(--neon);
+    box-shadow: 0 0 0 1px var(--neon), 0 0 12px rgba(57,255,20,.35);
+}
+
+.lb-controls .btn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.lb-message {
+    min-height: 1.2em;
+    text-align: center;
+    font-size: .9rem;
+    letter-spacing: .5px;
+    color: var(--muted);
+    margin: 10px 0 0;
+}
+
+.lb-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+
+.lb-avatar {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #050505;
+    border: 1px solid var(--neon);
+    box-shadow: 0 0 8px rgba(57,255,20,.35);
+}
+
+.lb-avatar-empty {
+    display: inline-block;
+    border-color: #333;
+    box-shadow: none;
+}
