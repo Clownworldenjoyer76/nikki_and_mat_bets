@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard — NFL Picks</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <header class="main-header" id="topbar">
+      <div class="titles">
+        <h1 id="pageTitle">Leaderboard</h1>
+        <div class="sub" id="scopeLabel">Loading…</div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="lb-controls">
+        <button class="btn" id="scopeSeasonBtn" type="button">Season</button>
+        <button class="btn" id="scopeLastWeekBtn" type="button">Last Week</button>
+        <button class="btn" id="scopeWeekBtn" type="button">Week #</button>
+        <select id="weekSelect" hidden></select>
+      </div>
+
+      <div id="lbMessage" class="lb-message"></div>
+
+      <div id="lbTable"></div>
+    </main>
+
+    <div id="navbar"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="./supabase-client.js" defer></script>
+    <script src="./nav.js" defer></script>
+    <script src="./leaderboard.js" defer></script>
+</body>
+</html>
