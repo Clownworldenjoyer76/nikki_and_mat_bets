@@ -1,5 +1,5 @@
 /* ============================================================
-   NIKKI & MAT'S NFL PICKS — VEGAS SPORTSBOOK THEME
+   NFL PICKS — VEGAS SPORTSBOOK THEME
    Palette: black / felt green, neon green + neon pink accents,
    gold highlights, chrome edges.
    ============================================================ */
@@ -699,4 +699,66 @@ tbody tr:last-child td { border-bottom: none; }
     outline: none;
     border-color: var(--neon);
     box-shadow: 0 0 0 1px var(--neon), 0 0 12px rgba(57,255,20,.35);
+}
+
+/* ============================================================
+   LANDING PAGE (docs/index.html)
+   ============================================================ */
+
+.home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 18px 0 8px;
+}
+
+.home-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 130px;
+    padding: 22px 16px;
+    text-decoration: none;
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 6px 22px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.04);
+    transition: border-color .18s, box-shadow .18s, transform .1s;
+}
+
+.home-card:hover {
+    border-color: var(--neon);
+    box-shadow: 0 6px 22px rgba(0,0,0,.75), 0 0 20px rgba(57,255,20,.28);
+    transform: translateY(-2px);
+}
+
+.home-card:active { transform: translateY(0); }
+
+.home-card-icon {
+    font-size: 2rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 10px rgba(255,57,195,.45));
+}
+
+.home-card-title {
+    font-size: .95rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--neon);
+    text-shadow: 0 0 6px var(--neon), 0 0 18px rgba(57,255,20,.45);
+    text-align: center;
+}
+
+.home-actions {
+    display: flex;
+    justify-content: center;
+    margin: 22px 0 10px;
+}
+
+.home-actions .btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
 }
