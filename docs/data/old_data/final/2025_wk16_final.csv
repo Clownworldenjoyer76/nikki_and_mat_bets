@@ -1,0 +1,17 @@
+season,week,game_id,commence_time_utc,home_team,away_team,spread_home,total,mat_spread,mat_total,nikki_spread,nikki_total,home_score,away_score
+2025,16,ac7881cc5a498c5b72680498d3fa8f6e,2025-12-19T01:15:00+00:00,Seattle Seahawks,Los Angeles Rams,0.0,43.0,away,over,home,over,38.0,37.0
+2025,16,18fe4528a0bc43d9cd64bd09c0d5019f,2025-12-20T22:00:00+00:00,Washington Commanders,Philadelphia Eagles,6.5,44.5,away,under,home,over,18.0,29.0
+2025,16,9f70d98bc6918dc8e21f329405b649fe,2025-12-21T01:20:00+00:00,Chicago Bears,Green Bay Packers,1.0,46.5,home,over,home,over,22.0,16.0
+2025,16,2557976e0e66ab698539b543de125469,2025-12-21T18:00:00+00:00,Cleveland Browns,Buffalo Bills,10.0,42.0,home,under,home,under,20.0,23.0
+2025,16,d056f31082bdea4d018a26ba274b8430,2025-12-21T18:00:00+00:00,Carolina Panthers,Tampa Bay Buccaneers,3.0,45.5,home,over,home,over,23.0,20.0
+2025,16,945286798abb5081432aef109df29778,2025-12-21T18:00:00+00:00,Miami Dolphins,Cincinnati Bengals,4.0,47.5,home,under,away,under,21.0,45.0
+2025,16,aa9d0cf732b6adde4ad3ec04ca79825c,2025-12-21T18:00:00+00:00,Dallas Cowboys,Los Angeles Chargers,-2.0,49.5,away,under,home,over,17.0,34.0
+2025,16,0cce34b9a49c4c6bdc1e65449e37a0f9,2025-12-21T18:00:00+00:00,Tennessee Titans,Kansas City Chiefs,3.5,37.5,home,under,home,over,26.0,9.0
+2025,16,3db6ba91d2a72ada8843d5a0517bff27,2025-12-21T18:00:00+00:00,New York Giants,Minnesota Vikings,3.0,43.5,away,under,home,over,13.0,16.0
+2025,16,aa5b25e85d1ad6540d7a5ae04b73ddfd,2025-12-21T18:00:00+00:00,New Orleans Saints,New York Jets,-4.5,40.5,home,over,home,over,29.0,6.0
+2025,16,7d71a0d3cc2a04eb35f1a725104217b5,2025-12-21T21:05:00+00:00,Arizona Cardinals,Atlanta Falcons,2.5,48.0,home,over,away,under,19.0,26.0
+2025,16,93c002f0a42d1b57f3bbabdcfe24ab97,2025-12-21T21:05:00+00:00,Denver Broncos,Jacksonville Jaguars,-3.0,46.5,away,under,away,over,20.0,34.0
+2025,16,a03f89d3aaadf737deb09be24986d5bf,2025-12-21T21:25:00+00:00,Detroit Lions,Pittsburgh Steelers,-7.0,52.0,away,under,home,under,24.0,29.0
+2025,16,47a54fb60f7b79179bc80e18a7c5de81,2025-12-21T21:25:00+00:00,Houston Texans,Las Vegas Raiders,-14.0,38.0,home,under,away,over,23.0,21.0
+2025,16,a0476b027679a1670f21e8b75a860ab9,2025-12-22T01:20:00+00:00,Baltimore Ravens,New England Patriots,-3.0,48.0,away,over,away,over,24.0,28.0
+2025,16,2dd4521ee298fa2c6f0ab009c182aae9,2025-12-23T01:15:00+00:00,Indianapolis Colts,San Francisco 49ers,6.0,46.5,home,over,home,under,27.0,48.0

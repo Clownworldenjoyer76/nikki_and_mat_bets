@@ -1,0 +1,273 @@
+season,week,game_id,commence_time_utc,home_team,away_team,spread_home,total,mat_spread,mat_total,nikki_spread,nikki_total
+2025,1,f1bc532dff946d15cb85654b5c4b246e,2025-09-05T00:20:00+00:00,Philadelphia Eagles,Dallas Cowboys,,,away,under,away,over
+2025,1,9535d3e3ee9d9fc83ea2b500ad0b587c,2025-09-06T00:00:00+00:00,Los Angeles Chargers,Kansas City Chiefs,,,away,under,home,under
+2025,1,557d13ef8f4c1d21044f3a478cda6d0b,2025-09-07T17:00:00+00:00,New Orleans Saints,Arizona Cardinals,,,away,over,home,over
+2025,1,1e09eb3fe1385796c1a32000de48ac64,2025-09-07T17:00:00+00:00,Atlanta Falcons,Tampa Bay Buccaneers,,,home,over,home,over
+2025,1,394256a6c3d0f5ecd1208fffaae6a72f,2025-09-07T17:00:00+00:00,Jacksonville Jaguars,Carolina Panthers,,,away,under,home,under
+2025,1,e2d3b0596efcebc1c19dab92009f5e26,2025-09-07T17:00:00+00:00,Cleveland Browns,Cincinnati Bengals,,,away,over,home,under
+2025,1,b02a72c768a6c6dee87aa74f78e84176,2025-09-07T17:00:00+00:00,Indianapolis Colts,Miami Dolphins,,,away,under,home,under
+2025,1,0b2455795dfcd692dd607503e4f20d04,2025-09-07T17:00:00+00:00,New England Patriots,Las Vegas Raiders,,,away,under,home,over
+2025,1,4cce00ca468c67eca17a9a061f778fb2,2025-09-07T17:00:00+00:00,Washington Commanders,New York Giants,,,home,over,away,over
+2025,1,5ed483bb614b18955f8b43f177746371,2025-09-07T17:00:00+00:00,New York Jets,Pittsburgh Steelers,,,home,under,away,under
+2025,1,68397f3aa9eb847a421a49f990a11928,2025-09-07T20:05:00+00:00,Denver Broncos,Tennessee Titans,,,home,under,home,over
+2025,1,9f1ad249959aacae89e5e74e43429a4a,2025-09-07T20:05:00+00:00,Seattle Seahawks,San Francisco 49ers,,,away,over,home,over
+2025,1,8e0e2d9237098222f9ca7554b11b12bb,2025-09-07T20:25:00+00:00,Green Bay Packers,Detroit Lions,,,home,over,away,over
+2025,1,dc0e3db61983a138098f28226788d2d3,2025-09-07T20:25:00+00:00,Los Angeles Rams,Houston Texans,,,home,over,away,under
+2025,1,dee0a41ed5e8201a96d457899adbe918,2025-09-08T00:20:00+00:00,Buffalo Bills,Baltimore Ravens,,,away,over,away,over
+2025,1,c6d7807cee33d5e81c671527b9c8b3f1,2025-09-09T00:15:00+00:00,Chicago Bears,Minnesota Vikings,,,away,under,home,under
+2025,2,0c6e5d9821ce0d3e82f3e792879776a6,2025-09-12T00:16:00+00:00,Green Bay Packers,Washington Commanders,-3.5,48.0,,,,
+2025,2,1ee9ea2c8256bc6be5dd92e60f6c17de,2025-09-14T17:00:00+00:00,Detroit Lions,Chicago Bears,-6.0,47.5,,,,
+2025,2,ec75e45d75691f810f347e0c5ff25d6e,2025-09-14T17:00:00+00:00,Cincinnati Bengals,Jacksonville Jaguars,-3.5,49.5,,,,
+2025,2,05a5b084f4e19535b2d3f91ef5c00169,2025-09-14T17:00:00+00:00,Dallas Cowboys,New York Giants,-6.0,44.5,,,,
+2025,2,575c1b169aab675ec72372ccb0f4c55f,2025-09-14T17:00:00+00:00,Miami Dolphins,New England Patriots,-1.5,44.0,,,,
+2025,2,553edb8bf2452482b37dde58e832a6fb,2025-09-14T17:01:00+00:00,Baltimore Ravens,Cleveland Browns,-11.0,45.0,,,,
+2025,2,cd0fd9335b5182d3bfed35ab8d5ab6fb,2025-09-14T17:01:00+00:00,New York Jets,Buffalo Bills,6.5,45.5,,,,
+2025,2,0e6f68b30237afc04d1517a193213a65,2025-09-14T17:01:00+00:00,Tennessee Titans,Los Angeles Rams,5.5,42.0,,,,
+2025,2,866d7405986fb4d14897cdb6c0aa5926,2025-09-14T17:01:00+00:00,New Orleans Saints,San Francisco 49ers,4.5,42.0,,,,
+2025,2,82f9fd7001598d5cf9c1bdd57c66cae4,2025-09-14T17:01:00+00:00,Pittsburgh Steelers,Seattle Seahawks,-3.0,40.0,,,,
+2025,2,7e2ad5ef04493526707e0868f7b70c47,2025-09-14T20:05:00+00:00,Arizona Cardinals,Carolina Panthers,-6.5,44.5,,,,
+2025,2,e217b38ef8bc6e98d3512cb42b90782e,2025-09-14T20:06:00+00:00,Indianapolis Colts,Denver Broncos,2.5,42.5,,,,
+2025,2,bbec8d71145954cff67915c9b006bb6e,2025-09-14T20:25:00+00:00,Kansas City Chiefs,Philadelphia Eagles,1.0,47.0,,,,
+2025,2,37d09ce5d357536d0e58dd4ba0ab4106,2025-09-15T00:20:00+00:00,Minnesota Vikings,Atlanta Falcons,-4.75,45.5,,,,
+2025,2,7d9a04f411031528d9c1d2df7b9a0453,2025-09-15T23:01:00+00:00,Houston Texans,Tampa Bay Buccaneers,-2.5,42.0,,,,
+2025,2,bebae12f59f19bd877df7ac3cab05263,2025-09-16T02:00:00+00:00,Las Vegas Raiders,Los Angeles Chargers,3.5,47.0,,,,
+2025,3,aca5234c57e31b1931e51d2d0d6046f5,2025-09-19T00:15:00+00:00,Buffalo Bills,Miami Dolphins,-12.5,49.5,away,under,home,under
+2025,3,5737e4dbf6879c5061bb23033a4d8a55,2025-09-21T17:00:00+00:00,Carolina Panthers,Atlanta Falcons,5.0,43.5,away,over,home,over
+2025,3,eefb7f130c8fc2c129e296fe5c6ba3e3,2025-09-21T17:00:00+00:00,Minnesota Vikings,Cincinnati Bengals,-3.0,41.5,home,over,home,over
+2025,3,581955d1b79fe87a3a61a4885cd7ea67,2025-09-21T17:00:00+00:00,Cleveland Browns,Green Bay Packers,8.0,42.5,away,over,home,under
+2025,3,97de7672b61dbddbce982711c121e76d,2025-09-21T17:00:00+00:00,Jacksonville Jaguars,Houston Texans,-1.0,44.5,away,over,home,over
+2025,3,03a5eed2c8ef5d1c8a48866ea4b0d63a,2025-09-21T17:00:00+00:00,Washington Commanders,Las Vegas Raiders,-3.5,44.5,home,over,home,over
+2025,3,c4c42918a645b1a4773f47d7eaa5cfcf,2025-09-21T17:00:00+00:00,New England Patriots,Pittsburgh Steelers,1.0,44.5,away,over,away,over
+2025,3,02522f48a7b7e7524881c1b1638cd94d,2025-09-21T17:00:00+00:00,Tampa Bay Buccaneers,New York Jets,-7.0,45.5,home,under,home,under
+2025,3,bb506016737825f4d0b1f9862f95c246,2025-09-21T17:01:00+00:00,Tennessee Titans,Indianapolis Colts,3.5,43.5,away,over,home,over
+2025,3,4c4ae4a2d54fc3f71c450187e9391ddc,2025-09-21T17:01:00+00:00,Philadelphia Eagles,Los Angeles Rams,-3.5,44.5,away,under,home,under
+2025,3,0ee3f5a0078c21cfdffd1b97002e7da5,2025-09-21T20:05:00+00:00,Los Angeles Chargers,Denver Broncos,-2.5,44.5,away,under,home,over
+2025,3,311c411c2d53e36a902763dc7a2ef678,2025-09-21T20:05:00+00:00,Seattle Seahawks,New Orleans Saints,-7.5,41.5,home,over,home,over
+2025,3,186868cc79ce1f5d22075b67ebbc7b64,2025-09-21T20:25:00+00:00,Chicago Bears,Dallas Cowboys,-1.0,50.0,away,under,away,under
+2025,3,20b50dac292089c063b21e1410f172ef,2025-09-21T20:26:00+00:00,San Francisco 49ers,Arizona Cardinals,-1.5,43.5,home,over,away,under
+2025,3,ee840f13db8bd150fcdd8f6670fa7041,2025-09-22T00:21:00+00:00,New York Giants,Kansas City Chiefs,6.0,44.5,home,under,home,over
+2025,3,6e67ddae4bb01d1c2d3f461ee62d2666,2025-09-23T00:15:00+00:00,Baltimore Ravens,Detroit Lions,-6.0,51.5,home,over,away,over
+2025,4,4a08b89f07a4a395620f6df5c1d239f4,2025-09-26T00:16:00+00:00,Arizona Cardinals,Seattle Seahawks,1.5,43.5,away,under,away,under
+2025,4,4dd631102a977fd398f7ea594ed208f2,2025-09-28T13:31:00+00:00,Pittsburgh Steelers,Minnesota Vikings,2.5,40.5,away,over,away,over
+2025,4,bcb1f89cf378a586097c50585e53acce,2025-09-28T17:00:00+00:00,Detroit Lions,Cleveland Browns,-10.0,44.5,away,under,away,over
+2025,4,d921b1e86b0a30ad91000ffc360d302d,2025-09-28T17:00:00+00:00,New York Giants,Los Angeles Chargers,6.5,44.0,away,under,home,over
+2025,4,b7934d72587b62de0f563ac9acbaa770,2025-09-28T17:01:00+00:00,Atlanta Falcons,Washington Commanders,1.0,45.0,home,under,away,under
+2025,4,d16a43752aaac66e9ff8768d8590b662,2025-09-28T17:01:00+00:00,Buffalo Bills,New Orleans Saints,-15.5,48.0,home,under,away,over
+2025,4,f8fe40924827231233dc10f6999d8ff7,2025-09-28T17:01:00+00:00,New England Patriots,Carolina Panthers,-5.5,43.0,away,under,away,over
+2025,4,85c9b76cd6bd575b611cb4e8feb7a0b0,2025-09-28T17:01:00+00:00,Houston Texans,Tennessee Titans,-7.0,38.5,away,under,away,under
+2025,4,894976986c24d52cf1d45f0e6bb0e90c,2025-09-28T17:01:00+00:00,Tampa Bay Buccaneers,Philadelphia Eagles,3.5,43.5,home,over,away,over
+2025,4,d90e0de2d5fa2d57e8812f31775ad0ba,2025-09-28T20:06:00+00:00,Los Angeles Rams,Indianapolis Colts,-3.5,49.5,home,under,away,over
+2025,4,09f55b4a19a83eb951a9400a11123477,2025-09-28T20:06:00+00:00,San Francisco 49ers,Jacksonville Jaguars,-3.0,47.0,home,under,away,under
+2025,4,051233db287b02fd3e7574955879ece2,2025-09-28T20:25:00+00:00,Kansas City Chiefs,Baltimore Ravens,2.5,48.5,away,over,away,over
+2025,4,af6fbb0a2e996613bc393115276c60e2,2025-09-28T20:26:00+00:00,Las Vegas Raiders,Chicago Bears,-1.0,47.5,home,under,home,over
+2025,4,de432abcc3bd8d42a582ae9f71388dcd,2025-09-29T00:21:00+00:00,Dallas Cowboys,Green Bay Packers,6.5,47.0,home,over,home,over
+2025,4,bc76fb8d846588ed46297aaab4e83de9,2025-09-29T23:15:00+00:00,Miami Dolphins,New York Jets,-3.0,45.0,away,over,home,over
+2025,4,8dcb2a6bf542ccb7e6bc58f83c8fc2ac,2025-09-30T00:15:00+00:00,Denver Broncos,Cincinnati Bengals,-7.5,44.0,home,under,home,under
+2025,5,c4b72eabb3d557e73022ec730d8e3944,2025-10-03T00:16:00+00:00,Los Angeles Rams,San Francisco 49ers,-8.5,45.0,home,under,home,under
+2025,5,6e206c7bc9379b07d27298a393305384,2025-10-05T13:31:00+00:00,Cleveland Browns,Minnesota Vikings,3.5,36.0,home,under,home,under
+2025,5,6eb8eeff6a052455649ddd2a50e0a188,2025-10-05T17:01:00+00:00,Baltimore Ravens,Houston Texans,1.5,40.5,home,over,home,under
+2025,5,ff8222149317a63ffe50fcda777d14c0,2025-10-05T17:01:00+00:00,Carolina Panthers,Miami Dolphins,1.0,44.5,home,over,away,over
+2025,5,df7e32f3c6cfaaa66de560906faabe32,2025-10-05T17:01:00+00:00,New York Jets,Dallas Cowboys,2.5,47.5,away,over,away,over
+2025,5,bc4f9a719baf61261befad75f4bdb539,2025-10-05T17:01:00+00:00,Philadelphia Eagles,Denver Broncos,-3.5,43.5,away,under,away,over
+2025,5,1e3d3526039030b96471845ade5992cf,2025-10-05T17:01:00+00:00,Indianapolis Colts,Las Vegas Raiders,-7.0,48.0,home,under,away,over
+2025,5,1fe136913ef0e77717c0f0668163637f,2025-10-05T17:01:00+00:00,New Orleans Saints,New York Giants,-2.0,42.0,home,over,home,over
+2025,5,8fa3fd86eaa7b432469d43b84904e1dc,2025-10-05T20:06:00+00:00,Arizona Cardinals,Tennessee Titans,-7.5,42.5,away,under,home,under
+2025,5,6f5a22a3ca33478094cef1e9212ba0fc,2025-10-05T20:06:00+00:00,Seattle Seahawks,Tampa Bay Buccaneers,-3.5,44.5,away,under,away,over
+2025,5,e9de9c4390a28a90f437760050b23531,2025-10-05T20:26:00+00:00,Cincinnati Bengals,Detroit Lions,10.5,49.5,away,over,away,over
+2025,5,79c4e9f40e2647dc2a7b377cf61c48cd,2025-10-05T20:26:00+00:00,Los Angeles Chargers,Washington Commanders,-2.5,48.0,home,under,away,over
+2025,5,ba826e757d625a676452b8d3d6971bb0,2025-10-06T00:21:00+00:00,Buffalo Bills,New England Patriots,-8.0,49.0,away,over,away,over
+2025,5,1910db6879dddf37e4f86f0bcf1c9547,2025-10-07T00:16:00+00:00,Jacksonville Jaguars,Kansas City Chiefs,3.5,46.5,away,under,home,over
+2025,6,e10fe83ee6178a598e7fa84ea0913366,2025-10-10T00:15:00+00:00,New York Giants,Philadelphia Eagles,7.5,41.5,home,under,home,over
+2025,6,e34812ee7fbf13bd75e4298bccfbdd10,2025-10-12T12:31:00+00:00,New York Jets,Denver Broncos,7.0,43.5,away,under,away,under
+2025,6,e5dd1fed586cfc0ec2d7c06f2a02c37a,2025-10-12T17:00:00+00:00,Jacksonville Jaguars,Seattle Seahawks,-1.5,46.5,away,over,away,over
+2025,6,dfa87b0532de1389297103c2e3195347,2025-10-12T17:01:00+00:00,Indianapolis Colts,Arizona Cardinals,-6.5,47.5,home,over,home,over
+2025,6,b235bc78609644cb28492cc1d6ad69fd,2025-10-12T17:01:00+00:00,Baltimore Ravens,Los Angeles Rams,7.5,45.0,away,under,home,under
+2025,6,dd3a14fa1529e79bd338a7bfd71d5b3a,2025-10-12T17:01:00+00:00,Carolina Panthers,Dallas Cowboys,3.5,49.5,away,over,away,over
+2025,6,a11bbccb332241029ebaeb519b93b776,2025-10-12T17:01:00+00:00,Pittsburgh Steelers,Cleveland Browns,-5.0,38.0,away,under,away,over
+2025,6,a7211a87bbd5fb2ee473eb9c93ee2e68,2025-10-12T17:01:00+00:00,Miami Dolphins,Los Angeles Chargers,4.0,43.5,home,over,home,over
+2025,6,4963bff460a5f26cab46a8e5ea6db148,2025-10-12T20:06:00+00:00,Las Vegas Raiders,Tennessee Titans,-4.5,41.5,home,under,away,over
+2025,6,f2c642e1f95555424b9a9a4f03733b42,2025-10-12T20:25:00+00:00,New Orleans Saints,New England Patriots,3.5,46.0,away,over,home,over
+2025,6,0c85b0939650e29689bb2651b33522eb,2025-10-12T20:26:00+00:00,Green Bay Packers,Cincinnati Bengals,-14.5,44.5,away,over,away,over
+2025,6,9e705d669039f2ca8364f408b7792a8a,2025-10-12T20:26:00+00:00,Tampa Bay Buccaneers,San Francisco 49ers,-3.0,47.5,home,over,home,over
+2025,6,82e432d5d8bc0b5a6cbe0c324de90de3,2025-10-13T00:20:00+00:00,Kansas City Chiefs,Detroit Lions,-1.0,50.5,away,over,away,over
+2025,6,33e0adf378d2856ffe5f8452e7d5512d,2025-10-13T23:15:00+00:00,Atlanta Falcons,Buffalo Bills,3.5,48.5,home,over,home,under
+2025,6,38366aa83a3eb6cef71a1134c4fceb2c,2025-10-14T00:16:00+00:00,Washington Commanders,Chicago Bears,-4.5,50.0,home,over,home,under
+2025,7,6076f9eab496770efc0ab7095b27c122,2025-10-17T00:15:00+00:00,Cincinnati Bengals,Pittsburgh Steelers,5.5,45.0,away,over,home,under
+2025,7,79de65f1b97c9145ebdcb019eb486500,2025-10-19T13:30:00+00:00,Jacksonville Jaguars,Los Angeles Rams,3.0,44.5,home,under,home,over
+2025,7,ba4e8bfa1f4eeaa74c7b09f409361c0d,2025-10-19T17:00:00+00:00,New York Jets,Carolina Panthers,1.0,42.0,home,under,away,under
+2025,7,8f06a4b503cc7309cb0df4a8b67f9930,2025-10-19T17:00:00+00:00,Chicago Bears,New Orleans Saints,-5.0,46.5,away,over,away,over
+2025,7,f0336c9a3749716250afba387d157377,2025-10-19T17:00:00+00:00,Cleveland Browns,Miami Dolphins,-2.5,37.5,home,under,away,over
+2025,7,3127c0dd6ed51a44354af51791bc3e5a,2025-10-19T17:00:00+00:00,Kansas City Chiefs,Las Vegas Raiders,-12.0,45.5,away,over,home,over
+2025,7,6a8d2daf7f75100d02656bc0217737e8,2025-10-19T17:00:00+00:00,Minnesota Vikings,Philadelphia Eagles,1.5,44.0,away,over,home,over
+2025,7,f7fa9341eeffb08f7e6e769398cd32e2,2025-10-19T17:00:00+00:00,Tennessee Titans,New England Patriots,7.0,42.5,away,under,away,over
+2025,7,3be866344dfa050e602a6e69170b3cbe,2025-10-19T20:05:00+00:00,Denver Broncos,New York Giants,-7.0,40.5,away,under,away,over
+2025,7,a0ad5501e9d1d2ee9f61d9f293374f17,2025-10-19T20:05:00+00:00,Los Angeles Chargers,Indianapolis Colts,-1.5,48.5,away,under,away,over
+2025,7,1036171316ac51350b388c99e000cfc1,2025-10-19T20:25:00+00:00,Arizona Cardinals,Green Bay Packers,6.5,45.0,away,under,home,under
+2025,7,ff0c1ce30d562926ce40fc9bbaa2b7b1,2025-10-19T20:25:00+00:00,Dallas Cowboys,Washington Commanders,1.5,55.0,home,over,home,over
+2025,7,7b2ded52498efcf97a08ef10ee99b0f3,2025-10-20T00:20:00+00:00,San Francisco 49ers,Atlanta Falcons,-2.0,47.0,away,under,away,under
+2025,7,b808059d3ccc754ace4a3d23b58e47e8,2025-10-20T23:00:00+00:00,Detroit Lions,Tampa Bay Buccaneers,-5.5,52.5,home,under,away,over
+2025,7,7ca953ab786f70b22cabbe4946d330fa,2025-10-21T02:00:00+00:00,Seattle Seahawks,Houston Texans,-3.0,41.0,home,over,home,over
+2025,8,6439b16f4a038f1c351dc3f1aef27471,2025-10-24T00:15:00+00:00,Los Angeles Chargers,Minnesota Vikings,-3.0,44.5,away,over,away,under
+2025,8,ac02b1b59aa0623845378a02bc530c68,2025-10-26T17:00:00+00:00,Atlanta Falcons,Miami Dolphins,-7.5,44.5,home,under,away,over
+2025,8,a061e80d1f50eab193b34d19f8e59f62,2025-10-26T17:00:00+00:00,Baltimore Ravens,Chicago Bears,-6.5,49.0,away,under,home,over
+2025,8,53d4369464c66630f03a5d128cd39b08,2025-10-26T17:00:00+00:00,Carolina Panthers,Buffalo Bills,7.0,46.5,home,under,away,over
+2025,8,9c1f73e48ca9750f6e7d5d64874057c2,2025-10-26T17:00:00+00:00,Cincinnati Bengals,New York Jets,-6.5,44.5,home,over,home,under
+2025,8,3536a3e857050d2dd6e2019ceb668f67,2025-10-26T17:00:00+00:00,New England Patriots,Cleveland Browns,-7.0,40.5,away,under,home,over
+2025,8,abc4104a9ac597ce37d703613256fd6c,2025-10-26T17:00:00+00:00,Houston Texans,San Francisco 49ers,-1.5,41.5,away,over,away,over
+2025,8,a8ebe01e05675c109b53a97f653f8653,2025-10-26T17:00:00+00:00,Philadelphia Eagles,New York Giants,-7.5,44.0,home,over,away,over
+2025,8,a8dd9bb0681692540d067bd0e9e66989,2025-10-26T20:05:00+00:00,New Orleans Saints,Tampa Bay Buccaneers,4.0,47.0,away,over,home,over
+2025,8,40c2ebd9ddd5ce8ff5b1ada730bb1785,2025-10-26T20:25:00+00:00,Denver Broncos,Dallas Cowboys,-3.5,51.0,away,over,away,under
+2025,8,88187a33b007c088d75c6cd14c83086c,2025-10-26T20:25:00+00:00,Indianapolis Colts,Tennessee Titans,-14.5,47.5,home,under,home,over
+2025,8,fb900eef07307ebf5c1930341ecd852a,2025-10-27T00:20:00+00:00,Pittsburgh Steelers,Green Bay Packers,3.0,45.5,away,under,home,over
+2025,8,7e3361e84d5223a8d210a887b249f247,2025-10-28T00:15:00+00:00,Kansas City Chiefs,Washington Commanders,-12.5,48.0,away,under,away,under
+2025,9,677dbbb6ad96fc5f5b36bb20b43139dd,2025-10-31T00:15:00+00:00,Miami Dolphins,Baltimore Ravens,7.5,51.0,away,under,home,under
+2025,9,6dd3b8a705ed0db85d59fa19b9062cc8,2025-11-02T18:00:00+00:00,New England Patriots,Atlanta Falcons,-5.5,45.0,home,over,away,over
+2025,9,6031b513e188fc19a2311499566c9258,2025-11-02T18:00:00+00:00,Green Bay Packers,Carolina Panthers,-13.0,44.0,away,under,away,under
+2025,9,016f76d8237e8d4eb62b9c2ef68381bb,2025-11-02T18:00:00+00:00,Cincinnati Bengals,Chicago Bears,3.0,51.5,home,over,home,over
+2025,9,72e2ce6652bbb3901f60b38bec05bf5f,2025-11-02T18:00:00+00:00,Houston Texans,Denver Broncos,-1.5,39.5,away,under,home,over
+2025,9,cf95657d78ab3e515203df1d19c3b0c2,2025-11-02T18:00:00+00:00,Detroit Lions,Minnesota Vikings,-8.5,48.5,home,under,home,over
+2025,9,2340a6e0794d5688996dcf8aaf634742,2025-11-02T18:00:00+00:00,Pittsburgh Steelers,Indianapolis Colts,3.0,50.5,away,over,away,over
+2025,9,b60025aea576e2e89ef7bc7303f847ec,2025-11-02T18:00:00+00:00,Tennessee Titans,Los Angeles Chargers,9.5,43.5,away,under,home,under
+2025,9,a788e7cebff4b5fe10034710090e4529,2025-11-02T18:00:00+00:00,New York Giants,San Francisco 49ers,2.5,48.5,away,under,away,under
+2025,9,d0bf341e7959d69b55f1a8ff09065234,2025-11-02T21:05:00+00:00,Las Vegas Raiders,Jacksonville Jaguars,3.0,44.5,home,over,home,under
+2025,9,b08df670a95f1809707b335dc75081c6,2025-11-02T21:05:00+00:00,Los Angeles Rams,New Orleans Saints,-14.0,44.0,away,over,home,over
+2025,9,61531628516decd1ee8116da5f6f9056,2025-11-02T21:25:00+00:00,Buffalo Bills,Kansas City Chiefs,2.0,52.5,away,under,away,over
+2025,9,c2fd8a23091a954fb21ff6d3537db826,2025-11-03T01:20:00+00:00,Washington Commanders,Seattle Seahawks,3.0,48.0,away,over,away,under
+2025,9,f3dfb574e0a542375a480534525ee6cf,2025-11-04T01:15:00+00:00,Dallas Cowboys,Arizona Cardinals,-2.5,53.5,home,over,home,over
+2025,10,13bdffda97e8fb13179fe3f2f69d66f8,2025-11-07T01:15:00+00:00,Denver Broncos,Las Vegas Raiders,-9.0,43.0,away,under,away,over
+2025,10,42473c1ddf8f424069ff3f264dd8dca4,2025-11-09T14:30:00+00:00,Indianapolis Colts,Atlanta Falcons,-6.5,48.25,home,over,away,over
+2025,10,9900b89c4776c5b47dd26ca4c755edf9,2025-11-09T18:00:00+00:00,Minnesota Vikings,Baltimore Ravens,4.0,49.0,away,under,away,over
+2025,10,3c10bc18680995136017c3bfd3152334,2025-11-09T18:00:00+00:00,Miami Dolphins,Buffalo Bills,9.5,50.0,home,under,home,over
+2025,10,21f47a328fb2ab65c01360a7a2bd9571,2025-11-09T18:00:00+00:00,Carolina Panthers,New Orleans Saints,-5.5,39.5,home,under,home,over
+2025,10,3b1a97366685a96e6e1940ae56cc4d31,2025-11-09T18:00:00+00:00,Chicago Bears,New York Giants,-4.5,46.5,home,over,away,over
+2025,10,844b89333f293f055f8e0c147fb9fec5,2025-11-09T18:00:00+00:00,New York Jets,Cleveland Browns,2.0,37.5,away,under,home,under
+2025,10,9dbf94f23521c7cae7fd89b2d33fc3bd,2025-11-09T18:00:00+00:00,Houston Texans,Jacksonville Jaguars,1.0,37.5,away,under,away,over
+2025,10,39e7c1f6e36d5bc4d2613ebf7bb83c10,2025-11-09T18:00:00+00:00,Tampa Bay Buccaneers,New England Patriots,-2.5,48.0,home,over,home,over
+2025,10,740b843794cc89176c4ffe38b66d30d9,2025-11-09T21:05:00+00:00,Seattle Seahawks,Arizona Cardinals,-6.5,45.0,home,over,home,over
+2025,10,93365f943b3aa23705bc9e1c7b47d7f8,2025-11-09T21:25:00+00:00,Washington Commanders,Detroit Lions,8.0,49.0,away,over,away,under
+2025,10,2710103fe4fb0170ae03b4e34bde8132,2025-11-09T21:25:00+00:00,San Francisco 49ers,Los Angeles Rams,4.5,49.5,away,under,home,under
+2025,10,349d53a4f89591312ea528e81b786474,2025-11-10T01:20:00+00:00,Los Angeles Chargers,Pittsburgh Steelers,-3.0,45.0,away,under,home,under
+2025,10,438868ff90501a1fe9a0fbecbee9dc12,2025-11-11T01:15:00+00:00,Green Bay Packers,Philadelphia Eagles,-2.25,45.0,away,over,away,over
+2025,11,32ec2bd4ac9e4c40f9f5cbed7e67f837,2025-11-14T01:15:00+00:00,New England Patriots,New York Jets,-13.0,43.0,away,under,home,under
+2025,11,265f0188945bb81ec64751571eb724cb,2025-11-16T14:30:00+00:00,Miami Dolphins,Washington Commanders,-2.5,47.5,home,over,home,under
+2025,11,0ae85bbc3711ad0cb94475a40e2364f0,2025-11-16T18:00:00+00:00,Atlanta Falcons,Carolina Panthers,-3.5,42.5,home,over,away,over
+2025,11,96377d2fb55e3cef733cecccdecaed5f,2025-11-16T18:00:00+00:00,Buffalo Bills,Tampa Bay Buccaneers,-5.5,47.5,away,under,away,over
+2025,11,229a5e9ce60dcb344a8cc3c97121154e,2025-11-16T18:00:00+00:00,Minnesota Vikings,Chicago Bears,-3.0,48.5,home,over,home,over
+2025,11,7147476b5d96c0ee874b838de3910ee3,2025-11-16T18:00:00+00:00,Pittsburgh Steelers,Cincinnati Bengals,-5.5,49.0,away,over,away,over
+2025,11,5c06e82838fcfade9adf1e89b8bd3081,2025-11-16T18:00:00+00:00,New York Giants,Green Bay Packers,7.0,42.5,home,under,home,over
+2025,11,fd2f29289d6437a7c07d4780c5f04936,2025-11-16T18:00:00+00:00,Tennessee Titans,Houston Texans,6.0,37.0,away,over,home,over
+2025,11,591fd7cff37201a14cbdfbd457592445,2025-11-16T18:00:00+00:00,Jacksonville Jaguars,Los Angeles Chargers,3.0,43.5,away,under,away,under
+2025,11,91630b9c62640117918fa30d2a62d2db,2025-11-16T21:05:00+00:00,Arizona Cardinals,San Francisco 49ers,3.0,48.5,away,under,away,under
+2025,11,e926e654cedeb65fcfcc389a5158ef4e,2025-11-16T21:05:00+00:00,Los Angeles Rams,Seattle Seahawks,-3.0,48.5,away,over,home,over
+2025,11,cc60225b5a907bd9ba7c27c23131fc5c,2025-11-16T21:25:00+00:00,Cleveland Browns,Baltimore Ravens,7.5,39.0,home,over,home,over
+2025,11,96ce7785b0980b03282c7e10d4c58d4a,2025-11-16T21:25:00+00:00,Denver Broncos,Kansas City Chiefs,4.0,45.0,away,over,home,under
+2025,11,6d209e0e637f3b116ec958e0634f2a02,2025-11-17T01:20:00+00:00,Philadelphia Eagles,Detroit Lions,-2.5,46.5,away,over,away,over
+2025,11,80d04ba917883a6438580ebae9fb0f22,2025-11-18T01:15:00+00:00,Las Vegas Raiders,Dallas Cowboys,3.5,50.0,away,over,home,over
+2025,12,cd2e0964817c30ad3f5144ea49b55f2b,2025-11-21T01:15:00+00:00,Houston Texans,Buffalo Bills,5.5,44.5,away,over,home,over
+2025,12,7159d60c7a31c7d593167637723d7663,2025-11-23T18:00:00+00:00,Baltimore Ravens,New York Jets,-13.5,44.5,away,over,away,over
+2025,12,c8913b70b63ae247f23a4e1dec08c668,2025-11-23T18:00:00+00:00,Chicago Bears,Pittsburgh Steelers,-2.5,45.5,home,over,home,over
+2025,12,1a8f3d70399a5cad83c95196795ed77b,2025-11-23T18:00:00+00:00,Cincinnati Bengals,New England Patriots,6.0,51.5,away,over,home,over
+2025,12,535bbe97d4e56494b039ade88459c338,2025-11-23T18:00:00+00:00,Detroit Lions,New York Giants,-10.5,50.0,away,under,away,over
+2025,12,91019a528f43cd28965fdc68a3f3ef85,2025-11-23T18:00:00+00:00,Green Bay Packers,Minnesota Vikings,-6.5,41.5,away,under,home,over
+2025,12,8b39d8dc550ced94f9faa91878ebf6b6,2025-11-23T18:00:00+00:00,Kansas City Chiefs,Indianapolis Colts,-3.5,50.0,away,over,away,under
+2025,12,0ff4e68cf39cc57ca7cf1276e4a44d2f,2025-11-23T18:00:00+00:00,Tennessee Titans,Seattle Seahawks,13.0,40.0,away,over,away,over
+2025,12,e32e0030899c06fdf2c74745ca27d85a,2025-11-23T21:05:00+00:00,Arizona Cardinals,Jacksonville Jaguars,3.0,47.5,away,over,away,under
+2025,12,27f50ddbc4c3fbad10398c5187a28dc7,2025-11-23T21:05:00+00:00,Las Vegas Raiders,Cleveland Browns,-4.0,36.0,home,under,away,over
+2025,12,8c2d6a56aa63f42227f18a18fc3d2146,2025-11-23T21:25:00+00:00,New Orleans Saints,Atlanta Falcons,-2.0,40.5,away,under,home,over
+2025,12,4553ba763cb3cfcfc33fd62672a2057f,2025-11-23T21:25:00+00:00,Dallas Cowboys,Philadelphia Eagles,3.0,47.5,away,under,home,over
+2025,12,9e7119f5a24471c39145663b84f100b2,2025-11-24T01:20:00+00:00,Los Angeles Rams,Tampa Bay Buccaneers,-6.5,49.5,away,over,home,under
+2025,12,90391be251d876bb41d36978a43c7ac2,2025-11-25T01:15:00+00:00,San Francisco 49ers,Carolina Panthers,-7.0,49.5,away,under,away,over
+2025,13,fe2eb07797580740af78037ab498198e,2025-11-27T18:00:00+00:00,Detroit Lions,Green Bay Packers,-3.0,48.0,away,under,home,over
+2025,13,de53b8a594fe830c5fd56484705cd756,2025-11-27T21:30:00+00:00,Dallas Cowboys,Kansas City Chiefs,3.5,52.5,home,under,home,over
+2025,13,883a79a306b312fad75ebf04b441b4da,2025-11-28T01:20:00+00:00,Baltimore Ravens,Cincinnati Bengals,-7.5,51.5,away,under,away,over
+2025,13,52f539d9d080618aa8830a0b03846a80,2025-11-28T20:00:00+00:00,Philadelphia Eagles,Chicago Bears,-7.0,44.0,away,over,away,over
+2025,13,c0d324e29ce58b36bdc77564f7aae56f,2025-11-30T18:00:00+00:00,Tampa Bay Buccaneers,Arizona Cardinals,-2.5,43.5,away,under,home,over
+2025,13,9da608f5bdae527b280abd61e47a110b,2025-11-30T18:00:00+00:00,New York Jets,Atlanta Falcons,2.5,39.5,away,over,home,over
+2025,13,67e51d17848485bed8737bd7043a275a,2025-11-30T18:00:00+00:00,Carolina Panthers,Los Angeles Rams,10.5,44.5,away,over,away,over
+2025,13,36fcf5ca155a5dcd2f7a87fd2a985b02,2025-11-30T18:00:00+00:00,Cleveland Browns,San Francisco 49ers,5.0,36.0,home,over,home,over
+2025,13,fa46c661007f5f0cbbf6abf939ac9d51,2025-11-30T18:00:00+00:00,Indianapolis Colts,Houston Texans,-4.0,44.5,home,over,home,under
+2025,13,61e1e459b2ddafd43e8808d4f40c01d9,2025-11-30T18:00:00+00:00,Tennessee Titans,Jacksonville Jaguars,6.5,41.5,away,over,home,over
+2025,13,e3c9bfba57bbe784481d881ea3b4519d,2025-11-30T18:00:00+00:00,Miami Dolphins,New Orleans Saints,-5.5,41.5,home,over,home,over
+2025,13,6f956074c4df48e7b07a3286a6c6ed2a,2025-11-30T21:05:00+00:00,Seattle Seahawks,Minnesota Vikings,-11.5,41.0,home,over,home,under
+2025,13,365a766a3862bc47a5455dc3b097421e,2025-11-30T21:25:00+00:00,Pittsburgh Steelers,Buffalo Bills,3.5,45.5,away,over,home,under
+2025,13,76ac5a8d2c8679ae6ea8861114791bd8,2025-11-30T21:25:00+00:00,Los Angeles Chargers,Las Vegas Raiders,-9.5,40.5,home,under,away,over
+2025,13,9c040de8f1dfc3ddee20e0d65c9402de,2025-12-01T01:20:00+00:00,Washington Commanders,Denver Broncos,5.5,43.5,away,under,home,over
+2025,13,3e65786eddd4c7aee9e7f2504f6fdedc,2025-12-02T01:15:00+00:00,New England Patriots,New York Giants,-7.5,46.0,away,over,away,over
+2025,14,81db991c5b34169eeeff8d734d8836d9,2025-12-05T01:15:00+00:00,Detroit Lions,Dallas Cowboys,-3.0,54.5,away,over,away,over
+2025,14,f0bdd27bbed46dfc3d0657500c95a96c,2025-12-07T18:00:00+00:00,Atlanta Falcons,Seattle Seahawks,7.0,44.5,home,over,home,over
+2025,14,4fead7bd0592ec121cc3baf72e3e21e0,2025-12-07T18:00:00+00:00,Baltimore Ravens,Pittsburgh Steelers,-6.0,42.5,away,under,home,under
+2025,14,c67c327076a98a3a1c4a5eb32e5a80c2,2025-12-07T18:00:00+00:00,Buffalo Bills,Cincinnati Bengals,-5.5,53.5,home,over,away,over
+2025,14,f95be6b9bd8ce1208f766cbaae8a4822,2025-12-07T18:00:00+00:00,Cleveland Browns,Tennessee Titans,-4.0,34.0,home,under,home,over
+2025,14,4e289ac7d9b5663fd5a06881f2b1424d,2025-12-07T18:00:00+00:00,Jacksonville Jaguars,Indianapolis Colts,1.5,47.5,home,under,home,under
+2025,14,c86a0783216d21040c87fce3aadd3336,2025-12-07T18:00:00+00:00,New York Jets,Miami Dolphins,3.0,41.5,away,over,away,over
+2025,14,58b16c4033587f5662ff365bce2dbb92,2025-12-07T18:00:00+00:00,Minnesota Vikings,Washington Commanders,-2.0,42.0,away,under,away,over
+2025,14,15555b4c7283dc6553e011dd6c8aea8d,2025-12-07T18:00:00+00:00,Tampa Bay Buccaneers,New Orleans Saints,-8.5,42.5,home,over,away,over
+2025,14,d5fd126cbfea2ccd79962a17f0ef4463,2025-12-07T21:05:00+00:00,Las Vegas Raiders,Denver Broncos,7.5,40.5,home,under,home,over
+2025,14,12bbffdcd65d53436b56c68a811ca610,2025-12-07T21:25:00+00:00,Arizona Cardinals,Los Angeles Rams,8.0,47.5,away,over,home,under
+2025,14,5b1211b476d0afa2b57133c9603583b6,2025-12-07T21:25:00+00:00,Green Bay Packers,Chicago Bears,-6.5,44.5,away,over,away,over
+2025,14,4727a6cfcd3d604dbfcb898c5a4d40a6,2025-12-08T01:20:00+00:00,Kansas City Chiefs,Houston Texans,-3.0,42.0,away,under,away,over
+2025,14,5d7b12c34454df4ff2c59a15ca58e63f,2025-12-09T01:15:00+00:00,Los Angeles Chargers,Philadelphia Eagles,3.0,40.5,away,under,home,over
+2025,15,08bfd9cd8115339250817cc66a8b3cba,2025-12-12T01:15:00+00:00,Tampa Bay Buccaneers,Atlanta Falcons,-4.5,44.0,home,under,home,over
+2025,15,a360e4c43576d22057ff90d818928066,2025-12-14T18:00:00+00:00,Houston Texans,Arizona Cardinals,-10.0,42.5,away,under,away,under
+2025,15,1aa1fb046f11dadb32dad77d5baf552e,2025-12-14T18:00:00+00:00,Cincinnati Bengals,Baltimore Ravens,2.5,51.5,home,over,home,over
+2025,15,c127c7a2426ec655e18ca9c394068f6c,2025-12-14T18:00:00+00:00,New England Patriots,Buffalo Bills,1.0,49.5,away,over,home,under
+2025,15,8261541e6b9b32537bd0821ef2c0a05d,2025-12-14T18:00:00+00:00,Chicago Bears,Cleveland Browns,-7.5,39.0,away,over,away,over
+2025,15,0f0601c020a478f5d9f81f06a141c2c8,2025-12-14T18:00:00+00:00,Jacksonville Jaguars,New York Jets,-13.5,41.5,home,under,away,over
+2025,15,cd5151f8a1e7fcba4901929e77b94acd,2025-12-14T18:00:00+00:00,Kansas City Chiefs,Los Angeles Chargers,-5.5,41.5,away,under,home,over
+2025,15,813dab51d999b87c7968ac4890965f73,2025-12-14T18:00:00+00:00,Philadelphia Eagles,Las Vegas Raiders,-11.5,38.0,away,over,away,over
+2025,15,3aba4bb1fe41ecd45f934116fcc90c3f,2025-12-14T18:00:00+00:00,New York Giants,Washington Commanders,-2.5,47.0,home,over,home,under
+2025,15,f3fd2782d4d03bd12a177fbbad17005b,2025-12-14T21:25:00+00:00,New Orleans Saints,Carolina Panthers,2.5,40.5,away,over,away,over
+2025,15,2ec8a387d0c337aeffac3f956c292e87,2025-12-14T21:25:00+00:00,Denver Broncos,Green Bay Packers,2.5,42.5,away,over,home,over
+2025,15,bd299b70476643cff05f2be58e12301a,2025-12-14T21:25:00+00:00,Los Angeles Rams,Detroit Lions,-6.0,55.0,away,over,home,under
+2025,15,f7343baf47dcf23e672799d00788173d,2025-12-14T21:25:00+00:00,Seattle Seahawks,Indianapolis Colts,-14.0,42.5,home,over,away,over
+2025,15,7ba03312d1012d9872de9999e496558f,2025-12-14T21:25:00+00:00,San Francisco 49ers,Tennessee Titans,-13.0,44.5,home,under,away,under
+2025,15,3c74ebd1d005a7346c182daf6f7279dd,2025-12-15T01:20:00+00:00,Dallas Cowboys,Minnesota Vikings,-5.5,47.5,home,over,home,over
+2025,15,ba5d065a7e9ea9afe54642036f2ec83a,2025-12-16T01:15:00+00:00,Pittsburgh Steelers,Miami Dolphins,-3.5,41.5,home,under,away,over
+2025,16,ac7881cc5a498c5b72680498d3fa8f6e,2025-12-19T01:15:00+00:00,Seattle Seahawks,Los Angeles Rams,0.0,43.0,away,over,home,over
+2025,16,18fe4528a0bc43d9cd64bd09c0d5019f,2025-12-20T22:00:00+00:00,Washington Commanders,Philadelphia Eagles,6.5,44.5,away,under,home,over
+2025,16,9f70d98bc6918dc8e21f329405b649fe,2025-12-21T01:20:00+00:00,Chicago Bears,Green Bay Packers,1.0,46.5,home,over,home,over
+2025,16,2557976e0e66ab698539b543de125469,2025-12-21T18:00:00+00:00,Cleveland Browns,Buffalo Bills,10.0,42.0,home,under,home,under
+2025,16,d056f31082bdea4d018a26ba274b8430,2025-12-21T18:00:00+00:00,Carolina Panthers,Tampa Bay Buccaneers,3.0,45.5,home,over,home,over
+2025,16,945286798abb5081432aef109df29778,2025-12-21T18:00:00+00:00,Miami Dolphins,Cincinnati Bengals,4.0,47.5,home,under,away,under
+2025,16,aa9d0cf732b6adde4ad3ec04ca79825c,2025-12-21T18:00:00+00:00,Dallas Cowboys,Los Angeles Chargers,-2.0,49.5,away,under,home,over
+2025,16,0cce34b9a49c4c6bdc1e65449e37a0f9,2025-12-21T18:00:00+00:00,Tennessee Titans,Kansas City Chiefs,3.5,37.5,home,under,home,over
+2025,16,3db6ba91d2a72ada8843d5a0517bff27,2025-12-21T18:00:00+00:00,New York Giants,Minnesota Vikings,3.0,43.5,away,under,home,over
+2025,16,aa5b25e85d1ad6540d7a5ae04b73ddfd,2025-12-21T18:00:00+00:00,New Orleans Saints,New York Jets,-4.5,40.5,home,over,home,over
+2025,16,7d71a0d3cc2a04eb35f1a725104217b5,2025-12-21T21:05:00+00:00,Arizona Cardinals,Atlanta Falcons,2.5,48.0,home,over,away,under
+2025,16,93c002f0a42d1b57f3bbabdcfe24ab97,2025-12-21T21:05:00+00:00,Denver Broncos,Jacksonville Jaguars,-3.0,46.5,away,under,away,over
+2025,16,a03f89d3aaadf737deb09be24986d5bf,2025-12-21T21:25:00+00:00,Detroit Lions,Pittsburgh Steelers,-7.0,52.0,away,under,home,under
+2025,16,47a54fb60f7b79179bc80e18a7c5de81,2025-12-21T21:25:00+00:00,Houston Texans,Las Vegas Raiders,-14.0,38.0,home,under,away,over
+2025,16,a0476b027679a1670f21e8b75a860ab9,2025-12-22T01:20:00+00:00,Baltimore Ravens,New England Patriots,-3.0,48.0,away,over,away,over
+2025,16,2dd4521ee298fa2c6f0ab009c182aae9,2025-12-23T01:15:00+00:00,Indianapolis Colts,San Francisco 49ers,6.0,46.5,home,over,home,under
+2025,17,de07002921b9b2b2e1ee2928e4270a3c,2025-12-25T18:00:00+00:00,Washington Commanders,Dallas Cowboys,7.0,51.0,home,over,home,over
+2025,17,29da148b927afea00a7774b2a8ee68e7,2025-12-25T21:30:00+00:00,Minnesota Vikings,Detroit Lions,7.5,43.5,home,over,away,over
+2025,17,29164a99a917051c6e1778270033d362,2025-12-26T01:15:00+00:00,Kansas City Chiefs,Denver Broncos,13.5,36.5,away,under,home,over
+2025,17,832c36c4b6d5132e88cf11391797c194,2025-12-27T21:30:00+00:00,Los Angeles Chargers,Houston Texans,-2.0,39.5,away,over,away,over
+2025,17,85bead6a72a1952cdd737dcecb55446b,2025-12-28T01:00:00+00:00,Green Bay Packers,Baltimore Ravens,-3.0,40.5,home,over,away,over
+2025,17,7aeff5d5bb88b218c7d72f267a90eb7f,2025-12-28T18:00:00+00:00,Cincinnati Bengals,Arizona Cardinals,-7.0,53.5,home,over,away,under
+2025,17,8e7a26b4026e4eca7394cc523fa10a64,2025-12-28T18:00:00+00:00,Carolina Panthers,Seattle Seahawks,7.0,42.5,away,over,home,over
+2025,17,e6721ef0adb705a8abcbedc2ef6dfb3a,2025-12-28T18:00:00+00:00,Cleveland Browns,Pittsburgh Steelers,3.0,33.5,away,over,home,over
+2025,17,f960b282ac197513c9d80bd28baa7e38,2025-12-28T18:00:00+00:00,Indianapolis Colts,Jacksonville Jaguars,6.5,48.5,away,over,home,under
+2025,17,374166780155b8c14e867face95885ee,2025-12-28T18:00:00+00:00,Miami Dolphins,Tampa Bay Buccaneers,5.5,45.5,away,under,away,over
+2025,17,95bdb9f5b22f0491bfba1381637c5009,2025-12-28T18:00:00+00:00,New York Jets,New England Patriots,13.5,42.75,away,over,away,over
+2025,17,d75c88e4fb7650ab0577264980bdf98f,2025-12-28T18:00:00+00:00,Tennessee Titans,New Orleans Saints,2.5,39.5,away,over,away,over
+2025,17,dd4aec72c5175cb8cea67d5edc7b1990,2025-12-28T21:05:00+00:00,Las Vegas Raiders,New York Giants,-1.5,41.75,away,under,away,over
+2025,17,596df6f5735277fee0cd78e61cd71060,2025-12-28T21:25:00+00:00,Buffalo Bills,Philadelphia Eagles,-1.5,43.5,home,under,away,over
+2025,17,b0dedebd28a82f8f38398033356e9015,2025-12-29T01:20:00+00:00,San Francisco 49ers,Chicago Bears,-3.0,52.5,away,under,away,over
+2025,17,ea5fe5f603483c8d46f83081cf780397,2025-12-30T01:15:00+00:00,Atlanta Falcons,Los Angeles Rams,8.0,49.5,away,over,home,over
+2026,2,4fd1173e2f647cbbebf6713d39693089,2026-01-03T21:30:00+00:00,Tampa Bay Buccaneers,Carolina Panthers,-2.5,43.5,away,over,away,over
+2026,2,c624c615075899bb7be6a39e5eea3b2b,2026-01-04T01:00:00+00:00,San Francisco 49ers,Seattle Seahawks,1.5,48.0,home,under,away,over
+2026,2,7906052ca20e6daddf755c7fe3932887,2026-01-04T18:00:00+00:00,Atlanta Falcons,New Orleans Saints,-3.0,45.0,away,over,away,over
+2026,2,dad5ec44b4df2b91138872aeb4454e1e,2026-01-04T18:00:00+00:00,Cincinnati Bengals,Cleveland Browns,-7.5,44.75,away,under,home,over
+2026,2,d48a44e7b45f563282fd042c2104da9b,2026-01-04T18:00:00+00:00,New York Giants,Dallas Cowboys,3.5,51.25,away,over,home,under
+2026,2,41fc7f3165cc9dfdb47c25a9decd7c9b,2026-01-04T18:00:00+00:00,Minnesota Vikings,Green Bay Packers,-7.0,35.5,away,over,home,over
+2026,2,26b8cf55eeac1bb05b585132f7dcc0e3,2026-01-04T18:00:00+00:00,Houston Texans,Indianapolis Colts,-10.5,39.0,home,over,away,over
+2026,2,623e9172767ca231241e2313bbee095e,2026-01-04T18:00:00+00:00,Jacksonville Jaguars,Tennessee Titans,-12.5,47.5,away,under,away,under
+2026,2,2f4cf01e2db22ed928eb8f0357a74007,2026-01-04T21:25:00+00:00,Los Angeles Rams,Arizona Cardinals,-7.0,46.25,away,over,away,over
+2026,2,bd5134e8440a2b12cc8ac98ab4f18093,2026-01-04T21:25:00+00:00,Buffalo Bills,New York Jets,-7.0,38.0,home,over,home,under
+2026,2,1a5451b8f0d74f90937c52bec447dc40,2026-01-04T21:25:00+00:00,Chicago Bears,Detroit Lions,-3.0,50.5,home,over,away,over
+2026,2,30621f6a1072712bee795c15eafe9768,2026-01-04T21:25:00+00:00,Denver Broncos,Los Angeles Chargers,-12.5,37.5,away,under,home,over
+2026,2,de4ae000f7f94eecf9d827eabff2991b,2026-01-04T21:25:00+00:00,Las Vegas Raiders,Kansas City Chiefs,5.5,36.75,home,under,home,over
+2026,2,d242576b25f56b3f598044c9abfb4df0,2026-01-04T21:25:00+00:00,New England Patriots,Miami Dolphins,-10.5,45.5,away,over,home,over
+2026,2,b6eb23d78a4e1b3bf9946be7cfac0e6b,2026-01-04T21:25:00+00:00,Philadelphia Eagles,Washington Commanders,-4.0,39.0,home,over,home,over
+2026,2,f609b38fe2bf0687644ad8603e28220b,2026-01-05T01:20:00+00:00,Pittsburgh Steelers,Baltimore Ravens,3.5,40.75,away,over,home,over

@@ -1,0 +1,16 @@
+season,week,game_id,commence_time_utc,home_team,away_team,spread_home,total,mat_spread,mat_total,nikki_spread,nikki_total,home_score,away_score
+2025,7,6076f9eab496770efc0ab7095b27c122,2025-10-17T00:15:00+00:00,Cincinnati Bengals,Pittsburgh Steelers,5.5,45.0,away,over,home,under,33.0,31.0
+2025,7,79de65f1b97c9145ebdcb019eb486500,2025-10-19T13:30:00+00:00,Jacksonville Jaguars,Los Angeles Rams,3.0,44.5,home,under,home,over,7.0,35.0
+2025,7,ba4e8bfa1f4eeaa74c7b09f409361c0d,2025-10-19T17:00:00+00:00,New York Jets,Carolina Panthers,1.0,42.0,home,under,away,under,6.0,13.0
+2025,7,8f06a4b503cc7309cb0df4a8b67f9930,2025-10-19T17:00:00+00:00,Chicago Bears,New Orleans Saints,-5.0,46.5,away,over,away,over,26.0,14.0
+2025,7,f0336c9a3749716250afba387d157377,2025-10-19T17:00:00+00:00,Cleveland Browns,Miami Dolphins,-2.5,37.5,home,under,away,over,6.0,31.0
+2025,7,3127c0dd6ed51a44354af51791bc3e5a,2025-10-19T17:00:00+00:00,Kansas City Chiefs,Las Vegas Raiders,-12.0,45.5,away,over,home,over,31.0,0.0
+2025,7,6a8d2daf7f75100d02656bc0217737e8,2025-10-19T17:00:00+00:00,Minnesota Vikings,Philadelphia Eagles,1.5,44.0,away,over,home,over,22.0,28.0
+2025,7,f7fa9341eeffb08f7e6e769398cd32e2,2025-10-19T17:00:00+00:00,Tennessee Titans,New England Patriots,7.0,42.5,away,under,away,over,13.0,31.0
+2025,7,3be866344dfa050e602a6e69170b3cbe,2025-10-19T20:05:00+00:00,Denver Broncos,New York Giants,-7.0,40.5,away,under,away,over,33.0,32.0
+2025,7,a0ad5501e9d1d2ee9f61d9f293374f17,2025-10-19T20:05:00+00:00,Los Angeles Chargers,Indianapolis Colts,-1.5,48.5,away,under,away,over,,
+2025,7,1036171316ac51350b388c99e000cfc1,2025-10-19T20:25:00+00:00,Arizona Cardinals,Green Bay Packers,6.5,45.0,away,under,home,under,,
+2025,7,ff0c1ce30d562926ce40fc9bbaa2b7b1,2025-10-19T20:25:00+00:00,Dallas Cowboys,Washington Commanders,1.5,55.0,home,over,home,over,,
+2025,7,7b2ded52498efcf97a08ef10ee99b0f3,2025-10-20T00:20:00+00:00,San Francisco 49ers,Atlanta Falcons,-2.0,47.0,away,under,away,under,,
+2025,7,b808059d3ccc754ace4a3d23b58e47e8,2025-10-20T23:00:00+00:00,Detroit Lions,Tampa Bay Buccaneers,-5.5,52.5,home,under,away,over,,
+2025,7,7ca953ab786f70b22cabbe4946d330fa,2025-10-21T02:00:00+00:00,Seattle Seahawks,Houston Texans,-3.0,41.0,home,over,home,over,,
