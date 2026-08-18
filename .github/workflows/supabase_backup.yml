@@ -1,0 +1,89 @@
+name: Supabase Public Backup
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      BACKUP_DIR: docs/supabase/backup
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Create backup directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$BACKUP_DIR"
+
+      - name: Backup database schema
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          supabase db dump \
+            --db-url "$SUPABASE_DB_URL" \
+            --file "$BACKUP_DIR/schema.sql"
+
+      - name: Backup non-sensitive data
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          supabase db dump \
+            --db-url "$SUPABASE_DB_URL" \
+            --file "$BACKUP_DIR/data.sql" \
+            --data-only \
+            --use-copy \
+            --schema public \
+            --exclude public.profiles \
+            --exclude public.picks \
+            --exclude public.comments \
+            --exclude public.contact_messages
+
+      - name: Verify sensitive tables are excluded
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for table in profiles picks comments contact_messages; do
+            if grep -Eiq "COPY[[:space:]]+public\.${table}[[:space:]]*\(" "$BACKUP_DIR/data.sql"; then
+              echo "Sensitive table found in data backup: $table"
+              exit 1
+            fi
+          done
+
+          echo "Sensitive table data is not present in data.sql."
+
+      - name: Commit backup
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add "$BACKUP_DIR/schema.sql" "$BACKUP_DIR/data.sql"
+
+          if git diff --cached --quiet; then
+            echo "No backup changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Update Supabase public backup"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
