@@ -4,7 +4,7 @@ SET session_replication_role = replica;
 -- PostgreSQL database dump
 --
 
--- \restrict Fb0OccMHJ4VJtmJn3cXM0WxkviikA3h5dHbjIpsBLVKBrUTzcgwvtQGAIpxcMdv
+-- \restrict IK8l1hpRVVmAvl13KUULGrEuPQG0vXo8HxnerbMeclfefLwyK5SzloV1bYX0LiC
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.6
@@ -57,6 +57,6 @@ COPY "public"."scores" ("id", "created_at", "game_id", "away_score", "home_score
 -- PostgreSQL database dump complete
 --
 
--- \unrestrict Fb0OccMHJ4VJtmJn3cXM0WxkviikA3h5dHbjIpsBLVKBrUTzcgwvtQGAIpxcMdv
+-- \unrestrict IK8l1hpRVVmAvl13KUULGrEuPQG0vXo8HxnerbMeclfefLwyK5SzloV1bYX0LiC
 
 RESET ALL;
