@@ -6,11 +6,12 @@
    ============================================================ */
 
 const NAV_LINKS = [
-  { href: "./index.html",       label: "\u{1F3E0} Home" },
-  { href: "./account.html",     label: "\u{1F464} Account" },
-  { href: "./make_picks.html",  label: "\u{1F3C8} Picks" },
-  { href: "./leaderboard.html", label: "\u{1F3C6} Leaderboard" },
-  { href: "./insights.html",    label: "\u{1F4D0} Insights" }
+  { href: "./index.html",       label: "🏠 Home" },
+  { href: "./account.html",     label: "👤 Account" },
+  { href: "./make_picks.html",  label: "🏈 Picks" },
+  { href: "./view_picks.html",  label: "🔎 View Picks" },
+  { href: "./leaderboard.html", label: "🏆 Leaderboard" },
+  { href: "./insights.html",    label: "📐 Insights" }
 ];
 
 (() => {

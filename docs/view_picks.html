@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Picks — NFL Picks</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <header class="main-header" id="topbar">
+      <div class="titles">
+        <h1 id="pageTitle">View Picks</h1>
+        <div class="sub" id="scopeLabel">Select a user</div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="lb-controls">
+        <label for="userSelect">User</label>
+        <select id="userSelect">
+          <option value="">Select a user</option>
+        </select>
+
+        <label for="seasonSelect">Season</label>
+        <select id="seasonSelect" disabled>
+          <option value="">Season</option>
+        </select>
+
+        <label for="weekSelect">Week</label>
+        <select id="weekSelect" disabled>
+          <option value="all">All Weeks</option>
+        </select>
+      </div>
+
+      <div id="vpMessage" class="lb-message"></div>
+
+      <div id="vpTable"></div>
+    </main>
+
+    <div id="navbar"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="./supabase-client.js" defer></script>
+    <script src="./nav.js" defer></script>
+    <script src="./view_picks.js" defer></script>
+</body>
+</html>
