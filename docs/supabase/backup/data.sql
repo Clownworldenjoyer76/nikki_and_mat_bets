@@ -4,10 +4,10 @@ SET session_replication_role = replica;
 -- PostgreSQL database dump
 --
 
--- \restrict iGTdOvnSfcda3epWqyMmOHS3NfiXM5532W5JUxltzzK9T208uGOtIaNm527d3nk
+-- \restrict BCs0VzSmmIog0DI4o96vMprpAd0h3dUkogt1JeoCYorMHAqACCTaI9JeSIRcRxg
 
 -- Dumped from database version 17.6
--- Dumped by pg_dump version 17.6
+-- Dumped by pg_dump version 17.11
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -153,6 +153,6 @@ c38376ef-42f0-4c37-8345-aeccb5e84443	2026-09-29 14:31:24.219979+00	50e46151-4db7
 -- PostgreSQL database dump complete
 --
 
--- \unrestrict iGTdOvnSfcda3epWqyMmOHS3NfiXM5532W5JUxltzzK9T208uGOtIaNm527d3nk
+-- \unrestrict BCs0VzSmmIog0DI4o96vMprpAd0h3dUkogt1JeoCYorMHAqACCTaI9JeSIRcRxg
 
 RESET ALL;
