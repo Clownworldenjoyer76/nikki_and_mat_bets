@@ -4,7 +4,7 @@ SET session_replication_role = replica;
 -- PostgreSQL database dump
 --
 
--- \restrict 8B4seQ82ultmUlw4NFEMRiizrSTMLedc3KJWDqTUHZgCAqOZTGWzTKeTbuOFhHE
+-- \restrict 2IXCpMxm3jpYeWWhpxUFPnksN6lDUomKgeYmeCjLytJGiaRH3OZpPYah5kWQxty
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.12
@@ -170,25 +170,41 @@ f4951b82-6e50-4b41-bb13-df77b0567791	2026-11-03 13:25:34.117615+00	2026_11_08_Ne
 b19f3b31-99c0-4586-8383-946b31d3687f	2026-11-03 13:25:34.117615+00	2026_11_08_Seattle Seahawks_Arizona Cardinals	2026	9	regular	Arizona Cardinals	Seattle Seahawks	2026-11-08 21:25:00+00	-11.5	45.0	final	2026-11-10 10:57:30.318131+00
 68c7d61e-4d03-475b-8539-1cd3fd37cfe3	2026-11-03 13:25:34.117615+00	2026_11_08_Chicago Bears_Tampa Bay Buccaneers	2026	9	regular	Tampa Bay Buccaneers	Chicago Bears	2026-11-09 01:20:00+00	-5.0	47.0	final	2026-11-10 10:57:30.318131+00
 8bf23243-3bbe-40e8-9e85-741995452d8c	2026-11-03 13:25:34.117615+00	2026_11_09_Minnesota Vikings_Buffalo Bills	2026	9	regular	Buffalo Bills	Minnesota Vikings	2026-11-10 01:15:00+00	3.5	45.5	final	2026-11-10 10:57:30.318131+00
-8b42fe92-ed15-4138-bbf7-9c0f52300af3	2026-11-17 12:13:58.46183+00	2026_11_19_Houston Texans_Indianapolis Colts	2026	11	regular	Indianapolis Colts	Houston Texans	2026-11-20 01:15:00+00	-12.0	44.5	scheduled	2026-11-17 12:13:58.46183+00
-839dd426-76ef-4c8b-bbc6-edc4871b00ca	2026-11-17 12:13:58.46183+00	2026_11_22_Carolina Panthers_Baltimore Ravens	2026	11	regular	Baltimore Ravens	Carolina Panthers	2026-11-22 18:00:00+00	-2.5	44.0	scheduled	2026-11-17 12:13:58.46183+00
-93994b37-ab61-444c-89b0-60bfe37d3fb8	2026-11-17 12:13:58.46183+00	2026_11_22_Detroit Lions_Tampa Bay Buccaneers	2026	11	regular	Tampa Bay Buccaneers	Detroit Lions	2026-11-22 18:00:00+00	-6.0	46.5	scheduled	2026-11-17 12:13:58.46183+00
-d0efd532-5b9e-405b-965a-ff460d7e0b70	2026-11-17 12:13:58.46183+00	2026_11_22_Chicago Bears_New Orleans Saints	2026	11	regular	New Orleans Saints	Chicago Bears	2026-11-22 18:00:00+00	-11.5	49.0	scheduled	2026-11-17 12:13:58.46183+00
-90f8622d-1593-43bb-9ab5-4a2f42b02fba	2026-11-17 12:13:58.46183+00	2026_11_22_Kansas City Chiefs_Arizona Cardinals	2026	11	regular	Arizona Cardinals	Kansas City Chiefs	2026-11-22 18:00:00+00	-16.0	41.0	scheduled	2026-11-17 12:13:58.46183+00
-461d3954-1285-458d-910c-205c76805a09	2026-11-17 12:13:58.46183+00	2026_11_22_Dallas Cowboys_Tennessee Titans	2026	11	regular	Tennessee Titans	Dallas Cowboys	2026-11-22 18:00:00+00	-8.0	55.0	scheduled	2026-11-17 12:13:58.46183+00
-19931bd3-b8e8-4d47-b6da-c3d23c5e7c66	2026-11-17 12:13:58.46183+00	2026_11_22_Buffalo Bills_Miami Dolphins	2026	11	regular	Miami Dolphins	Buffalo Bills	2026-11-22 18:00:00+00	-16.5	45.5	scheduled	2026-11-17 12:13:58.46183+00
-d7f91187-8997-495b-a8e0-9e345a7bf95f	2026-11-17 12:13:58.46183+00	2026_11_22_Philadelphia Eagles_Pittsburgh Steelers	2026	11	regular	Pittsburgh Steelers	Philadelphia Eagles	2026-11-22 18:00:00+00	4.5	38.5	scheduled	2026-11-17 12:13:58.46183+00
-9bceecac-7d74-415f-9b18-0c1cf92891bf	2026-11-17 12:13:58.46183+00	2026_11_22_Los Angeles Chargers_New York Jets	2026	11	regular	New York Jets	Los Angeles Chargers	2026-11-22 21:05:00+00	-3.0	40.5	scheduled	2026-11-17 12:13:58.46183+00
-d7934462-e80a-42da-9d32-5dea00682046	2026-11-17 12:13:58.46183+00	2026_11_22_New York Giants_Jacksonville Jaguars	2026	11	regular	Jacksonville Jaguars	New York Giants	2026-11-22 21:25:00+00	6.0	46.5	scheduled	2026-11-17 12:13:58.46183+00
-dabd59ff-f6d4-46f4-865b-4b2cae0cbedc	2026-11-17 12:13:58.46183+00	2026_11_22_Denver Broncos_Las Vegas Raiders	2026	11	regular	Las Vegas Raiders	Denver Broncos	2026-11-22 21:25:00+00	-10.0	40.0	scheduled	2026-11-17 12:13:58.46183+00
-4083480f-4413-498d-b211-9e1445aced65	2026-11-17 12:13:58.46183+00	2026_11_22_San Francisco 49ers_Minnesota Vikings	2026	11	regular	Minnesota Vikings	San Francisco 49ers	2026-11-23 01:20:00+00	-3.0	46.5	scheduled	2026-11-17 12:13:58.46183+00
-c858d164-9b7e-44ed-bc0c-2ceb38d3b4ee	2026-11-17 12:13:58.46183+00	2026_11_23_Washington Commanders_Cincinnati Bengals	2026	11	regular	Cincinnati Bengals	Washington Commanders	2026-11-24 01:15:00+00	6.5	53.0	scheduled	2026-11-17 12:13:58.46183+00
 5c9d2373-55f0-43ad-91c9-3d3511a66b9f	2026-11-10 10:54:01.16913+00	2026_11_15_Green Bay Packers_Minnesota Vikings	2026	10	regular	Minnesota Vikings	Green Bay Packers	2026-11-15 18:00:00+00	-3.5	42.0	final	2026-11-17 12:14:40.603738+00
 c39174e8-b867-4841-8c4e-eceb918546b0	2026-11-10 10:54:01.16913+00	2026_11_15_Las Vegas Raiders_Seattle Seahawks	2026	10	regular	Seattle Seahawks	Las Vegas Raiders	2026-11-15 21:05:00+00	3.5	43.0	final	2026-11-17 12:14:40.603738+00
 b55df3f1-7352-47af-9224-297b82057834	2026-11-10 10:54:01.16913+00	2026_11_15_Arizona Cardinals_Los Angeles Rams	2026	10	regular	Los Angeles Rams	Arizona Cardinals	2026-11-15 21:05:00+00	9.5	39.5	final	2026-11-17 12:14:40.603738+00
 5dcc6ffe-2bd7-4b3e-9b88-f2ec9d7f9e7b	2026-11-10 10:54:01.16913+00	2026_11_15_Dallas Cowboys_San Francisco 49ers	2026	10	regular	San Francisco 49ers	Dallas Cowboys	2026-11-15 21:25:00+00	4.5	56.0	final	2026-11-17 12:14:40.603738+00
 6537de89-31da-4aa5-9ac8-dae3e926c110	2026-11-10 10:54:01.16913+00	2026_11_15_Cincinnati Bengals_Pittsburgh Steelers	2026	10	regular	Pittsburgh Steelers	Cincinnati Bengals	2026-11-16 01:20:00+00	-3.5	48.5	final	2026-11-17 12:14:40.603738+00
 2ccfa600-eefa-4700-b608-52e5b63fc540	2026-11-10 10:54:01.16913+00	2026_11_16_Baltimore Ravens_Los Angeles Chargers	2026	10	regular	Los Angeles Chargers	Baltimore Ravens	2026-11-17 01:15:00+00	-5.0	38.5	final	2026-11-17 12:14:40.603738+00
+87280b67-cf5e-4449-9205-5c9e9e7a3c4c	2026-11-24 11:26:19.080256+00	2026_11_25_Los Angeles Rams_Green Bay Packers	2026	12	regular	Green Bay Packers	Los Angeles Rams	2026-11-26 01:00:00+00	-2.5	44.0	scheduled	2026-11-24 11:26:19.080256+00
+6434f0ff-11fb-46fd-b431-6e641a3869fb	2026-11-24 11:26:19.080256+00	2026_11_26_Detroit Lions_Chicago Bears	2026	12	regular	Chicago Bears	Detroit Lions	2026-11-26 18:00:00+00	2.5	55.0	scheduled	2026-11-24 11:26:19.080256+00
+fd9c42fd-9b02-4bae-92da-b7e053adff42	2026-11-24 11:26:19.080256+00	2026_11_26_Dallas Cowboys_Philadelphia Eagles	2026	12	regular	Philadelphia Eagles	Dallas Cowboys	2026-11-26 21:30:00+00	-8.5	48.0	scheduled	2026-11-24 11:26:19.080256+00
+1be82aea-c4e1-4f89-a668-b9ee7cf713ba	2026-11-24 11:26:19.080256+00	2026_11_26_Buffalo Bills_Kansas City Chiefs	2026	12	regular	Kansas City Chiefs	Buffalo Bills	2026-11-27 01:20:00+00	-3.0	48.0	scheduled	2026-11-24 11:26:19.080256+00
+42269218-c03f-490b-aea8-c08dcb80be94	2026-11-24 11:26:19.080256+00	2026_11_27_Pittsburgh Steelers_Denver Broncos	2026	12	regular	Denver Broncos	Pittsburgh Steelers	2026-11-27 20:00:00+00	3.0	37.5	scheduled	2026-11-24 11:26:19.080256+00
+46fe2179-b8be-4151-9696-b1fa00fbae5e	2026-11-24 11:26:19.080256+00	2026_11_29_Indianapolis Colts_New York Giants	2026	12	regular	New York Giants	Indianapolis Colts	2026-11-29 18:00:00+00	6.5	41.0	scheduled	2026-11-24 11:26:19.080256+00
+d3676ac3-65d2-4ee2-98d5-2f1ce680ea5f	2026-11-24 11:26:19.080256+00	2026_11_29_Houston Texans_Baltimore Ravens	2026	12	regular	Baltimore Ravens	Houston Texans	2026-11-29 18:00:00+00	-6.5	46.5	scheduled	2026-11-24 11:26:19.080256+00
+75997195-5387-4923-bfdd-331ee120f151	2026-11-24 11:26:19.080256+00	2026_11_29_Minnesota Vikings_Atlanta Falcons	2026	12	regular	Atlanta Falcons	Minnesota Vikings	2026-11-29 18:00:00+00	-7.0	42.0	scheduled	2026-11-24 11:26:19.080256+00
+0d1b251f-81ea-4410-ae40-cf9961272230	2026-11-24 11:26:19.080256+00	2026_11_29_Cincinnati Bengals_New Orleans Saints	2026	12	regular	New Orleans Saints	Cincinnati Bengals	2026-11-29 18:00:00+00	-10.0	50.5	scheduled	2026-11-24 11:26:19.080256+00
+a8de6127-b9f8-4148-988c-679b2f60c3ed	2026-11-24 11:26:19.080256+00	2026_11_29_Miami Dolphins_New York Jets	2026	12	regular	New York Jets	Miami Dolphins	2026-11-29 18:00:00+00	3.5	41.0	scheduled	2026-11-24 11:26:19.080256+00
+1026264f-c486-4ff5-9697-c757383e7966	2026-11-24 11:26:19.080256+00	2026_11_29_Jacksonville Jaguars_Tennessee Titans	2026	12	regular	Tennessee Titans	Jacksonville Jaguars	2026-11-29 18:00:00+00	-14.5	47.5	scheduled	2026-11-24 11:26:19.080256+00
+0d927276-ba9d-450c-864e-7d9d37431e77	2026-11-24 11:26:19.080256+00	2026_11_29_Los Angeles Chargers_New England Patriots	2026	12	regular	New England Patriots	Los Angeles Chargers	2026-11-29 21:05:00+00	-1.0	35.5	scheduled	2026-11-24 11:26:19.080256+00
+f0c1baf1-48e7-4809-909e-94ae66e3ba69	2026-11-24 11:26:19.080256+00	2026_11_29_Arizona Cardinals_Washington Commanders	2026	12	regular	Washington Commanders	Arizona Cardinals	2026-11-29 21:25:00+00	7.0	41.0	scheduled	2026-11-24 11:26:19.080256+00
+300efed2-d796-4444-96ea-59ddd928f2c6	2026-11-24 11:26:19.080256+00	2026_11_29_San Francisco 49ers_Seattle Seahawks	2026	12	regular	Seattle Seahawks	San Francisco 49ers	2026-11-29 21:25:00+00	-3.0	46.5	scheduled	2026-11-24 11:26:19.080256+00
+87566842-c721-444e-b21d-2ac5b19d623c	2026-11-24 11:26:19.080256+00	2026_11_29_Cleveland Browns_Las Vegas Raiders	2026	12	regular	Las Vegas Raiders	Cleveland Browns	2026-11-30 01:20:00+00	-4.5	41.0	scheduled	2026-11-24 11:26:19.080256+00
+65a7bb05-ff7a-495d-96b7-cd9fac0fb39f	2026-11-24 11:26:19.080256+00	2026_11_30_Tampa Bay Buccaneers_Carolina Panthers	2026	12	regular	Carolina Panthers	Tampa Bay Buccaneers	2026-12-01 01:15:00+00	-3.0	43.5	scheduled	2026-11-24 11:26:19.080256+00
+8b42fe92-ed15-4138-bbf7-9c0f52300af3	2026-11-17 12:13:58.46183+00	2026_11_19_Houston Texans_Indianapolis Colts	2026	11	regular	Indianapolis Colts	Houston Texans	2026-11-20 01:15:00+00	-12.0	44.5	final	2026-11-24 11:29:39.088088+00
+839dd426-76ef-4c8b-bbc6-edc4871b00ca	2026-11-17 12:13:58.46183+00	2026_11_22_Carolina Panthers_Baltimore Ravens	2026	11	regular	Baltimore Ravens	Carolina Panthers	2026-11-22 18:00:00+00	-2.5	44.0	final	2026-11-24 11:29:39.088088+00
+93994b37-ab61-444c-89b0-60bfe37d3fb8	2026-11-17 12:13:58.46183+00	2026_11_22_Detroit Lions_Tampa Bay Buccaneers	2026	11	regular	Tampa Bay Buccaneers	Detroit Lions	2026-11-22 18:00:00+00	-6.0	46.5	final	2026-11-24 11:29:39.088088+00
+d0efd532-5b9e-405b-965a-ff460d7e0b70	2026-11-17 12:13:58.46183+00	2026_11_22_Chicago Bears_New Orleans Saints	2026	11	regular	New Orleans Saints	Chicago Bears	2026-11-22 18:00:00+00	-11.5	49.0	final	2026-11-24 11:29:39.088088+00
+90f8622d-1593-43bb-9ab5-4a2f42b02fba	2026-11-17 12:13:58.46183+00	2026_11_22_Kansas City Chiefs_Arizona Cardinals	2026	11	regular	Arizona Cardinals	Kansas City Chiefs	2026-11-22 18:00:00+00	-16.0	41.0	final	2026-11-24 11:29:39.088088+00
+461d3954-1285-458d-910c-205c76805a09	2026-11-17 12:13:58.46183+00	2026_11_22_Dallas Cowboys_Tennessee Titans	2026	11	regular	Tennessee Titans	Dallas Cowboys	2026-11-22 18:00:00+00	-8.0	55.0	final	2026-11-24 11:29:39.088088+00
+19931bd3-b8e8-4d47-b6da-c3d23c5e7c66	2026-11-17 12:13:58.46183+00	2026_11_22_Buffalo Bills_Miami Dolphins	2026	11	regular	Miami Dolphins	Buffalo Bills	2026-11-22 18:00:00+00	-16.5	45.5	final	2026-11-24 11:29:39.088088+00
+d7f91187-8997-495b-a8e0-9e345a7bf95f	2026-11-17 12:13:58.46183+00	2026_11_22_Philadelphia Eagles_Pittsburgh Steelers	2026	11	regular	Pittsburgh Steelers	Philadelphia Eagles	2026-11-22 18:00:00+00	4.5	38.5	final	2026-11-24 11:29:39.088088+00
+9bceecac-7d74-415f-9b18-0c1cf92891bf	2026-11-17 12:13:58.46183+00	2026_11_22_Los Angeles Chargers_New York Jets	2026	11	regular	New York Jets	Los Angeles Chargers	2026-11-22 21:05:00+00	-3.0	40.5	final	2026-11-24 11:29:39.088088+00
+d7934462-e80a-42da-9d32-5dea00682046	2026-11-17 12:13:58.46183+00	2026_11_22_New York Giants_Jacksonville Jaguars	2026	11	regular	Jacksonville Jaguars	New York Giants	2026-11-22 21:25:00+00	6.0	46.5	final	2026-11-24 11:29:39.088088+00
+dabd59ff-f6d4-46f4-865b-4b2cae0cbedc	2026-11-17 12:13:58.46183+00	2026_11_22_Denver Broncos_Las Vegas Raiders	2026	11	regular	Las Vegas Raiders	Denver Broncos	2026-11-22 21:25:00+00	-10.0	40.0	final	2026-11-24 11:29:39.088088+00
+4083480f-4413-498d-b211-9e1445aced65	2026-11-17 12:13:58.46183+00	2026_11_22_San Francisco 49ers_Minnesota Vikings	2026	11	regular	Minnesota Vikings	San Francisco 49ers	2026-11-23 01:20:00+00	-3.0	46.5	final	2026-11-24 11:29:39.088088+00
+c858d164-9b7e-44ed-bc0c-2ceb38d3b4ee	2026-11-17 12:13:58.46183+00	2026_11_23_Washington Commanders_Cincinnati Bengals	2026	11	regular	Cincinnati Bengals	Washington Commanders	2026-11-24 01:15:00+00	6.5	53.0	final	2026-11-24 11:29:39.088088+00
 \.
 
 
@@ -347,6 +363,19 @@ dbc164e1-bb26-48ec-b1eb-8501c29b8e3d	2026-11-17 12:14:40.234473+00	05feb0e6-41f4
 5eccd729-eb2d-4513-b4f9-64972bebb60a	2026-11-17 12:14:40.234473+00	f32dc158-f0e6-4da6-ab62-148ef1159105	31	12	final	2026-11-17 12:14:40.234473+00	\N
 ee48add0-7344-473f-ae08-c336ad987d99	2026-11-17 12:14:40.234473+00	7ab932e8-ebda-4d67-a335-0ed977bbea1e	10	35	final	2026-11-17 12:14:40.234473+00	\N
 df671311-6812-4520-a8f4-43e780529ee3	2026-11-17 12:14:40.234473+00	b32ac74d-53a5-4b9a-ac0e-f756536d9220	24	21	final	2026-11-17 12:14:40.234473+00	\N
+0591dba8-74a5-4f69-a3ba-e77eed17af48	2026-11-24 11:29:38.738083+00	c858d164-9b7e-44ed-bc0c-2ceb38d3b4ee	20	22	final	2026-11-24 11:29:38.738083+00	\N
+14dd3eed-9b82-4efa-aed9-84a6b26c3c45	2026-11-24 11:29:38.738083+00	4083480f-4413-498d-b211-9e1445aced65	10	35	final	2026-11-24 11:29:38.738083+00	\N
+22c559f1-19f4-43a4-a218-937aaabacfb4	2026-11-24 11:29:38.738083+00	dabd59ff-f6d4-46f4-865b-4b2cae0cbedc	24	38	final	2026-11-24 11:29:38.738083+00	\N
+f188ee6b-7a01-4a5b-91de-48b28a03328f	2026-11-24 11:29:38.738083+00	d7934462-e80a-42da-9d32-5dea00682046	18	23	final	2026-11-24 11:29:38.738083+00	\N
+22c6e008-e641-471d-b095-aaf409e4bfac	2026-11-24 11:29:38.738083+00	9bceecac-7d74-415f-9b18-0c1cf92891bf	27	24	final	2026-11-24 11:29:38.738083+00	\N
+ec573b54-07e0-42fa-a676-26a49cc14187	2026-11-24 11:29:38.738083+00	d7f91187-8997-495b-a8e0-9e345a7bf95f	16	19	final	2026-11-24 11:29:38.738083+00	\N
+82b7ee30-068b-4b83-bdce-323e978a8d56	2026-11-24 11:29:38.738083+00	19931bd3-b8e8-4d47-b6da-c3d23c5e7c66	9	26	final	2026-11-24 11:29:38.738083+00	\N
+7eb825e9-335d-49a2-95d5-694dfa69b3e4	2026-11-24 11:29:38.738083+00	461d3954-1285-458d-910c-205c76805a09	30	51	final	2026-11-24 11:29:38.738083+00	\N
+e7a93b77-4926-49e9-801a-d23f56a498b4	2026-11-24 11:29:38.738083+00	90f8622d-1593-43bb-9ab5-4a2f42b02fba	7	34	final	2026-11-24 11:29:38.738083+00	\N
+cf2c8118-e31a-4b8d-8f3a-c6c7507c2eca	2026-11-24 11:29:38.738083+00	d0efd532-5b9e-405b-965a-ff460d7e0b70	13	21	final	2026-11-24 11:29:38.738083+00	\N
+3c3750e4-0a17-44ac-a218-3a0383965e14	2026-11-24 11:29:38.738083+00	93994b37-ab61-444c-89b0-60bfe37d3fb8	21	31	final	2026-11-24 11:29:38.738083+00	\N
+7ede552f-f4c1-4226-b5e8-9e68f8678def	2026-11-24 11:29:38.738083+00	839dd426-76ef-4c8b-bbc6-edc4871b00ca	33	35	final	2026-11-24 11:29:38.738083+00	\N
+8967375e-06fc-45e7-a11e-dbfef5b1c841	2026-11-24 11:29:38.738083+00	8b42fe92-ed15-4138-bbf7-9c0f52300af3	3	26	final	2026-11-24 11:29:38.738083+00	\N
 \.
 
 
@@ -354,6 +383,6 @@ df671311-6812-4520-a8f4-43e780529ee3	2026-11-17 12:14:40.234473+00	b32ac74d-53a5
 -- PostgreSQL database dump complete
 --
 
--- \unrestrict 8B4seQ82ultmUlw4NFEMRiizrSTMLedc3KJWDqTUHZgCAqOZTGWzTKeTbuOFhHE
+-- \unrestrict 2IXCpMxm3jpYeWWhpxUFPnksN6lDUomKgeYmeCjLytJGiaRH3OZpPYah5kWQxty
 
 RESET ALL;
