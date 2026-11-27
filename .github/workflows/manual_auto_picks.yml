@@ -1,0 +1,54 @@
+name: Manual AutoPicks NFL
+
+on:
+  workflow_dispatch:
+    inputs:
+      season:
+        description: NFL season (e.g. 2026)
+        required: true
+        type: string
+      week:
+        description: NFL week number (e.g. 12)
+        required: true
+        type: string
+      mode:
+        description: Preview validates only; submit inserts missing pre-kickoff picks
+        required: true
+        type: choice
+        default: preview
+        options:
+          - preview
+          - submit
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manual-autopicks-nfl
+  cancel-in-progress: false
+
+jobs:
+  auto-picks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Require main branch
+        if: github.ref != 'refs/heads/main'
+        run: exit 1
+      - name: Checkout NFL Picks repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate and submit AutoPicks
+        env:
+          SEASON: ${{ inputs.season }}
+          WEEK: ${{ inputs.week }}
+          MODE: ${{ inputs.mode }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python scripts/sync_auto_picks.py --season "$SEASON" --week "$WEEK" --mode "$MODE"
